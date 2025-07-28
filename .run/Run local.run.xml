@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
     <configuration default="false" name="Run local" type="QuarkusRunConfigurationType" factoryName="Quarkus">
-        <module name="homecalendar.main"/>
+        <module name="home-calendar-api.main"/>
         <QsGradleRunConfiguration>
             <ExternalSystemSettings>
                 <option name="executionName"/>

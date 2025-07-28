@@ -1,0 +1,9 @@
+quarkus:
+  http:
+    port: 8085
+  log:
+    console:
+      level: DEBUG
+    category:
+      "com.meln":
+        level: DEBUG
