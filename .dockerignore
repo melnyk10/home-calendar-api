@@ -1,5 +1,14 @@
-*
-!build/*-runner
-!build/*-runner.jar
-!build/lib/*
-!build/quarkus-app/*
+.git
+.gradle
+.idea
+*.iml
+*.log
+Dockerfile*
+README.md
+
+# Ignore build directory
+build/
+
+# But include only the output needed to run the app
+!build/quarkus-app/
+!build/quarkus-app/**
