@@ -1,6 +1,12 @@
 quarkus:
   application:
     name: home-calendar-api
+  mongodb:
+    connection-string: ${MONGODB_CONNECTION_STRING}
+    database: ${MONGODB_DB_NAME}
+  mongock:
+    migrate-at-start: true
+    transaction-enabled: false #todo: check me!
   log:
     level: INFO
     min-level: ALL
