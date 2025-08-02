@@ -1,0 +1,32 @@
+version: '3.8'
+
+networks:
+  home-calendar-network:
+
+volumes:
+  mongo-data:
+
+services:
+  db:
+    image: mongo:8.0.12
+    container_name: home-calendar-db
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - mongo-data:/data/db
+
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: home-calendar-api
+    environment:
+      MONGODB_CONNECTION_STRING: mongodb://admin:admin@home-calendar-api:27017
+    ports:
+      - "8085:8080"
+    networks:
+      - home-calendar-network
