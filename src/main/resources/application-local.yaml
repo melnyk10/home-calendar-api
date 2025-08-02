@@ -1,6 +1,9 @@
 quarkus:
   http:
     port: 8085
+  mongodb:
+    connection-string: ${MONGODB_CONNECTION_STRING:mongodb://admin:admin@localhost:27017}
+    database: ${MONGODB_DB_NAME:homecalendardb}
   log:
     console:
       level: DEBUG
