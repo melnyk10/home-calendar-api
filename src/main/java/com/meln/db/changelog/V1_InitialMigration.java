@@ -11,22 +11,21 @@ public class V1_InitialMigration {
 
     @Execution
     public void init(MongoDatabase db) {
-        Document indexKeys = new Document()
-                .append("email", 1)
-                .append("firstName", 1)
-                .append("lastName", 1);
-
+        Document indexKeys = new Document().append("email", 1);
         db.getCollection("users").createIndex(indexKeys);
+
+        Document user = new Document()
+                .append("email", "o.melnyk10@gmail.com")
+                .append("firstName", "Sam")
+                .append("lastName", "Porter-Bridge");
+        db.getCollection("users").insertOne(user);
     }
 
     @RollbackExecution
-    public void rollbackInit(MongoDatabase db) {
-        Document indexKeys = new Document()
-                .append("email", 1)
-                .append("firstName", 1)
-                .append("lastName", 1);
-
+    public void rollback(MongoDatabase db) {
+        Document indexKeys = new Document().append("email", 1);
         db.getCollection("users").dropIndex(indexKeys);
+        db.getCollection("users").deleteOne(new Document("email", "o.melnyk10@gmail.com"));
     }
 
 }

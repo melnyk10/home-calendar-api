@@ -2,3 +2,7 @@
 
 ### Search by title
 GET {{baseUrl}}/hello
+
+### List users
+GET {{baseUrl}}/api/v1/users
+Content-Type: application/json
