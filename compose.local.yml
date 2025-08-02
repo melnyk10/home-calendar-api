@@ -26,6 +26,7 @@ services:
     container_name: home-calendar-api
     environment:
       MONGODB_CONNECTION_STRING: mongodb://admin:admin@home-calendar-api:27017
+      MONGODB_DB_NAME: homecalendardb
     ports:
       - "8085:8080"
     networks:
