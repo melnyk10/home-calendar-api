@@ -2,8 +2,11 @@ quarkus:
   http:
     port: 8085
   mongodb:
-    connection-string: ${MONGODB_CONNECTION_STRING:mongodb://admin:admin@localhost:27017}
+    connection-string: ${MONGODB_CONNECTION_STRING:mongodb://homecalendar_user:admin@localhost:27017/homecalendardb?retryWrites=false}
     database: ${MONGODB_DB_NAME:homecalendardb}
+  mongock:
+    migrate-at-start: true
+    transaction-enabled: false
   log:
     console:
       level: DEBUG

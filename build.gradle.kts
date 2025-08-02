@@ -20,6 +20,8 @@ val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
+val mongockPlatformVersion: String by project
+
 val lombokVersion = "1.18.38"
 
 dependencies {
@@ -27,13 +29,18 @@ dependencies {
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-rest")
     implementation("io.quarkus:quarkus-config-yaml")
+
+    // DB
+    implementation(enforcedPlatform("io.mongock:mongock-bom:$mongockPlatformVersion"))
+    implementation("io.quarkiverse.mongock:quarkus-mongock:0.6.0")
+    implementation("io.mongock:mongodb-sync-v4-driver")
     implementation("io.quarkus:quarkus-mongodb-panache")
 
+    // Lombok
     compileOnly("org.projectlombok:lombok:$lombokVersion")
     annotationProcessor("org.projectlombok:lombok:$lombokVersion")
     testCompileOnly("org.projectlombok:lombok:$lombokVersion")
     testAnnotationProcessor("org.projectlombok:lombok:$lombokVersion")
-
 
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
