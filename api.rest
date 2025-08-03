@@ -1,7 +1,9 @@
 @baseUrl = http://localhost:8085
 
-### Search by title
-GET {{baseUrl}}/hello
+### Return authenticated user
+GET {{baseUrl}}/api/v1/users/me
+Content-Type: application/json
+
 
 ### List users
 GET {{baseUrl}}/api/v1/users
