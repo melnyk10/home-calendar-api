@@ -8,18 +8,29 @@ quarkus:
     migrate-at-start: true
     transaction-enabled: false #todo: check me!
   oidc:
+    application-type: service
     provider: google
-    application-type: WEB_APP
     auth-server-url: https://accounts.google.com
+    auth-type: bearer
     client-id: ${GOOGLE_CLIENT_ID}
     credentials:
       secret: ${GOOGLE_CLIENT_SECRET}
-    authentication:
-      redirect-path: http://localhost:3000/oauth2/redirect
-      scopes:
-        - openid
-        - email
-        - profile
+    token:
+      issuer: https://accounts.google.com
+      principal-claim: email
+  http:
+    auth:
+      permission:
+        public:
+          paths:
+            - /q/*
+            - /health/*
+            - /openapi
+            - /swagger-ui/*
+          policy: permit
+        authenticated:
+          paths: /*
+          policy: authenticated
   log:
     level: INFO
     min-level: ALL

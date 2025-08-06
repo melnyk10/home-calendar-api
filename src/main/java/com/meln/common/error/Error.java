@@ -10,4 +10,8 @@ import lombok.Getter;
 public class Error {
     private String code;
     private String message;
+
+    public static Error from(String code, String message) {
+        return Error.builder().code(code).message(message).build();
+    }
 }

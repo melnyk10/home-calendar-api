@@ -7,7 +7,7 @@ import io.mongock.api.annotations.RollbackExecution;
 import org.bson.Document;
 
 @ChangeUnit(id = "init", order = "001", author = "system", systemVersion = "1")
-public class V1_InitialMigration {
+public class V001_InitialMigration {
 
     @Execution
     public void init(MongoDatabase db) {
