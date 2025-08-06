@@ -7,5 +7,6 @@ public interface EndPoints {
 
     interface User {
         String USERS = "/users";
+        String ME = USERS + "/me";
     }
 }

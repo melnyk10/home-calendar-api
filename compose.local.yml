@@ -42,5 +42,7 @@ services:
       MONGODB_DB_NAME: homecalendardb
     ports:
       - "8085:8080"
+    depends_on:
+      - db
     networks:
       - home-calendar-network

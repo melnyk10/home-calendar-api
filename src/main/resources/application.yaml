@@ -7,6 +7,30 @@ quarkus:
   mongock:
     migrate-at-start: true
     transaction-enabled: false #todo: check me!
+  oidc:
+    application-type: service
+    provider: google
+    auth-server-url: https://accounts.google.com
+    auth-type: bearer
+    client-id: ${GOOGLE_CLIENT_ID}
+    credentials:
+      secret: ${GOOGLE_CLIENT_SECRET}
+    token:
+      issuer: https://accounts.google.com
+      principal-claim: email
+  http:
+    auth:
+      permission:
+        public:
+          paths:
+            - /q/*
+            - /health/*
+            - /openapi
+            - /swagger-ui/*
+          policy: permit
+        authenticated:
+          paths: /*
+          policy: authenticated
   log:
     level: INFO
     min-level: ALL

@@ -1,8 +1,7 @@
 @baseUrl = http://localhost:8085
+@bearerToken =
 
-### Search by title
-GET {{baseUrl}}/hello
-
-### List users
-GET {{baseUrl}}/api/v1/users
+### Return authenticated user
+GET {{baseUrl}}/api/v1/users/me
+Authorization: Bearer {{bearerToken}}
 Content-Type: application/json
