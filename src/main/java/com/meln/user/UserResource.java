@@ -3,7 +3,6 @@ package com.meln.user;
 import com.meln.common.EndPoints;
 import com.meln.common.error.Error;
 import com.meln.common.error.ErrorMessage;
-import io.quarkus.security.Authenticated;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -15,8 +14,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
 @Path(EndPoints.API_V1)
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -25,11 +22,10 @@ public class UserResource {
     private final UserService userService;
 
     @GET
-    @Authenticated
     @Path(EndPoints.User.ME)
     public Response me(@Context SecurityIdentity identity) {
         String email = identity.getPrincipal().getName();
-        if (email == null ||  email.isBlank()) {
+        if (email == null || email.isBlank()) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
@@ -47,8 +43,4 @@ public class UserResource {
         return Response.ok(UserMe.from(user)).build();
     }
 
-    @GET
-    public List<User> getAllUsers() {
-        return userService.getAll();
-    }
 }
