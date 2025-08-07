@@ -1,8 +1,6 @@
 package com.meln.user;
 
 import com.meln.common.EndPoints;
-import com.meln.common.error.Error;
-import com.meln.common.error.ErrorMessage;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -25,22 +23,7 @@ public class UserResource {
     @Path(EndPoints.User.ME)
     public Response me(@Context SecurityIdentity identity) {
         String email = identity.getPrincipal().getName();
-        if (email == null || email.isBlank()) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
-
-        User user = userService.getByEmail(email);
-        if (user == null) {
-            return Response
-                    .status(Response.Status.NOT_FOUND)
-                    .entity(Error.from(
-                            ErrorMessage.Auth.Code.USER_NOT_FOUND,
-                            ErrorMessage.Auth.Message.USER_NOT_FOUND(email))
-                    )
-                    .build();
-        }
-
-        return Response.ok(UserMe.from(user)).build();
+        return Response.ok(userService.me(email)).build();
     }
 
 }

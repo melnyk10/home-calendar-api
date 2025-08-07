@@ -4,6 +4,7 @@ public interface ErrorMessage {
 
     interface Auth {
         interface Code {
+            String USERNAME_MISSING = "USERNAME_MISSING";
             String USER_NOT_FOUND = "USER_NOT_FOUND";
         }
 
