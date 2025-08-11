@@ -24,4 +24,8 @@ COPY --from=build $APP_HOME/build/quarkus-app/ $APP_HOME
 
 EXPOSE 8080
 
+HEALTHCHECK --interval=30s --timeout=15s --retries=3 \
+  CMD curl --fail --silent http://localhost:8080/q/health/ready \
+   && curl --fail --silent http://localhost:8080/q/health/live || exit 1
+
 CMD ["java", "-jar", "quarkus-run.jar"]

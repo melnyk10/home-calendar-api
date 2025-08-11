@@ -27,7 +27,6 @@ val lombokVersion = "1.18.38"
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-arc")
-    implementation("io.quarkus:quarkus-rest")
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-rest-jackson")
     implementation("io.quarkus:quarkus-oidc")

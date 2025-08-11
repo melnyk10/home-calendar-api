@@ -27,7 +27,7 @@ public class UserService {
         return UserMe.from(user);
     }
 
-    protected User getByEmail(String email) {
+    private User getByEmail(String email) {
         return userRepo.findByEmail(email);
     }
 }
