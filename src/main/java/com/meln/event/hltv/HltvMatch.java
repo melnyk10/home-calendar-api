@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode(of = "matchId", callSuper = false)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,8 +38,8 @@ public class HltvMatch extends PanacheMongoEntity {
     private String matchUrl;
 
     @NotNull
-    @BsonProperty("date_time")
-    private Instant startsDatetime;
+    @BsonProperty("starts_at")
+    private Instant startsAt;
 
     @BsonProperty("score1")
     private Integer score1;
