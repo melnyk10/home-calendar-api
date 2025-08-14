@@ -1,6 +1,6 @@
 package com.meln.user;
 
-import com.meln.common.EndPoints;
+import com.meln.common.Endpoints;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -12,7 +12,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
-@Path(EndPoints.API_V1)
+@Path(Endpoints.API_V1)
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -20,7 +20,7 @@ public class UserResource {
     private final UserService userService;
 
     @GET
-    @Path(EndPoints.User.ME)
+    @Path(Endpoints.User.ME)
     public Response me(@Context SecurityIdentity identity) {
         String email = identity.getPrincipal().getName();
         return Response.ok(userService.me(email)).build();

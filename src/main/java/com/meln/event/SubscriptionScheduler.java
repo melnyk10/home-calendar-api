@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SubscriptionScheduler {
     private final ProviderRegistry registry;
-    private final EventUpserterHelper eventUpserterHelper;
+    private final EventService eventService;
     private final SubscriptionRepo subscriptionRepo;
 
     @Scheduled(every = "15m")
@@ -23,7 +23,7 @@ public class SubscriptionScheduler {
             try {
                 EventProvider eventProvider = registry.get(sub.getProvider());
                 List<Event> events = eventProvider.fetch(sub);
-                eventUpserterHelper.upsertAll(events);
+                eventService.saveOrUpdate(events);
             } catch (Exception e) {
                 log.error("Sync failed for sub {} ({}})", sub.id, sub.getProvider(), e);
             }
