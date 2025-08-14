@@ -31,7 +31,7 @@ public class HltvEventProvider implements EventProvider {
                     .map(this::from)
                     .toList();
         }
-        throw new IllegalArgumentException("HLTV subscription has non-HLTV criteria");
+        throw new IllegalArgumentException("HLTV subscription has non-HLTV criteria"); //todo: add appropriate exception
     }
 
     private Event from(HltvMatch hltvMatch) {

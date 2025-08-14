@@ -1,19 +1,21 @@
 package com.meln.event.hltv;
 
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
-import com.mongodb.client.model.WriteModel;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import org.bson.conversions.Bson;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -21,24 +23,34 @@ public class HltvTeamRepo implements PanacheMongoRepository<HltvTeam> {
     private final MongoClient mongoClient;
 
     public void bulkUpsert(List<HltvTeam> teams) {
-        List<WriteModel<HltvTeam>> hltvWrites = teams.stream()
-                .map(team -> new UpdateOneModel<HltvTeam>(
-                        Filters.eq("team_id", team.getTeamId()),
-                        Updates.combine(
-                                Updates.set("slug", team.getSlug()),
-                                Updates.set("team_name", team.getTeamName()),
-                                Updates.set("logo_url", team.getLogoUrl()),
-                                Updates.set("rank", team.getRank())
-                        ),
-                        new UpdateOptions().upsert(true)
-                ))
-                .collect(Collectors.<WriteModel<HltvTeam>>toList());
+        List<UpdateOneModel<HltvTeam>> writes = teams.stream()
+                .filter(t -> t.getTeamId() != null) // idempotency key required
+                .map(t -> {
+                    Instant now = Instant.now();
 
-        getCollection().bulkWrite(hltvWrites);
-    }
+                    Bson filter = Filters.eq("team_id", t.getTeamId());
 
-    //todo: investigate why MongoCollection<Hltv> not working
-    private MongoCollection<HltvTeam> getCollection() {
-        return mongoClient.getDatabase("home-calendar-db").getCollection("hltv_team", HltvTeam.class);
+                    List<Bson> sets = new ArrayList<>();
+                    Optional.ofNullable(t.getSlug()).ifPresent(v -> sets.add(Updates.set("slug", v)));
+                    Optional.ofNullable(t.getTeamName()).ifPresent(v -> sets.add(Updates.set("team_name", v)));
+                    Optional.ofNullable(t.getLogoUrl()).ifPresent(v -> sets.add(Updates.set("logo_url", v)));
+                    Optional.ofNullable(t.getRank()).ifPresent(v -> sets.add(Updates.set("rank", v)));
+                    sets.add(Updates.set("updated_at", now));
+
+                    Bson setStage = Updates.combine(sets.toArray(new Bson[0]));
+                    Bson setOnInsertStage = Updates.setOnInsert("created_at", now);
+                    Bson update = Updates.combine(setStage, setOnInsertStage);
+
+                    return new UpdateOneModel<HltvTeam>(
+                            filter,
+                            update,
+                            new UpdateOptions().upsert(true)
+                    );
+                })
+                .toList();
+
+        if (!writes.isEmpty()) {
+            mongoCollection().bulkWrite(writes, new BulkWriteOptions().ordered(false));
+        }
     }
 }

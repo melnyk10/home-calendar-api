@@ -12,10 +12,6 @@ public class EventService {
     private final EventRepo eventRepo;
 
     public void saveOrUpdate(Collection<Event> events) {
-        eventRepo.upsertAll(events);
-    }
-
-    public void saveOrUpdate(Event event) {
-        eventRepo.upsert(event);
+        eventRepo.bulkUpsert(events);
     }
 }

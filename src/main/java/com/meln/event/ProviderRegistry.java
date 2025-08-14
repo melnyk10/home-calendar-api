@@ -19,6 +19,6 @@ public class ProviderRegistry {
 
     public EventProvider get(Provider provider) {
         return Optional.ofNullable(byProvider.get(provider))
-                .orElseThrow(() -> new IllegalArgumentException("No provider for " + provider));
+                .orElseThrow(() -> new IllegalArgumentException("No provider for " + provider)); //todo: add appropriate exception
     }
 }

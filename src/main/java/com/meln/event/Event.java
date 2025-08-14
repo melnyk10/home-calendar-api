@@ -65,6 +65,12 @@ public class Event extends PanacheMongoEntity {
     @BsonProperty("updated_at")
     private Instant updatedAt;
 
+    @Override
+    public void persist() {
+        prePersist();
+        super.persist();
+    }
+
     public void prePersist() {
         Instant now = Instant.now();
         if (createdAt == null) {
@@ -73,23 +79,17 @@ public class Event extends PanacheMongoEntity {
         updatedAt = now;
     }
 
-    public void preUpdate() {
-        updatedAt = Instant.now();
-    }
-
-    @Override
-    public void persist() {
-        prePersist();
-        super.persist();
-    }
-
     @Override
     public void update() {
         preUpdate();
         super.update();
     }
 
-    public String naturalKey() {
+    public void preUpdate() {
+        updatedAt = Instant.now();
+    }
+
+    public String composeKey() {
         return provider + ":" + externalId;
     }
 }

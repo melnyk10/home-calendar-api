@@ -32,7 +32,7 @@ public class HltvTeamService {
             hltvTeamRepo.bulkUpsert(hltvTeams);
             return hltvTeams;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); //todo: add appropriate exception
         }
     }
 }

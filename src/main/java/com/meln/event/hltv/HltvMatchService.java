@@ -42,7 +42,7 @@ public class HltvMatchService {
             hltvMatchRepo.bulkUpsert(hltvMatches);
             return hltvMatches;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); //todo: add appropriate exception
         }
     }
 }

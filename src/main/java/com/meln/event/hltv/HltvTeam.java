@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import org.bson.types.ObjectId;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode(of = {"teamId"}, callSuper = false)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
