@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
@@ -26,9 +25,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @MongoEntity(collection = "hltv_match")
 public class HltvMatch extends PanacheMongoEntity {
-    @BsonId
-    private ObjectId id;
-
     @NotBlank
     @BsonProperty("match_id")
     private String matchId;

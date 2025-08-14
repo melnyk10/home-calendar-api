@@ -28,8 +28,8 @@ public class HltvMatchService {
 
         List<HltvMatch> hltvMatches = hltvMatchResponses.stream()
                 .map(match -> {
-                    HltvTeam team1 = teamById.get(match.getTeam1());
-                    HltvTeam team2 = teamById.getOrDefault(match.getTeam2(), null);
+                    HltvTeam team1 = teamById.get(match.getTeam1Id());
+                    HltvTeam team2 = teamById.getOrDefault(match.getTeam2Id(), null);
                     return HltvMatchConverter.from(match, team1, team2);
                 })
                 .toList();

@@ -22,5 +22,4 @@ public class Subscription extends PanacheMongoEntity {
 
     @BsonProperty("criteria")
     public Criteria criteria;
-
 }

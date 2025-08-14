@@ -26,9 +26,6 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor
 @MongoEntity(collection = "hltv_team")
 public class HltvTeam extends PanacheMongoEntity {
-    @BsonId
-    private ObjectId id;
-
     @BsonProperty("logo_url")
     @Pattern(regexp = "^https?://.+", message = "logoUrl must be http(s) URL")
     private String logoUrl;
@@ -49,4 +46,8 @@ public class HltvTeam extends PanacheMongoEntity {
 
     @BsonProperty("rank")
     private Integer rank;
+
+    public ObjectId getId() {
+        return id;
+    }
 }

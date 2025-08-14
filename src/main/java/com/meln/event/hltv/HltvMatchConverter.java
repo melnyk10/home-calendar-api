@@ -14,7 +14,7 @@ public class HltvMatchConverter {
         match.setScore1(response.getScore1());
         match.setScore2(response.getScore2());
         match.setTeam1Id(team1.getId());
-        match.setTeam2Id(team2.getId());
+        match.setTeam2Id(team2 != null ? team2.getId() : null);
         return match;
     }
 

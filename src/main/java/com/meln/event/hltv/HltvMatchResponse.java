@@ -19,8 +19,8 @@ public class HltvMatchResponse {
     private String matchId;
     private String matchUrl;
     private Instant dateTime;
-    private String team1;
-    private String team2;
+    private String team1Id;
+    private String team2Id;
     private Integer score1;
     private Integer score2;
     private Integer bestOf;
