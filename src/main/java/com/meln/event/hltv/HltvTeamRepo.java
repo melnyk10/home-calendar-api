@@ -1,6 +1,5 @@
 package com.meln.event.hltv;
 
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOneModel;
@@ -20,8 +19,6 @@ import java.util.Optional;
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class HltvTeamRepo implements PanacheMongoRepository<HltvTeam> {
-    private final MongoClient mongoClient;
-
     public void bulkUpsert(List<HltvTeam> teams) {
         List<UpdateOneModel<HltvTeam>> writes = teams.stream()
                 .filter(t -> t.getTeamId() != null) // idempotency key required
