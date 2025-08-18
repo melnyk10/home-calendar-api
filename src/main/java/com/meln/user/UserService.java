@@ -27,7 +27,13 @@ public class UserService {
         return UserMe.from(user);
     }
 
-    private User getByEmail(String email) {
-        return userRepo.findByEmail(email);
+    public User getByEmail(String email) {
+        User user = userRepo.findByEmail(email);
+        if (user == null) {
+            throw new CustomException(Response.Status.NOT_FOUND,
+                    ErrorMessage.User.Code.USER_NOT_FOUND,
+                    ErrorMessage.User.Message.USER_NOT_FOUND(email));
+        }
+        return user;
     }
 }

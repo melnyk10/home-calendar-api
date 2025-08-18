@@ -23,4 +23,15 @@ public interface ErrorMessage {
         }
     }
 
+    interface User {
+        interface Code {
+            String USER_NOT_FOUND = "USER_NOT_FOUND";
+        }
+        interface Message {
+            static String USER_NOT_FOUND(String email) {
+                return "Cannot find user with email: %s".formatted(email);
+            }
+        }
+    }
+
 }

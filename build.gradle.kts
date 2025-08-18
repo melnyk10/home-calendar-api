@@ -30,6 +30,8 @@ dependencies {
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-rest-jackson")
     implementation("io.quarkus:quarkus-oidc")
+    implementation("io.quarkus:quarkus-scheduler")
+    implementation("io.quarkus:quarkus-hibernate-validator")
 
     // DB
     implementation(enforcedPlatform("io.mongock:mongock-bom:$mongockPlatformVersion"))

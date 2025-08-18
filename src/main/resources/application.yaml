@@ -31,6 +31,8 @@ quarkus:
         authenticated:
           paths: /*
           policy: authenticated
+  scheduler:
+    enabled: true
   log:
     level: INFO
     min-level: ALL

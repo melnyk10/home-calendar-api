@@ -1,4 +1,4 @@
-package com.meln.user;
+package com.meln.event;
 
 import com.meln.common.Endpoints;
 import io.quarkus.security.identity.SecurityIdentity;
@@ -9,21 +9,22 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Path(Endpoints.API_V1)
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiredArgsConstructor(onConstructor_ = @Inject)
-public class UserResource {
-    private final UserService userService;
+public class SubscriptionResource {
+    private final SubscriptionService subscriptionService;
 
     @GET
-    @Path(Endpoints.User.ME)
-    public Response me(@Context SecurityIdentity identity) {
+    @Path(Endpoints.Subscription.SUBSCRIPTIONS)
+    public List<Subscription> userSubscriptions(@Context SecurityIdentity identity) {
         String email = identity.getPrincipal().getName();
-        return Response.ok(userService.me(email)).build();
+        return subscriptionService.getAllUserSubscriptions(email);
     }
 
 }
