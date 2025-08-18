@@ -24,10 +24,10 @@ public class HltvTeamService {
                 .map(HltvTeamConverter::from)
                 .toList();
 
-        return saveAll(hltvTeams);
+        return saveOrUpdate(hltvTeams);
     }
 
-    private List<HltvTeam> saveAll(List<HltvTeam> hltvTeams) {
+    private List<HltvTeam> saveOrUpdate(List<HltvTeam> hltvTeams) {
         try {
             hltvTeamRepo.bulkUpsert(hltvTeams);
             List<String> teamSourceIds = hltvTeams.stream().map(HltvTeam::getSourceId).toList();

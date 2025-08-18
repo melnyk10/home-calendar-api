@@ -38,10 +38,10 @@ public class HltvMatchService {
                 })
                 .toList();
 
-        saveAll(hltvMatches);
+        saveOrUpdate(hltvMatches);
     }
 
-    private void saveAll(List<HltvMatch> hltvMatches) {
+    private void saveOrUpdate(List<HltvMatch> hltvMatches) {
         try {
             hltvMatchRepo.bulkUpsert(hltvMatches);
         } catch (Exception e) {

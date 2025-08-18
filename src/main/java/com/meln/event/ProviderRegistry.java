@@ -10,15 +10,15 @@ import java.util.Optional;
 
 @ApplicationScoped
 public class ProviderRegistry {
-    private final Map<Provider, EventProvider> byProvider = new EnumMap<>(Provider.class);
+    private final Map<Provider, EventProvider> eventProviderByType = new EnumMap<>(Provider.class);
 
     @Inject
     public ProviderRegistry(Instance<EventProvider> providers) {
-        providers.forEach(p -> byProvider.put(p.provider(), p));
+        providers.forEach(p -> eventProviderByType.put(p.provider(), p));
     }
 
     public EventProvider get(Provider provider) {
-        return Optional.ofNullable(byProvider.get(provider))
+        return Optional.ofNullable(eventProviderByType.get(provider))
                 .orElseThrow(() -> new IllegalArgumentException("No provider for " + provider)); //todo: add appropriate exception
     }
 }
