@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -17,10 +18,13 @@ public class HltvMatchService {
     private final HltvMatchClient hltvMatchClient;
 
     protected List<HltvMatch> getAllByTeamId(Collection<ObjectId> teamIds) {
+        if (teamIds == null || teamIds.isEmpty()) {
+            return new ArrayList<>();
+        }
         return hltvMatchRepo.findByTeam1IdIn(teamIds);
     }
 
-    protected List<HltvMatch> syncMatches(Collection<HltvTeam> teams) {
+    protected void syncMatches(Collection<HltvTeam> teams) {
         List<HltvMatchResponse> hltvMatchResponses = hltvMatchClient.syncMatches(teams);
 
         Map<String, HltvTeam> teamById = teams.stream()
@@ -34,13 +38,12 @@ public class HltvMatchService {
                 })
                 .toList();
 
-        return saveAll(hltvMatches);
+        saveAll(hltvMatches);
     }
 
-    private List<HltvMatch> saveAll(List<HltvMatch> hltvMatches) {
+    private void saveAll(List<HltvMatch> hltvMatches) {
         try {
             hltvMatchRepo.bulkUpsert(hltvMatches);
-            return hltvMatches;
         } catch (Exception e) {
             throw new RuntimeException(e); //todo: add appropriate exception
         }

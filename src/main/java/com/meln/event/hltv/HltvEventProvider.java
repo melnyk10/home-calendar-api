@@ -8,7 +8,6 @@ import com.meln.event.Subscription;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -25,8 +24,8 @@ public class HltvEventProvider implements EventProvider {
 
     @Override
     public List<Event> fetch(Subscription sub) {
-        if (sub.getCriteria() instanceof CriteriaHltv(List<ObjectId> teamIds)) {
-            List<HltvMatch> matches = hltvMatchService.getAllByTeamId(teamIds);
+        if (sub.getCriteria() instanceof CriteriaHltv criteria) {
+            List<HltvMatch> matches = hltvMatchService.getAllByTeamId(criteria.getTeamIds());
             return matches.stream()
                     .map(this::from)
                     .toList();

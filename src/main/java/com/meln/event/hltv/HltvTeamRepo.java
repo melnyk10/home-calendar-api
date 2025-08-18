@@ -13,12 +13,17 @@ import org.bson.conversions.Bson;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class HltvTeamRepo implements PanacheMongoRepository<HltvTeam> {
+    public List<HltvTeam> findAllBySourceId(Collection<String> sourceIds) {
+        return find("team_id in ?1", sourceIds).list();
+    }
+
     public void bulkUpsert(List<HltvTeam> teams) {
         List<UpdateOneModel<HltvTeam>> writes = teams.stream()
                 .filter(t -> t.getTeamId() != null) // idempotency key required
