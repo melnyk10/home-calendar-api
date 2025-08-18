@@ -12,32 +12,25 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.bson.types.ObjectId;
 
 import java.time.Instant;
 
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = {"provider", "externalId"}, callSuper = false)
+@EqualsAndHashCode(of = {"provider", "sourceId"}, callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @MongoEntity(collection = "events")
 public class Event extends PanacheMongoEntity {
     @NotBlank
-    @BsonProperty("external_id")
-    private String externalId;
+    @BsonProperty("source_id")
+    private String sourceId;
 
     @NotNull
     @BsonProperty("provider")
     private Provider provider;
-
-    @BsonProperty("event_source_id")
-    private ObjectId eventSourceId;
-
-    @BsonProperty("subscription_id")
-    private ObjectId subscriptionId;
 
     @BsonProperty("title")
     @NotBlank
@@ -46,8 +39,11 @@ public class Event extends PanacheMongoEntity {
     @BsonProperty("url")
     private String url;
 
-    @BsonProperty("details")
-    private String details;
+    @BsonProperty("notes")
+    private String notes;
+
+    @BsonProperty("all_day")
+    private boolean allDay;
 
     @NotNull
     @BsonProperty("start_at")
@@ -55,9 +51,6 @@ public class Event extends PanacheMongoEntity {
 
     @BsonProperty("end_at")
     private Instant endAt;
-
-    @BsonProperty("all_day")
-    private boolean allDay;
 
     @BsonProperty("created_at")
     private Instant createdAt;
@@ -89,7 +82,4 @@ public class Event extends PanacheMongoEntity {
         updatedAt = Instant.now();
     }
 
-    public String composeKey() {
-        return provider + ":" + externalId;
-    }
 }

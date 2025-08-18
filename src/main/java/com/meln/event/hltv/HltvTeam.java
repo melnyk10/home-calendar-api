@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
@@ -20,7 +19,7 @@ import org.bson.types.ObjectId;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = {"teamId"}, callSuper = false)
+@EqualsAndHashCode(of = {"sourceId"}, callSuper = false)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,8 +30,8 @@ public class HltvTeam extends PanacheMongoEntity {
     private String logoUrl;
 
     @NotBlank
-    @BsonProperty("team_id")
-    private String teamId;
+    @BsonProperty("source_id")
+    private String sourceId;
 
     @NotBlank
     @Size(max = 128)

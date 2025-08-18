@@ -26,11 +26,11 @@ public class HltvTeamRepo implements PanacheMongoRepository<HltvTeam> {
 
     public void bulkUpsert(List<HltvTeam> teams) {
         List<UpdateOneModel<HltvTeam>> writes = teams.stream()
-                .filter(t -> t.getTeamId() != null) // idempotency key required
+                .filter(t -> t.getSourceId() != null) // idempotency key required
                 .map(t -> {
                     Instant now = Instant.now();
 
-                    Bson filter = Filters.eq("team_id", t.getTeamId());
+                    Bson filter = Filters.eq("team_id", t.getSourceId());
 
                     List<Bson> sets = new ArrayList<>();
                     Optional.ofNullable(t.getSlug()).ifPresent(v -> sets.add(Updates.set("slug", v)));

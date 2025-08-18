@@ -28,7 +28,7 @@ public class HltvMatchService {
         List<HltvMatchResponse> hltvMatchResponses = hltvMatchClient.syncMatches(teams);
 
         Map<String, HltvTeam> teamById = teams.stream()
-                .collect(Collectors.toMap(HltvTeam::getTeamId, team -> team));
+                .collect(Collectors.toMap(HltvTeam::getSourceId, team -> team));
 
         List<HltvMatch> hltvMatches = hltvMatchResponses.stream()
                 .map(match -> {

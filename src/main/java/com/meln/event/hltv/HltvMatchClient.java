@@ -14,7 +14,7 @@ public class HltvMatchClient {
         int matchCounter = 1000;
 
         for (HltvTeam team : teams) {
-            if (team.getTeamId().equals("9565")) {
+            if (team.getSourceId().equals("9565")) {
                 for (int i = 1; i <= 3; i++) {
                     matches.add(HltvMatchResponse.builder()
                             .eventName("IEM Katowice " + i)
@@ -22,7 +22,7 @@ public class HltvMatchClient {
                             .matchId(String.valueOf(matchCounter++))
                             .matchUrl("https://hltv.org/matches/" + (3000 + i) + "/natus-vincere-vs-team" + i)
                             .dateTime(Instant.now().plusSeconds(86400L * i))
-                            .team1Id(team.getTeamId())
+                            .team1Id(team.getSourceId())
                             .team2Id(null)
                             .score1(16)
                             .score2(10 + i)
@@ -36,7 +36,7 @@ public class HltvMatchClient {
                         .matchId(String.valueOf(matchCounter++))
                         .matchUrl("https://hltv.org/matches/" + (5000 + matchCounter) + "/match-vs-" + team.getSlug())
                         .dateTime(Instant.now().plusSeconds(172800L))
-                        .team1Id(team.getTeamId())
+                        .team1Id(team.getSourceId())
                         .team2Id(null)
                         .score1(14)
                         .score2(16)

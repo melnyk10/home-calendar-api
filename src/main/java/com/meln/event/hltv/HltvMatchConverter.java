@@ -22,7 +22,7 @@ public class HltvMatchConverter {
         Event event = new Event();
         event.setProvider(Provider.HLTV);
         event.setAllDay(false);
-        event.setExternalId(String.valueOf(hltvMatch.getMatchId()));
+        event.setSourceId(String.valueOf(hltvMatch.getMatchId()));
         event.setUrl(hltvMatch.getMatchUrl());
 
         String team2Name = team2 != null ? team2.getTeamName() : "TBD";

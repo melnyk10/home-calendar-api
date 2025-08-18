@@ -20,23 +20,22 @@ public class EventRepo implements PanacheMongoRepository<Event> {
 
     public void bulkUpsert(Collection<Event> events) {
         List<UpdateOneModel<Event>> writes = events.stream()
-                .filter(e -> e.getProvider() != null && e.getExternalId() != null)
+                .filter(e -> e.getProvider() != null && e.getSourceId() != null)
                 .map(e -> {
                     Instant now = Instant.now();
 
                     Bson filter = Filters.and(
                             Filters.eq("provider", e.getProvider()),
-                            Filters.eq("external_id", e.getExternalId())
+                            Filters.eq("external_id", e.getSourceId())
                     );
 
                     List<Bson> sets = new ArrayList<>();
                     Optional.ofNullable(e.getTitle()).ifPresent(v -> sets.add(Updates.set("title", v)));
                     Optional.ofNullable(e.getUrl()).ifPresent(v -> sets.add(Updates.set("url", v)));
-                    Optional.ofNullable(e.getDetails()).ifPresent(v -> sets.add(Updates.set("details", v)));
+                    Optional.ofNullable(e.getNotes()).ifPresent(v -> sets.add(Updates.set("details", v)));
                     Optional.ofNullable(e.getStartAt()).ifPresent(v -> sets.add(Updates.set("start_at", v)));
                     Optional.ofNullable(e.getEndAt()).ifPresent(v -> sets.add(Updates.set("end_at", v)));
-                    Optional.ofNullable(e.getEventSourceId()).ifPresent(v -> sets.add(Updates.set("event_source_id", v)));
-                    Optional.ofNullable(e.getSubscriptionId()).ifPresent(v -> sets.add(Updates.set("subscription_id", v)));
+                    Optional.ofNullable(e.getSourceId()).ifPresent(v -> sets.add(Updates.set("event_source_id", v)));
 
                     sets.add(Updates.set("all_day", e.isAllDay()));
                     sets.add(Updates.set("updated_at", now));
@@ -45,7 +44,7 @@ public class EventRepo implements PanacheMongoRepository<Event> {
 
                     Bson setOnInsertStage = Updates.combine(
                             Updates.setOnInsert("provider", e.getProvider()),
-                            Updates.setOnInsert("external_id", e.getExternalId()),
+                            Updates.setOnInsert("external_id", e.getSourceId()),
                             Updates.setOnInsert("created_at", now)
                     );
 

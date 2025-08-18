@@ -30,7 +30,7 @@ public class HltvTeamService {
     private List<HltvTeam> saveAll(List<HltvTeam> hltvTeams) {
         try {
             hltvTeamRepo.bulkUpsert(hltvTeams);
-            List<String> teamSourceIds = hltvTeams.stream().map(HltvTeam::getTeamId).toList();
+            List<String> teamSourceIds = hltvTeams.stream().map(HltvTeam::getSourceId).toList();
             return hltvTeamRepo.findAllBySourceId(teamSourceIds);
         } catch (Exception e) {
             throw new RuntimeException(e); //todo: add appropriate exception

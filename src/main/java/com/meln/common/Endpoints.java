@@ -14,4 +14,8 @@ public interface Endpoints {
         String HLTV = "/hltv";
         String HLTV_SYNC = HLTV + "/sync";
     }
+
+    interface Subscription {
+        String SUBSCRIPTIONS = "/subscriptions";
+    }
 }

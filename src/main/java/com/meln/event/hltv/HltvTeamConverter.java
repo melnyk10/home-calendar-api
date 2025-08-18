@@ -6,7 +6,7 @@ import lombok.experimental.UtilityClass;
 public class HltvTeamConverter {
     public HltvTeam from(HltvTeamResponse response) {
         HltvTeam hltvTeam = new HltvTeam();
-        hltvTeam.setTeamId(response.getTeamId().toString());
+        hltvTeam.setSourceId(response.getTeamId().toString());
         hltvTeam.setSlug(response.getTeamIdName());
         hltvTeam.setTeamName(response.getName());
         hltvTeam.setLogoUrl(response.getLogoUrl());

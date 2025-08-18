@@ -1,7 +1,8 @@
 package com.meln.event;
 
-
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -11,17 +12,12 @@ import java.util.List;
 
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @BsonDiscriminator(key = "_type", value = "hltv")
 public final class CriteriaHltv implements Criteria {
 
     @BsonProperty("team_ids")
     private List<ObjectId> teamIds;
-
-    public CriteriaHltv() {
-    }
-
-    public CriteriaHltv(List<ObjectId> teamIds) {
-        this.teamIds = teamIds;
-    }
 
 }
