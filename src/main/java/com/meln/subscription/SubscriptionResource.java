@@ -1,4 +1,4 @@
-package com.meln.event;
+package com.meln.subscription;
 
 import com.meln.common.Endpoints;
 import io.quarkus.security.identity.SecurityIdentity;

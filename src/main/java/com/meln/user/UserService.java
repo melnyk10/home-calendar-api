@@ -17,14 +17,15 @@ public class UserService {
             throw new CustomException(Response.Status.UNAUTHORIZED, ErrorMessage.Auth.Code.USERNAME_MISSING);
         }
 
-        User user = getByEmail(email);
-        if (user == null) {
+        try {
+            //todo: move to filter
+            User user = getByEmail(email);
+            return UserMe.from(user);
+        } catch (Exception e) {
             throw new CustomException(Response.Status.UNAUTHORIZED,
                     ErrorMessage.Auth.Code.USER_NOT_FOUND,
                     ErrorMessage.Auth.Message.USER_NOT_FOUND(email));
         }
-
-        return UserMe.from(user);
     }
 
     public User getByEmail(String email) {

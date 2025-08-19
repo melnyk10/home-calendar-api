@@ -1,10 +1,9 @@
 package com.meln.event.hltv;
 
-import com.meln.event.CriteriaHltv;
 import com.meln.event.Event;
 import com.meln.event.EventProvider;
 import com.meln.event.Provider;
-import com.meln.event.Subscription;
+import com.meln.subscription.Subscription;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;

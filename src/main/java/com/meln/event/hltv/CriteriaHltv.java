@@ -1,5 +1,6 @@
-package com.meln.event;
+package com.meln.event.hltv;
 
+import com.meln.event.Criteria;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

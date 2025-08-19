@@ -1,4 +1,4 @@
-package com.meln.event;
+package com.meln.subscription;
 
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import jakarta.enterprise.context.ApplicationScoped;

@@ -1,5 +1,9 @@
-package com.meln.event;
+package com.meln.subscription;
 
+import com.meln.event.Event;
+import com.meln.event.EventProvider;
+import com.meln.event.EventService;
+import com.meln.event.ProviderRegistry;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

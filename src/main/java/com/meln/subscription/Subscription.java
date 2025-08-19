@@ -1,5 +1,7 @@
-package com.meln.event;
+package com.meln.subscription;
 
+import com.meln.event.Criteria;
+import com.meln.event.Provider;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import lombok.Getter;
