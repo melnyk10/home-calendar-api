@@ -21,8 +21,8 @@ import java.util.Optional;
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class HltvMatchRepo implements PanacheMongoRepository<HltvMatch> {
-    public List<HltvMatch> findByTeam1IdIn(Collection<ObjectId> teamIds) {
-        return find("team1_id in ?1", teamIds).list();
+    public List<HltvMatch> findAllFeaturesMatchesByTeamIdIn(Collection<ObjectId> teamIds) {
+        return find("team1_id in ?1 or team2_id in ?1 and starts_at >= ?2", teamIds, Instant.now()).list();
     }
 
     public void bulkUpsert(List<HltvMatch> matches) {

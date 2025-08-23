@@ -28,6 +28,7 @@ public class EventConverter {
 
         Event event = new Event();
         event.setSourceId(dto.getSourceId());
+        event.setProvider(Provider.valueOf(dto.getProvider()));
         event.setTitle(dto.getTitle());
         event.setUrl(dto.getUrl());
         event.setNotes(dto.getNotes());

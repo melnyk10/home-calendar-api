@@ -21,7 +21,7 @@ public class HltvMatchService {
         if (teamIds == null || teamIds.isEmpty()) {
             return new ArrayList<>();
         }
-        return hltvMatchRepo.findByTeam1IdIn(teamIds);
+        return hltvMatchRepo.findAllFeaturesMatchesByTeamIdIn(teamIds);
     }
 
     protected void syncMatches(Collection<HltvTeam> teams) {
