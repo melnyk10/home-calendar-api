@@ -12,7 +12,6 @@ public class EventConverter {
 
         return EventDto.builder()
                 .sourceId(event.getSourceId())
-                .provider(event.getProvider())
                 .title(event.getTitle())
                 .url(event.getUrl())
                 .notes(event.getNotes())
@@ -29,7 +28,6 @@ public class EventConverter {
 
         Event event = new Event();
         event.setSourceId(dto.getSourceId());
-        event.setProvider(dto.getProvider());
         event.setTitle(dto.getTitle());
         event.setUrl(dto.getUrl());
         event.setNotes(dto.getNotes());

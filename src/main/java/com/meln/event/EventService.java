@@ -1,7 +1,7 @@
 package com.meln.event;
 
 import com.meln.common.event.EventDto;
-import com.meln.common.event.EventSink;
+import com.meln.common.event.EventClient;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.List;
 
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
-public class EventService implements EventSink {
+public class EventService implements EventClient {
     private final EventRepo eventRepo;
 
     @Override

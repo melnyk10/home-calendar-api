@@ -2,6 +2,6 @@ package com.meln.common.event;
 
 import java.util.Collection;
 
-public interface EventSink {
+public interface EventClient {
     void saveOrUpdate(Collection<EventDto> events);
 }

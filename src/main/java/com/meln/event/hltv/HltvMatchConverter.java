@@ -20,7 +20,7 @@ public class HltvMatchConverter {
 
     public EventDto from(HltvMatch hltvMatch, HltvTeam team1, HltvTeam team2) {
         EventDto event = new EventDto();
-        event.setProvider(Provider.HLTV);
+        event.setProvider(Provider.HLTV.toString());
         event.setAllDay(false);
         event.setSourceId(String.valueOf(hltvMatch.getMatchId()));
         event.setUrl(hltvMatch.getMatchUrl());
