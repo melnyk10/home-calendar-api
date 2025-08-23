@@ -1,4 +1,4 @@
-package com.meln.subscription;
+package com.meln.common.event;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 

@@ -1,9 +1,7 @@
 package com.meln.subscription;
 
-import com.meln.event.Event;
-import com.meln.event.EventProvider;
-import com.meln.event.EventService;
-import com.meln.event.ProviderRegistry;
+import com.meln.common.event.EventClient;
+import com.meln.common.event.EventProviderRegistry;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -16,8 +14,8 @@ import java.util.List;
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SubscriptionScheduler {
-    private final ProviderRegistry registry;
-    private final EventService eventService;
+    private final EventClient eventClient;
+    private final EventProviderRegistry registry;
     private final SubscriptionRepo subscriptionRepo;
 
     @Scheduled(every = "15m")
@@ -25,11 +23,12 @@ public class SubscriptionScheduler {
         List<Subscription> activeSubscriptions = subscriptionRepo.find("active", true).list();
         for (Subscription sub : activeSubscriptions) {
             try {
-                EventProvider eventProvider = registry.get(sub.getProvider());
-                List<Event> events = eventProvider.fetch(sub);
-                eventService.saveOrUpdate(events);
+                var criteria = sub.getCriteria();
+                var eventProvider = registry.get(criteria);
+                var events = eventProvider.fetch(criteria);
+                eventClient.saveOrUpdate(events);
             } catch (Exception e) {
-                log.error("Sync failed for sub {} ({}})", sub.id, sub.getProvider(), e);
+                log.error("Sync failed for sub: {}", sub.id, e);
             }
         }
     }

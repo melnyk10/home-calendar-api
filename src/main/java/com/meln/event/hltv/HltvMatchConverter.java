@@ -1,6 +1,6 @@
 package com.meln.event.hltv;
 
-import com.meln.event.Event;
+import com.meln.common.event.EventDto;
 import com.meln.event.Provider;
 import lombok.experimental.UtilityClass;
 
@@ -18,9 +18,9 @@ public class HltvMatchConverter {
         return match;
     }
 
-    public Event from(HltvMatch hltvMatch, HltvTeam team1, HltvTeam team2) {
-        Event event = new Event();
-        event.setProvider(Provider.HLTV);
+    public EventDto from(HltvMatch hltvMatch, HltvTeam team1, HltvTeam team2) {
+        EventDto event = new EventDto();
+        event.setProvider(Provider.HLTV.toString());
         event.setAllDay(false);
         event.setSourceId(String.valueOf(hltvMatch.getMatchId()));
         event.setUrl(hltvMatch.getMatchUrl());
@@ -35,4 +35,5 @@ public class HltvMatchConverter {
 
         return event;
     }
+
 }

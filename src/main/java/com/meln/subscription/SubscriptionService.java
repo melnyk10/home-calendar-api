@@ -1,10 +1,11 @@
 package com.meln.subscription;
 
-import com.meln.user.User;
-import com.meln.user.UserService;
+import com.meln.common.user.UserClient;
+import com.meln.common.user.UserDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 
 import java.util.List;
 
@@ -12,10 +13,10 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SubscriptionService {
     private final SubscriptionRepo subscriptionRepo;
-    private final UserService userService;
+    private final UserClient userClient;
 
     public List<Subscription> getAllUserSubscriptions(String email) {
-        User user = userService.getByEmail(email);
-        return subscriptionRepo.find("userId", user.id).list();
+        UserDto user = userClient.getByEmail(email);
+        return subscriptionRepo.find("userId", new ObjectId(user.getId())).list();
     }
 }
