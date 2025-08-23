@@ -1,7 +1,20 @@
 @baseUrl = http://localhost:8085
 @bearerToken =
 
+### Health
+GET {{baseUrl}}/q/health
+Content-Type: application/json
+
 ### Return authenticated user
 GET {{baseUrl}}/api/v1/users/me
 Authorization: Bearer {{bearerToken}}
 Content-Type: application/json
+
+### Sync Hltv teams
+PUT {{baseUrl}}/api/v1/hltv/sync
+Authorization: Bearer {{bearerToken}}
+Content-Type: */*
+
+### Get all Subscirptiona
+GET {{baseUrl}}/api/v1/subscriptions
+Authorization: Bearer {{bearerToken}}

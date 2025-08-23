@@ -33,6 +33,11 @@ quarkus:
           policy: authenticated
   scheduler:
     enabled: true
+  cache:
+    caffeine:
+      "user-exists-cache":
+        maximum-size: 5000
+        expire-after-write: 60M
   log:
     level: INFO
     min-level: ALL
