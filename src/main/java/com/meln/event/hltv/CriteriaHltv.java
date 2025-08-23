@@ -1,6 +1,6 @@
 package com.meln.event.hltv;
 
-import com.meln.subscription.Criteria;
+import com.meln.common.event.Criteria;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

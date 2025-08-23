@@ -1,6 +1,6 @@
 package com.meln.subscription;
 
-import com.meln.event.Provider;
+import com.meln.common.event.Criteria;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import lombok.Getter;
@@ -17,9 +17,6 @@ public class Subscription extends PanacheMongoEntity {
 
     @BsonProperty("active")
     private boolean active = true;
-
-    @BsonProperty("provider")
-    private Provider provider;
 
     @BsonProperty(value = "criteria", useDiscriminator = true)
     public Criteria criteria;
