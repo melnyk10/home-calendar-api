@@ -3,34 +3,32 @@
 [Home Calendar](https://omeln.atlassian.net/wiki/x/xIAD) is a smart, extensible event-tracking system designed to automatically monitor various event sources (
 starting with esports) and notify users across different platforms.
 
-## Running the application in dev mode
+# How to run?
+### **Before starting, ensure you have:**
+- [**Google Account**](https://accounts.google.com/signup) with the appropriate permissions
+- [**Google Cloud Project**](https://console.cloud.google.com/projectcreate) created and accessible
 
-You can run your application in dev mode that enables live coding using:
+### Prerequisites
+1. **Start the database**  
+   The easiest way is to use Docker:
+   ```bash
+   docker compose up -d db
+2. Configure environment variables: `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
+3. Run the application: `Run local.run.xml`
+4. Authorize and make API calls: [Google Cloud Authentication Setup for Dev](#google-cloud-authentication-setup-for-dev)
 
-```shell script
-./gradlew quarkusDev
-```
+> **Note**  
+> A good starting point in the codebase is [`SubscriptionScheduler`](./src/main/java/com/meln/subscription/SubscriptionScheduler.java).
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
-
-# Google Cloud Authentication Setup for Dev
+## Google Cloud Authentication Setup for Dev
 
 This guide provides comprehensive instructions for setting up authentication with Google Cloud Platform using multiple methods.
 
-## Prerequisites
-
-Before starting, ensure you have:
-
-- **macOS** with [Homebrew](https://brew.sh) installed
-- **Google account** with appropriate permissions
-- **Google Cloud Project** created and accessible
-- **Project billing** enabled (if using paid services)
-
-## Method 1: Google Cloud CLI Authentication
+### Method 1: Google Cloud CLI Authentication
 
 The Google Cloud CLI (`gcloud`) is the primary tool for managing GCP resources and authentication.
 
-### Installation and Setup
+#### Installation and Setup
 
 1. **Install Google Cloud CLI**
    ```bash
@@ -67,11 +65,11 @@ The Google Cloud CLI (`gcloud`) is the primary tool for managing GCP resources a
    gcloud auth print-access-token
    ```
 
-## Method 2: OAuth 2.0 Playground
+### Method 2: OAuth 2.0 Playground
 
 The OAuth 2.0 Playground is useful for testing API calls and understanding OAuth flows.
 
-### Setup Process
+#### Setup Process
 
 1. **Navigate to the playground**
    - Go to [OAuth 2.0 Playground](https://developers.google.com/oauthplayground)
