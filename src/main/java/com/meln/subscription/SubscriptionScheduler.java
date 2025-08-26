@@ -26,7 +26,9 @@ public class SubscriptionScheduler {
                 var criteria = sub.getCriteria();
                 var eventProvider = registry.get(criteria);
                 var events = eventProvider.fetch(criteria);
-                eventClient.saveOrUpdate(events);
+                if (!events.isEmpty()) {
+                    eventClient.saveOrUpdate(events);
+                }
             } catch (Exception e) {
                 log.error("Sync failed for sub: {}", sub.id, e);
             }

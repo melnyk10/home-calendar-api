@@ -53,16 +53,6 @@ public class V001_InitialMigration {
                         .unique(true)
                         .collation(CASE_INSENSITIVE)
         );
-
-        Document seed = new Document("email", "o.melnyk10@gmail.com")
-                .append("firstName", "Sam")
-                .append("lastName", "Porter-Bridge");
-
-        db.getCollection(COL_USERS).updateOne(
-                new Document("email", seed.getString("email")),
-                new Document("$setOnInsert", seed),
-                new com.mongodb.client.model.UpdateOptions().upsert(true)
-        );
     }
 
     private void hltvTeam(MongoDatabase db) {

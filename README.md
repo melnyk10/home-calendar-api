@@ -12,7 +12,7 @@ starting with esports) and notify users across different platforms.
 1. **Start the database**  
    The easiest way is to use Docker:
    ```bash
-   docker compose up -d db
+   docker compose -f compose.local.yml up -d db
 2. Configure environment variables: `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
 3. Run the application: `Run local.run.xml`
 4. Authorize and make API calls: [Google Cloud Authentication Setup for Dev](#google-cloud-authentication-setup-for-dev)
