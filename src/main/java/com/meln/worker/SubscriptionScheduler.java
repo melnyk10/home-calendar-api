@@ -1,0 +1,39 @@
+package com.meln.worker;
+
+import com.meln.app.event.EventService;
+import com.meln.app.event.EventProviderRegistry;
+import com.meln.app.subscription.Subscription;
+import com.meln.app.subscription.SubscriptionRepo;
+import io.quarkus.scheduler.Scheduled;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@ApplicationScoped
+@RequiredArgsConstructor(onConstructor_ = @Inject)
+public class SubscriptionScheduler {
+
+  private final EventService eventService;
+  private final EventProviderRegistry registry;
+  private final SubscriptionRepo subscriptionRepo;
+
+  @Scheduled(every = "15m")
+  void syncAll() {
+    List<Subscription> activeSubscriptions = subscriptionRepo.find("active", true).list();
+    for (Subscription sub : activeSubscriptions) {
+      try {
+        var criteria = sub.getCriteria();
+        var eventProvider = registry.get(criteria);
+        var events = eventProvider.fetch(criteria);
+        if (!events.isEmpty()) {
+          eventService.saveOrUpdate(events);
+        }
+      } catch (Exception e) {
+        log.error("Sync failed for sub: {}", sub.id, e);
+      }
+    }
+  }
+}
