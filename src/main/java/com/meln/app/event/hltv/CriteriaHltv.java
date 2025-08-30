@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/CriteriaHltv.java
 package com.meln.app.event.provider.hltv;
+========
+package com.meln.app.event.hltv;
+>>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/CriteriaHltv.java
 
 import com.meln.app.common.event.Criteria;
 import java.util.List;

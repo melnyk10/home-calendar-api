@@ -1,8 +1,14 @@
+<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/HltvEventProvider.java
 package com.meln.app.event.provider.hltv;
 
 import com.meln.app.event.provider.hltv.model.HltvMatch;
 import com.meln.app.event.provider.hltv.model.HltvTeam;
 import com.meln.app.event.model.EventDto;
+========
+package com.meln.app.event.hltv;
+
+import com.meln.app.event.EventDto;
+>>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvEventProvider.java
 import com.meln.app.event.EventProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/meln/app/event/model/Event.java
 package com.meln.app.event.model;
+========
+package com.meln.app.event;
+>>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/Event.java
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;

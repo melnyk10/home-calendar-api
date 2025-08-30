@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/model/HltvMatchResponse.java
 package com.meln.app.event.provider.hltv.model;
+========
+package com.meln.app.event.hltv;
+>>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvMatchResponse.java
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;

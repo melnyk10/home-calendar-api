@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/HltvMatchService.java
 package com.meln.app.event.provider.hltv;
+========
+package com.meln.app.event.hltv;
+>>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvMatchService.java
 
 import com.meln.app.event.provider.hltv.model.HltvMatch;
 import com.meln.app.event.provider.hltv.model.HltvTeam;

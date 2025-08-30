@@ -1,6 +1,6 @@
 package com.meln.app.event;
 
-import com.meln.app.common.event.Criteria;
+import com.meln.common.event.Criteria;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;

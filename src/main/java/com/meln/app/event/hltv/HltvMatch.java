@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/model/HltvMatch.java
 package com.meln.app.event.provider.hltv.model;
+========
+package com.meln.app.event.hltv;
+>>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvMatch.java
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
