@@ -10,12 +10,13 @@ import jakarta.ws.rs.ext.Provider;
 
 @Provider
 public class CustomExceptionMapper implements ExceptionMapper<CustomException> {
-    @Override
-    public Response toResponse(CustomException e) {
-        Error error = Error.from(e.getCode(), e.getMessage());
-        return Response.status(e.getHttpStatus())
-                .type(MediaType.APPLICATION_JSON_TYPE)
-                .entity(new ErrorResponse(error))
-                .build();
-    }
+
+  @Override
+  public Response toResponse(CustomException e) {
+    Error error = Error.from(e.getCode(), e.getMessage());
+    return Response.status(e.getHttpStatus())
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .entity(new ErrorResponse(error))
+        .build();
+  }
 }

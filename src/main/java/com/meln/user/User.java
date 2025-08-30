@@ -9,7 +9,8 @@ import lombok.Setter;
 @Setter
 @MongoEntity(collection = "users")
 public class User extends PanacheMongoEntity {
-    private String firstName;
-    private String lastName;
-    private String email;
+
+  private String firstName;
+  private String lastName;
+  private String email;
 }

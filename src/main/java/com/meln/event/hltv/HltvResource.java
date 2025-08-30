@@ -14,11 +14,12 @@ import lombok.RequiredArgsConstructor;
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class HltvResource {
-    private final HltvService hltvService;
 
-    @POST
-    @Path(Endpoints.Hltv.HLTV_SYNC)
-    public void sync() {
-        hltvService.sync();
-    }
+  private final HltvService hltvService;
+
+  @POST
+  @Path(Endpoints.Hltv.HLTV_SYNC)
+  public void sync() {
+    hltvService.sync();
+  }
 }

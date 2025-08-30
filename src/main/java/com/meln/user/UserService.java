@@ -11,24 +11,25 @@ import lombok.RequiredArgsConstructor;
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class UserService implements UserClient {
-    private final UserRepo userRepo;
 
-    protected UserMe me(String email) {
-        User user = userRepo.findByEmail(email);
-        return UserConverter.toUserMe(user);
-    }
+  private final UserRepo userRepo;
 
-    @Override
-    public UserDto getByEmail(String email) {
-        User user = userRepo.findByEmail(email);
-        return UserConverter.toUserDto(user);
-    }
+  protected UserMe me(String email) {
+    User user = userRepo.findByEmail(email);
+    return UserConverter.toUserMe(user);
+  }
 
-    @Override
-    @CacheResult(cacheName = CacheNames.USER_EXISTS_CACHE_NAME)
-    //todo: don't forget to add @CacheInvalidate for future deleteUser method
-    public boolean existsByEmail(String email) {
-        return userRepo.existsByEmail(email);
-    }
+  @Override
+  public UserDto getByEmail(String email) {
+    User user = userRepo.findByEmail(email);
+    return UserConverter.toUserDto(user);
+  }
+
+  @Override
+  @CacheResult(cacheName = CacheNames.USER_EXISTS_CACHE_NAME)
+  //todo: don't forget to add @CacheInvalidate for future deleteUser method
+  public boolean existsByEmail(String email) {
+    return userRepo.existsByEmail(email);
+  }
 
 }

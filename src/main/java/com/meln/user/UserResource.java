@@ -17,13 +17,14 @@ import lombok.RequiredArgsConstructor;
 @Consumes(MediaType.APPLICATION_JSON)
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class UserResource {
-    private final UserService userService;
 
-    @GET
-    @Path(Endpoints.User.ME)
-    public Response me(@Context SecurityIdentity identity) {
-        String email = identity.getPrincipal().getName();
-        return Response.ok(userService.me(email)).build();
-    }
+  private final UserService userService;
+
+  @GET
+  @Path(Endpoints.User.ME)
+  public Response me(@Context SecurityIdentity identity) {
+    String email = identity.getPrincipal().getName();
+    return Response.ok(userService.me(email)).build();
+  }
 
 }

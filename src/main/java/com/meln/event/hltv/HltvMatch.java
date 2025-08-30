@@ -4,6 +4,7 @@ import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -14,8 +15,6 @@ import lombok.ToString;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
-import java.time.Instant;
-
 @Getter
 @Setter
 @ToString
@@ -25,29 +24,30 @@ import java.time.Instant;
 @AllArgsConstructor
 @MongoEntity(collection = "hltv_match")
 public class HltvMatch extends PanacheMongoEntity {
-    @NotBlank
-    @BsonProperty("match_id")
-    private String matchId;
 
-    @NotBlank
-    @BsonProperty("match_url")
-    private String matchUrl;
+  @NotBlank
+  @BsonProperty("match_id")
+  private String matchId;
 
-    @NotNull
-    @BsonProperty("starts_at")
-    private Instant startsAt;
+  @NotBlank
+  @BsonProperty("match_url")
+  private String matchUrl;
 
-    @BsonProperty("score1")
-    private Integer score1;
+  @NotNull
+  @BsonProperty("starts_at")
+  private Instant startsAt;
 
-    @BsonProperty("score2")
-    private Integer score2;
+  @BsonProperty("score1")
+  private Integer score1;
 
-    @NotNull
-    @BsonProperty("team1_id")
-    private ObjectId team1Id;
+  @BsonProperty("score2")
+  private Integer score2;
 
-    @NotNull
-    @BsonProperty("team2_id")
-    private ObjectId team2Id;
+  @NotNull
+  @BsonProperty("team1_id")
+  private ObjectId team1Id;
+
+  @NotNull
+  @BsonProperty("team2_id")
+  private ObjectId team2Id;
 }

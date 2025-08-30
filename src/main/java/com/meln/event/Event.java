@@ -4,6 +4,7 @@ import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -12,8 +13,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.bson.codecs.pojo.annotations.BsonProperty;
-
-import java.time.Instant;
 
 @Getter
 @Setter
@@ -24,62 +23,63 @@ import java.time.Instant;
 @Builder
 @MongoEntity(collection = "events")
 public class Event extends PanacheMongoEntity {
-    @NotBlank
-    @BsonProperty("source_id")
-    private String sourceId;
 
-    @NotNull
-    @BsonProperty("provider")
-    private Provider provider;
+  @NotBlank
+  @BsonProperty("source_id")
+  private String sourceId;
 
-    @BsonProperty("title")
-    @NotBlank
-    private String title;
+  @NotNull
+  @BsonProperty("provider")
+  private Provider provider;
 
-    @BsonProperty("url")
-    private String url;
+  @BsonProperty("title")
+  @NotBlank
+  private String title;
 
-    @BsonProperty("notes")
-    private String notes;
+  @BsonProperty("url")
+  private String url;
 
-    @BsonProperty("all_day")
-    private boolean allDay;
+  @BsonProperty("notes")
+  private String notes;
 
-    @NotNull
-    @BsonProperty("start_at")
-    private Instant startAt;
+  @BsonProperty("all_day")
+  private boolean allDay;
 
-    @BsonProperty("end_at")
-    private Instant endAt;
+  @NotNull
+  @BsonProperty("start_at")
+  private Instant startAt;
 
-    @BsonProperty("created_at")
-    private Instant createdAt;
+  @BsonProperty("end_at")
+  private Instant endAt;
 
-    @BsonProperty("updated_at")
-    private Instant updatedAt;
+  @BsonProperty("created_at")
+  private Instant createdAt;
 
-    @Override
-    public void persist() {
-        prePersist();
-        super.persist();
+  @BsonProperty("updated_at")
+  private Instant updatedAt;
+
+  @Override
+  public void persist() {
+    prePersist();
+    super.persist();
+  }
+
+  public void prePersist() {
+    Instant now = Instant.now();
+    if (createdAt == null) {
+      createdAt = now;
     }
+    updatedAt = now;
+  }
 
-    public void prePersist() {
-        Instant now = Instant.now();
-        if (createdAt == null) {
-            createdAt = now;
-        }
-        updatedAt = now;
-    }
+  @Override
+  public void update() {
+    preUpdate();
+    super.update();
+  }
 
-    @Override
-    public void update() {
-        preUpdate();
-        super.update();
-    }
-
-    public void preUpdate() {
-        updatedAt = Instant.now();
-    }
+  public void preUpdate() {
+    updatedAt = Instant.now();
+  }
 
 }

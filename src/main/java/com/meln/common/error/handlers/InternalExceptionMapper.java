@@ -12,13 +12,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Provider
 public class InternalExceptionMapper implements ExceptionMapper<Exception> {
-    @Override
-    public Response toResponse(Exception e) {
-        log.error("Something went wrong", e);
-        Error error = Error.from(ErrorMessage.General.Code.SOMETHING_WENT_WRONG, ErrorMessage.General.Message.SOMETHING_WENT_WRONG);
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .type(MediaType.APPLICATION_JSON_TYPE)
-                .entity(new ErrorResponse(error))
-                .build();
-    }
+
+  @Override
+  public Response toResponse(Exception e) {
+    log.error("Something went wrong", e);
+    Error error = Error.from(ErrorMessage.General.Code.SOMETHING_WENT_WRONG,
+        ErrorMessage.General.Message.SOMETHING_WENT_WRONG);
+    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .entity(new ErrorResponse(error))
+        .build();
+  }
 }

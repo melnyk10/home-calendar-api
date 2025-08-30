@@ -25,28 +25,29 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor
 @MongoEntity(collection = "hltv_team")
 public class HltvTeam extends PanacheMongoEntity {
-    @BsonProperty("logo_url")
-    @Pattern(regexp = "^https?://.+", message = "logoUrl must be http(s) URL")
-    private String logoUrl;
 
-    @NotBlank
-    @BsonProperty("source_id")
-    private String sourceId;
+  @BsonProperty("logo_url")
+  @Pattern(regexp = "^https?://.+", message = "logoUrl must be http(s) URL")
+  private String logoUrl;
 
-    @NotBlank
-    @Size(max = 128)
-    @BsonProperty("slug")
-    private String slug;
+  @NotBlank
+  @BsonProperty("source_id")
+  private String sourceId;
 
-    @NotBlank
-    @Size(max = 128)
-    @BsonProperty("team_name")
-    private String teamName;
+  @NotBlank
+  @Size(max = 128)
+  @BsonProperty("slug")
+  private String slug;
 
-    @BsonProperty("rank")
-    private Integer rank;
+  @NotBlank
+  @Size(max = 128)
+  @BsonProperty("team_name")
+  private String teamName;
 
-    public ObjectId getId() {
-        return id;
-    }
+  @BsonProperty("rank")
+  private Integer rank;
+
+  public ObjectId getId() {
+    return id;
+  }
 }

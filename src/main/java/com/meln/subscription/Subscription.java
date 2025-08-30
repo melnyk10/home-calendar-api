@@ -12,12 +12,13 @@ import org.bson.types.ObjectId;
 @Setter
 @MongoEntity(collection = "subscriptions")
 public class Subscription extends PanacheMongoEntity {
-    @BsonProperty("user_id")
-    private ObjectId userId;
 
-    @BsonProperty("active")
-    private boolean active = true;
+  @BsonProperty("user_id")
+  private ObjectId userId;
 
-    @BsonProperty(value = "criteria", useDiscriminator = true)
-    public Criteria criteria;
+  @BsonProperty("active")
+  private boolean active = true;
+
+  @BsonProperty(value = "criteria", useDiscriminator = true)
+  public Criteria criteria;
 }

@@ -1,4 +1,4 @@
-rootProject.name="home-calendar-api"
+rootProject.name = "home-calendar-api"
 
 pluginManagement {
     val quarkusPluginVersion: String by settings

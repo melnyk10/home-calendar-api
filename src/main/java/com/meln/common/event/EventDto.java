@@ -1,12 +1,11 @@
 package com.meln.common.event;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.Instant;
 
 @Builder
 @Getter
@@ -14,12 +13,13 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventDto {
-    private String sourceId;
-    private String provider;
-    private String title;
-    private String url;
-    private String notes;
-    private boolean allDay;
-    private Instant startAt;
-    private Instant endAt;
+
+  private String sourceId;
+  private String provider;
+  private String title;
+  private String url;
+  private String notes;
+  private boolean allDay;
+  private Instant startAt;
+  private Instant endAt;
 }
