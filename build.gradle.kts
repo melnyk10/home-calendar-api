@@ -1,6 +1,12 @@
 plugins {
     java
     id("io.quarkus")
+    checkstyle
+}
+
+checkstyle {
+    toolVersion = "10.21.0"
+    configFile = rootProject.file("codestyle/google_checks.xml")
 }
 
 repositories {
@@ -58,8 +64,12 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.add("-parameters")
 }
-tasks.withType<Checkstyle> {
-    configFile = rootProject.file("codestyle/google_checks.xml")
-    isIgnoreFailures = false
+
+tasks.withType<Checkstyle>().configureEach {
+    isIgnoreFailures = true
     maxWarnings = 0
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
 }
