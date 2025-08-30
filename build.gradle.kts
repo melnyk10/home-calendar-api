@@ -4,23 +4,23 @@ plugins {
     checkstyle
 }
 
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
-
 checkstyle {
     toolVersion = "10.21.0"
     configFile = rootProject.file("codestyle/google_checks.xml")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+repositories {
+    mavenCentral()
+    mavenLocal()
 }
 
 group = "com.meln"
 version = "1.0.0-SNAPSHOT"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
 
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
