@@ -1,7 +1,7 @@
-package com.meln.app.event.hltv;
+package com.meln.app.event.provider.hltv;
 
-import com.meln.app.event.hltv.model.HltvTeam;
-import com.meln.app.event.hltv.model.HltvTeamResponse;
+import com.meln.app.event.provider.hltv.model.HltvTeam;
+import com.meln.app.event.provider.hltv.model.HltvTeamResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;

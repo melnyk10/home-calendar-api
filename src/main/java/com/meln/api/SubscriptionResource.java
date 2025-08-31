@@ -2,7 +2,7 @@ package com.meln.api;
 
 import com.meln.app.subscription.model.Subscription;
 import com.meln.app.subscription.SubscriptionService;
-import com.meln.app.user.model.UserDto;
+import com.meln.app.user.model.UserInfo;
 import com.meln.app.user.UserService;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
@@ -28,7 +28,7 @@ public class SubscriptionResource {
   @Path(Endpoints.Subscription.SUBSCRIPTIONS)
   public GetUserSubscriptions userSubscriptions(@Context SecurityIdentity identity) {
     String email = identity.getPrincipal().getName();
-    UserDto user = userService.getByEmail(email);
+    UserInfo user = userService.getByEmail(email);
     return new GetUserSubscriptions(subscriptionService.getAllUserSubscriptions(user.getId()));
   }
 

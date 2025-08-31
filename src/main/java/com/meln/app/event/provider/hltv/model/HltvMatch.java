@@ -1,4 +1,4 @@
-package com.meln.app.event.hltv.model;
+package com.meln.app.event.provider.hltv.model;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
