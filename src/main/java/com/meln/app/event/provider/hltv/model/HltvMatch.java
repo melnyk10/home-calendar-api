@@ -18,7 +18,7 @@ import org.bson.types.ObjectId;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = "matchId", callSuper = false)
+@EqualsAndHashCode(of = "matchId")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

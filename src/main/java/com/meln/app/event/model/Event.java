@@ -18,7 +18,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 @Setter
 @Builder
 @ToString
-@EqualsAndHashCode(of = {"provider", "sourceId"}, callSuper = false)
+@EqualsAndHashCode(of = {"provider", "sourceId"})
 @NoArgsConstructor
 @AllArgsConstructor
 @MongoEntity(collection = "events")
