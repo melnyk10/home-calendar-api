@@ -1,7 +1,6 @@
 package com.meln.app.event.provider.hltv;
 
 import com.meln.app.event.provider.hltv.model.HltvTeam;
-import com.meln.app.event.provider.hltv.model.HltvTeamResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
@@ -20,9 +19,9 @@ public class HltvTeamService {
   }
 
   protected List<HltvTeam> syncTeams() {
-    List<HltvTeamResponse> response = hltvTeamClient.syncTeams();
+    var response = hltvTeamClient.syncTeams();
 
-    List<HltvTeam> hltvTeams = response.stream()
+    var hltvTeams = response.stream()
         .map(HltvConverter::from)
         .toList();
 
@@ -32,7 +31,7 @@ public class HltvTeamService {
   private List<HltvTeam> saveOrUpdate(List<HltvTeam> hltvTeams) {
     try {
       hltvTeamRepo.bulkUpsert(hltvTeams);
-      List<String> teamSourceIds = hltvTeams.stream().map(HltvTeam::getSourceId).toList();
+      var teamSourceIds = hltvTeams.stream().map(HltvTeam::getSourceId).toList();
       return hltvTeamRepo.findAllBySourceId(teamSourceIds);
     } catch (Exception e) {
       throw new RuntimeException(e); //todo: add appropriate exception
