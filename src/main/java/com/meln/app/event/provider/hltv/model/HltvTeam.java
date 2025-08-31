@@ -19,7 +19,7 @@ import org.bson.types.ObjectId;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = {"sourceId"}, callSuper = false)
+@EqualsAndHashCode(of = {"sourceId"})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
