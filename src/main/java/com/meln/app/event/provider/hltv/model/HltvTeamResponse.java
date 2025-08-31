@@ -1,4 +1,4 @@
-package com.meln.app.event.hltv.model;
+package com.meln.app.event.provider.hltv.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

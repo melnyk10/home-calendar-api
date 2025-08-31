@@ -1,6 +1,6 @@
 package com.meln.api;
 
-import com.meln.app.user.model.UserDto;
+import com.meln.app.user.model.UserInfo;
 import com.meln.app.user.UserService;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
@@ -22,7 +22,7 @@ public class UserResource {
 
   @GET
   @Path(Endpoints.User.ME)
-  public UserDto me(@Context SecurityIdentity identity) {
+  public UserInfo me(@Context SecurityIdentity identity) {
     String email = identity.getPrincipal().getName();
     return userService.getByEmail(email);
   }

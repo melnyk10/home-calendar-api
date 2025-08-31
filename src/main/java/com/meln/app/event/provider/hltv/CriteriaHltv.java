@@ -1,4 +1,4 @@
-package com.meln.app.event.hltv;
+package com.meln.app.event.provider.hltv;
 
 import com.meln.app.common.event.Criteria;
 import java.util.List;

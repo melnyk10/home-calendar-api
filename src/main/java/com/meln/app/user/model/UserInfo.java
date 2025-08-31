@@ -11,18 +11,18 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UserInfo {
 
   private String id;
   private String firstName;
   private String lastName;
   private String email;
 
-  public static UserDto from(User entity) {
+  public static UserInfo from(User entity) {
     if (entity == null) {
       return null;
     }
-    return UserDto.builder()
+    return UserInfo.builder()
         .id(entity.id.toString())
         .firstName(entity.getFirstName())
         .lastName(entity.getLastName())

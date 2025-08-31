@@ -1,6 +1,6 @@
-package com.meln.app.event.hltv;
+package com.meln.app.event.provider.hltv;
 
-import com.meln.app.event.hltv.model.HltvMatch;
+import com.meln.app.event.provider.hltv.model.HltvMatch;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOneModel;

@@ -2,12 +2,11 @@ package com.meln.worker;
 
 import com.meln.app.event.EventProviderRegistry;
 import com.meln.app.event.EventService;
-import com.meln.app.subscription.model.Subscription;
 import com.meln.app.subscription.SubscriptionRepo;
+import com.meln.app.subscription.model.Subscription;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +27,9 @@ public class SubscriptionScheduler {
         var criteria = subscription.getCriteria();
         var eventProvider = eventProviderRegistry.get(criteria);
         var events = eventProvider.fetch(criteria);
-        Optional.ofNullable(events).ifPresent(eventService::saveOrUpdate);
+        if (!events.isEmpty()) {
+          eventService.saveOrUpdate(events);
+        }
       } catch (Exception e) {
         log.error("Sync failed for subscription: {}", subscription.id, e);
       }
