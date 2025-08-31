@@ -15,24 +15,24 @@ public class V001_InitialMigration {
 
   private static final String COL_USERS = "users";
   private static final String COL_EVENTS = "events";
-  private static final String COL_HLTV_TEAM = "hltv_team";
-  private static final String COL_HLTV_MATCH = "hltv_match";
+  private static final String COL_HLTV_TEAM = "hltvTeam";
+  private static final String COL_HLTV_MATCH = "hltvMatch";
   private static final String COL_SUBSCRIPTIONS = "subscriptions";
 
-  private static final String IDX_USERS_EMAIL_UNIQ = "uniq_users_email";
-  private static final String IDX_EVENTS_PROVIDER_EXT_UNIQ = "uniq_events_provider_external_id";
-  private static final String IDX_EVENTS_SUBSCRIPTION_START = "idx_events_subscription_start_at";
-  private static final String IDX_EVENTS_SOURCE_START = "idx_events_source_start_at";
-  private static final String IDX_EVENTS_START = "idx_events_start_at";
-  private static final String IDX_TEAM_TEAMID_UNIQ = "uniq_hltv_team_team_id";
-  private static final String IDX_MATCH_MATCHID_UNIQ = "uniq_hltv_match_match_id";
-  private static final String IDX_MATCH_STARTS_AT = "idx_hltv_match_starts_at";
-  private static final String IDX_MATCH_TEAM1 = "idx_hltv_match_team1_id";
-  private static final String IDX_MATCH_TEAM2 = "idx_hltv_match_team2_id";
-  private static final String IDX_SUB_USER = "idx_sub_user";
-  private static final String IDX_SUB_USER_PROVIDER_ACTIVE = "idx_sub_user_provider_active";
-  private static final String IDX_SUB_PROVIDER_ACTIVE = "idx_sub_provider_active";
-  private static final String IDX_SUB_HLTV_PROVIDER_TEAM = "idx_sub_hltv_provider_team";
+  private static final String IDX_USERS_EMAIL_UNIQ = "uniqUsersEmail";
+  private static final String IDX_EVENTS_PROVIDER_EXT_UNIQ = "uniqEventsProviderExternalId";
+  private static final String IDX_EVENTS_SUBSCRIPTION_START = "idxEventsSubscriptionStartAt";
+  private static final String IDX_EVENTS_SOURCE_START = "idxEventsSourceStartAt";
+  private static final String IDX_EVENTS_START = "idxEventsStartAt";
+  private static final String IDX_TEAM_TEAMID_UNIQ = "uniqHltvTeamTeamId";
+  private static final String IDX_MATCH_MATCHID_UNIQ = "uniqHltvMatchMatchId";
+  private static final String IDX_MATCH_STARTS_AT = "idxHltvMatchStartsAt";
+  private static final String IDX_MATCH_TEAM1 = "idxHltvMatchTeam1Id";
+  private static final String IDX_MATCH_TEAM2 = "idxHltvMatchTeam2Id";
+  private static final String IDX_SUB_USER = "idxSubUser";
+  private static final String IDX_SUB_USER_PROVIDER_ACTIVE = "idxSubUserProviderActive";
+  private static final String IDX_SUB_PROVIDER_ACTIVE = "idxSubProviderActive";
+  private static final String IDX_SUB_HLTV_PROVIDER_TEAM = "idxSubHltvProviderTeam";
 
   private static final Collation CASE_INSENSITIVE =
       Collation.builder().locale("en").collationStrength(CollationStrength.SECONDARY).build();
@@ -58,26 +58,26 @@ public class V001_InitialMigration {
 
   private void hltvTeam(MongoDatabase db) {
     db.getCollection(COL_HLTV_TEAM)
-        .createIndex(Indexes.ascending("team_id"),
+        .createIndex(Indexes.ascending("teamId"),
             new IndexOptions().unique(true).name(IDX_TEAM_TEAMID_UNIQ));
   }
 
   private void hltvMatch(MongoDatabase db) {
     var col = db.getCollection(COL_HLTV_MATCH);
 
-    // Unique numeric match_id only (partial index)
+    // Unique numeric matchId only (partial index)
     col.createIndex(
-        Indexes.ascending("match_id"),
+        Indexes.ascending("matchId"),
         new IndexOptions()
             .unique(true)
             .name(IDX_MATCH_MATCHID_UNIQ)
-            .partialFilterExpression(new Document("match_id", new Document("$type", "string")))
+            .partialFilterExpression(new Document("matchId", new Document("$type", "string")))
     );
 
     // Common lookups/sorts
-    col.createIndex(Indexes.ascending("starts_at"), new IndexOptions().name(IDX_MATCH_STARTS_AT));
-    col.createIndex(Indexes.ascending("team1_id"), new IndexOptions().name(IDX_MATCH_TEAM1));
-    col.createIndex(Indexes.ascending("team2_id"), new IndexOptions().name(IDX_MATCH_TEAM2));
+    col.createIndex(Indexes.ascending("startsAt"), new IndexOptions().name(IDX_MATCH_STARTS_AT));
+    col.createIndex(Indexes.ascending("team1Id"), new IndexOptions().name(IDX_MATCH_TEAM1));
+    col.createIndex(Indexes.ascending("team2Id"), new IndexOptions().name(IDX_MATCH_TEAM2));
   }
 
   private void events(MongoDatabase db) {
@@ -85,16 +85,16 @@ public class V001_InitialMigration {
 
     // Idempotency key
     eventsCol.createIndex(
-        Indexes.compoundIndex(Indexes.ascending("provider"), Indexes.ascending("external_id")),
+        Indexes.compoundIndex(Indexes.ascending("provider"), Indexes.ascending("externalId")),
         new IndexOptions().unique(true).name(IDX_EVENTS_PROVIDER_EXT_UNIQ)
     );
 
     // Common queries: upcoming events per subscription/source + calendar views
-    eventsCol.createIndex(Indexes.ascending("subscription_id", "start_at"),
+    eventsCol.createIndex(Indexes.ascending("subscriptionId", "startAt"),
         new IndexOptions().name(IDX_EVENTS_SUBSCRIPTION_START));
-    eventsCol.createIndex(Indexes.ascending("event_source_id", "start_at"),
+    eventsCol.createIndex(Indexes.ascending("eventSourceId", "startAt"),
         new IndexOptions().name(IDX_EVENTS_SOURCE_START));
-    eventsCol.createIndex(Indexes.ascending("start_at"),
+    eventsCol.createIndex(Indexes.ascending("startAt"),
         new IndexOptions().name(IDX_EVENTS_START));
   }
 
@@ -102,13 +102,13 @@ public class V001_InitialMigration {
     var col = db.getCollection(COL_SUBSCRIPTIONS);
 
     col.createIndex(
-        Indexes.ascending("user_id"),
+        Indexes.ascending("userId"),
         new IndexOptions().name(IDX_SUB_USER)
     );
 
     col.createIndex(
         Indexes.compoundIndex(
-            Indexes.ascending("user_id"),
+            Indexes.ascending("userId"),
             Indexes.ascending("provider"),
             Indexes.ascending("active")
         ),
@@ -127,13 +127,13 @@ public class V001_InitialMigration {
         Indexes.compoundIndex(
             Indexes.ascending("provider"),
             Indexes.ascending("criteria._type"),
-            Indexes.ascending("criteria.teamIds") // or "criteria.team_ids"
+            Indexes.ascending("criteria.teamIds") // or "criteria.teamIds"
         ),
         new IndexOptions()
             .name(IDX_SUB_HLTV_PROVIDER_TEAM)
             .partialFilterExpression(
                 new Document("criteria._type", "hltv")
-                    .append("criteria.teamIds", new Document("$type", "objectId")) // or "team_ids"
+                    .append("criteria.teamIds", new Document("$type", "objectId")) // or "teamIds"
             )
     );
   }
@@ -145,7 +145,6 @@ public class V001_InitialMigration {
       db.getCollection(COL_USERS).dropIndex(IDX_USERS_EMAIL_UNIQ);
     } catch (Exception ignored) {
     }
-    db.getCollection(COL_USERS).deleteOne(new Document("email", "o.melnyk10@gmail.com"));
 
     // events
     try {

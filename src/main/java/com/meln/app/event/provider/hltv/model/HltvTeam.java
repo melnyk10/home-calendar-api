@@ -23,7 +23,7 @@ import org.bson.types.ObjectId;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@MongoEntity(collection = "hltv_team")
+@MongoEntity(collection = "hltvTeam")
 public class HltvTeam extends PanacheMongoEntity {
 
   public static final String COL_LOGO_URL = "logoUrl";

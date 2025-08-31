@@ -143,6 +143,7 @@ public class V002_InitialDataMigration {
 
   @RollbackExecution
   public void rollback(MongoDatabase db) {
+    db.getCollection(COL_USERS).deleteOne(new Document("email", "o.melnyk10@gmail.com"));
     db.getCollection(COL_SUBSCRIPTIONS).deleteMany(new Document("provider", "HLTV"));
   }
 }
