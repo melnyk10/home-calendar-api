@@ -28,12 +28,12 @@ public class HltvMatchService {
   }
 
   protected void syncMatches(Collection<HltvTeam> teams) {
-    List<HltvMatchResponse> hltvMatchResponses = hltvMatchClient.syncMatches(teams);
+    List<HltvMatchResponse> response = hltvMatchClient.syncMatches(teams);
 
     Map<String, HltvTeam> teamById = teams.stream()
         .collect(Collectors.toMap(HltvTeam::getSourceId, team -> team));
 
-    List<HltvMatch> hltvMatches = hltvMatchResponses.stream()
+    List<HltvMatch> hltvMatches = response.stream()
         .map(match -> {
           HltvTeam team1 = teamById.get(match.getTeam1Id());
           HltvTeam team2 = teamById.getOrDefault(match.getTeam2Id(), null);
