@@ -22,7 +22,7 @@ import org.bson.types.ObjectId;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@MongoEntity(collection = "hltv_match")
+@MongoEntity(collection = "hltvMatch")
 public class HltvMatch extends PanacheMongoEntity {
 
   public static final String COL_MATCH_ID = "matchId";
