@@ -23,7 +23,7 @@ public class HltvEventProvider implements EventProvider<CriteriaHltv> {
 
   @Override
   public List<EventDto> fetch(CriteriaHltv criteria) {
-    List<HltvMatch> matches = hltvMatchService.getAllByTeamId(criteria.getTeamIds());
+    var matches = hltvMatchService.getAllByTeamId(criteria.getTeamIds());
     return matches.stream()
         .map(this::from)
         .toList();
@@ -31,8 +31,8 @@ public class HltvEventProvider implements EventProvider<CriteriaHltv> {
 
   private EventDto from(HltvMatch hltvMatch) {
     //todo: improve! on each event creation we will query DB
-    HltvTeam team1 = hltvTeamService.getById(hltvMatch.getTeam1Id());
-    HltvTeam team2 = hltvTeamService.getById(hltvMatch.getTeam2Id());
+    var team1 = hltvTeamService.getById(hltvMatch.getTeam1Id());
+    var team2 = hltvTeamService.getById(hltvMatch.getTeam2Id());
     return HltvConverter.from(hltvMatch, team1, team2);
   }
 }

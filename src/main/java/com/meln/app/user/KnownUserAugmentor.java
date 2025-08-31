@@ -27,7 +27,7 @@ public class KnownUserAugmentor implements SecurityIdentityAugmentor {
       return Uni.createFrom().item(identity);
     }
 
-    String email = identity.getPrincipal().getName();
+    var email = identity.getPrincipal().getName();
     if (email == null || email.isBlank()) {
       return Uni.createFrom().failure(new AuthenticationFailedException("Missing email claim"));
     }
