@@ -1,10 +1,6 @@
-<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/HltvTeamRepo.java
-package com.meln.app.event.provider.hltv;
-========
 package com.meln.app.event.hltv;
->>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvTeamRepo.java
 
-import com.meln.app.event.provider.hltv.model.HltvTeam;
+import com.meln.app.event.hltv.model.HltvTeam;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOneModel;
@@ -33,17 +29,15 @@ public class HltvTeamRepo implements PanacheMongoRepository<HltvTeam> {
     List<UpdateOneModel<HltvTeam>> writes = teams.stream()
         .filter(t -> t.getSourceId() != null) // idempotency key required
         .map(t -> {
+          Instant now = Instant.now();
+
           Bson filter = Filters.eq(HltvTeam.COL_SOURCE_ID, t.getSourceId());
 
           List<Bson> sets = new ArrayList<>();
-          Optional.ofNullable(t.getSlug())
-              .ifPresent(v -> sets.add(Updates.set(HltvTeam.COL_SLUG, v)));
-          Optional.ofNullable(t.getTeamName())
-              .ifPresent(v -> sets.add(Updates.set(HltvTeam.COL_TEAM_NAME, v)));
-          Optional.ofNullable(t.getLogoUrl())
-              .ifPresent(v -> sets.add(Updates.set(HltvTeam.COL_LOGO_URL, v)));
-          Optional.ofNullable(t.getRank())
-              .ifPresent(v -> sets.add(Updates.set(HltvTeam.COL_RANK, v)));
+          Optional.ofNullable(t.getSlug()).ifPresent(v -> sets.add(Updates.set(HltvTeam.COL_SLUG, v)));
+          Optional.ofNullable(t.getTeamName()).ifPresent(v -> sets.add(Updates.set(HltvTeam.COL_TEAM_NAME, v)));
+          Optional.ofNullable(t.getLogoUrl()).ifPresent(v -> sets.add(Updates.set(HltvTeam.COL_LOGO_URL, v)));
+          Optional.ofNullable(t.getRank()).ifPresent(v -> sets.add(Updates.set(HltvTeam.COL_RANK, v)));
 
           Bson setStage = Updates.combine(sets.toArray(new Bson[0]));
           Bson update = Updates.combine(setStage);

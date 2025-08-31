@@ -1,5 +1,7 @@
 package com.meln.app.event;
 
+import com.meln.app.event.model.Event;
+import com.meln.app.event.model.EventDto;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -26,16 +28,14 @@ public class EventConverter {
       return null;
     }
 
-    Event event = new Event();
-    event.setSourceId(dto.getSourceId());
-    event.setProvider(Provider.valueOf(dto.getProvider()));
-    event.setTitle(dto.getTitle());
-    event.setUrl(dto.getUrl());
-    event.setNotes(dto.getNotes());
-    event.setAllDay(dto.isAllDay());
-    event.setStartAt(dto.getStartAt());
-    event.setEndAt(dto.getEndAt());
-
-    return event;
+    return Event.builder()
+        .sourceId(dto.getSourceId())
+        .title(dto.getTitle())
+        .url(dto.getUrl())
+        .notes(dto.getNotes())
+        .allDay(dto.isAllDay())
+        .startAt(dto.getStartAt())
+        .endAt(dto.getEndAt())
+        .build();
   }
 }

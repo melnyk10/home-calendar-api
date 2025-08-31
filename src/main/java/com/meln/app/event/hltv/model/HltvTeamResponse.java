@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/model/HltvTeamResponse.java
-package com.meln.app.event.provider.hltv.model;
-========
-package com.meln.app.event.hltv;
->>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvTeamResponse.java
+package com.meln.app.event.hltv.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

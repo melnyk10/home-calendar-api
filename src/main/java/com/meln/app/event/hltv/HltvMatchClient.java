@@ -1,11 +1,7 @@
-<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/HltvMatchClient.java
-package com.meln.app.event.provider.hltv;
-========
 package com.meln.app.event.hltv;
->>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvMatchClient.java
 
-import com.meln.app.event.provider.hltv.model.HltvMatchResponse;
-import com.meln.app.event.provider.hltv.model.HltvTeam;
+import com.meln.app.event.hltv.model.HltvMatchResponse;
+import com.meln.app.event.hltv.model.HltvTeam;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.Instant;
 import java.util.ArrayList;

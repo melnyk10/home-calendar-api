@@ -1,11 +1,8 @@
-<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/HltvMatchService.java
-package com.meln.app.event.provider.hltv;
-========
 package com.meln.app.event.hltv;
->>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvMatchService.java
 
-import com.meln.app.event.provider.hltv.model.HltvMatch;
-import com.meln.app.event.provider.hltv.model.HltvTeam;
+import com.meln.app.event.hltv.model.HltvMatch;
+import com.meln.app.event.hltv.model.HltvMatchResponse;
+import com.meln.app.event.hltv.model.HltvTeam;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
@@ -31,15 +28,15 @@ public class HltvMatchService {
   }
 
   protected void syncMatches(Collection<HltvTeam> teams) {
-    var response = hltvMatchClient.syncMatches(teams);
+    List<HltvMatchResponse> hltvMatchResponses = hltvMatchClient.syncMatches(teams);
 
     Map<String, HltvTeam> teamById = teams.stream()
         .collect(Collectors.toMap(HltvTeam::getSourceId, team -> team));
 
-    var hltvMatches = response.stream()
+    List<HltvMatch> hltvMatches = hltvMatchResponses.stream()
         .map(match -> {
-          var team1 = teamById.get(match.getTeam1Id());
-          var team2 = teamById.getOrDefault(match.getTeam2Id(), null);
+          HltvTeam team1 = teamById.get(match.getTeam1Id());
+          HltvTeam team2 = teamById.getOrDefault(match.getTeam2Id(), null);
           return HltvConverter.from(match, team1, team2);
         })
         .toList();

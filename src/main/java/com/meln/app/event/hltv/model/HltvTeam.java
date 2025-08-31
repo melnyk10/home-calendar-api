@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/model/HltvTeam.java
-package com.meln.app.event.provider.hltv.model;
-========
-package com.meln.app.event.hltv;
->>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvTeam.java
+package com.meln.app.event.hltv.model;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
@@ -23,11 +19,11 @@ import org.bson.types.ObjectId;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = {"sourceId"})
+@EqualsAndHashCode(of = {"sourceId"}, callSuper = false)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@MongoEntity(collection = "hltvTeam")
+@MongoEntity(collection = "hltv_team")
 public class HltvTeam extends PanacheMongoEntity {
 
   public static final String COL_LOGO_URL = "logoUrl";

@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/model/HltvMatch.java
-package com.meln.app.event.provider.hltv.model;
-========
-package com.meln.app.event.hltv;
->>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvMatch.java
+package com.meln.app.event.hltv.model;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
@@ -22,11 +18,11 @@ import org.bson.types.ObjectId;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = "matchId")
+@EqualsAndHashCode(of = "matchId", callSuper = false)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@MongoEntity(collection = "hltvMatch")
+@MongoEntity(collection = "hltv_match")
 public class HltvMatch extends PanacheMongoEntity {
 
   public static final String COL_MATCH_ID = "matchId";

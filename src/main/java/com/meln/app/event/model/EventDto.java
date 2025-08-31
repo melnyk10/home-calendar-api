@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/meln/app/event/model/EventDto.java
 package com.meln.app.event.model;
-========
-package com.meln.app.event;
->>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/EventDto.java
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;

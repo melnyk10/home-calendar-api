@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/meln/app/subscription/model/Subscription.java
 package com.meln.app.subscription.model;
-========
-package com.meln.app.subscription;
->>>>>>>> 4626548 (move files):src/main/java/com/meln/app/subscription/Subscription.java
 
 import com.meln.app.common.event.Criteria;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;

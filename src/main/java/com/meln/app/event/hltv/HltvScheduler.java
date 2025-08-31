@@ -1,12 +1,10 @@
-<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/HltvScheduler.java
-package com.meln.app.event.provider.hltv;
-========
 package com.meln.app.event.hltv;
->>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvService.java
 
+import com.meln.app.event.hltv.model.HltvTeam;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.util.List;
 import lombok.AllArgsConstructor;
 
 @ApplicationScoped
@@ -18,7 +16,7 @@ public class HltvScheduler {
 
   @Scheduled(every = "15m")
   protected void sync() {
-    var hltvTeams = hltvTeamService.syncTeams();
+    List<HltvTeam> hltvTeams = hltvTeamService.syncTeams();
     hltvMatchService.syncMatches(hltvTeams);
   }
 

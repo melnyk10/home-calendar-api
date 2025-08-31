@@ -1,10 +1,7 @@
-<<<<<<<< HEAD:src/main/java/com/meln/app/event/provider/hltv/HltvTeamService.java
-package com.meln.app.event.provider.hltv;
-========
 package com.meln.app.event.hltv;
->>>>>>>> 4626548 (move files):src/main/java/com/meln/app/event/hltv/HltvTeamService.java
 
-import com.meln.app.event.provider.hltv.model.HltvTeam;
+import com.meln.app.event.hltv.model.HltvTeam;
+import com.meln.app.event.hltv.model.HltvTeamResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
@@ -23,9 +20,9 @@ public class HltvTeamService {
   }
 
   protected List<HltvTeam> syncTeams() {
-    var response = hltvTeamClient.syncTeams();
+    List<HltvTeamResponse> response = hltvTeamClient.syncTeams();
 
-    var hltvTeams = response.stream()
+    List<HltvTeam> hltvTeams = response.stream()
         .map(HltvConverter::from)
         .toList();
 
@@ -35,7 +32,7 @@ public class HltvTeamService {
   private List<HltvTeam> saveOrUpdate(List<HltvTeam> hltvTeams) {
     try {
       hltvTeamRepo.bulkUpsert(hltvTeams);
-      var teamSourceIds = hltvTeams.stream().map(HltvTeam::getSourceId).toList();
+      List<String> teamSourceIds = hltvTeams.stream().map(HltvTeam::getSourceId).toList();
       return hltvTeamRepo.findAllBySourceId(teamSourceIds);
     } catch (Exception e) {
       throw new RuntimeException(e); //todo: add appropriate exception
