@@ -12,12 +12,6 @@ public interface Endpoints {
     String ME = USERS + "/me";
   }
 
-  interface Hltv {
-
-    String HLTV = "/hltv";
-    String HLTV_SYNC = HLTV + "/sync";
-  }
-
   interface Subscription {
 
     String SUBSCRIPTIONS = "/subscriptions";

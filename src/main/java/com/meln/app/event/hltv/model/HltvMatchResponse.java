@@ -1,4 +1,4 @@
-package com.meln.app.event.hltv;
+package com.meln.app.event.hltv.model;
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;

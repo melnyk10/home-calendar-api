@@ -1,4 +1,4 @@
-package com.meln.app.event;
+package com.meln.app.event.model;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
@@ -16,46 +16,61 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 
 @Getter
 @Setter
+@Builder
 @ToString
 @EqualsAndHashCode(of = {"provider", "sourceId"}, callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @MongoEntity(collection = "events")
 public class Event extends PanacheMongoEntity {
 
+  public static final String COL_PROVIDER = "provider";
+  public static final String COL_SOURCE_ID = "sourceId";
+  public static final String COL_TITLE = "title";
+  public static final String COL_URL = "url";
+  public static final String COL_DETAILS = "details";
+  public static final String COL_NOTES = "notes";
+  public static final String COL_ALL_DAY = "allDay";
+  public static final String COL_START_AT = "startAt";
+  public static final String COL_END_AT = "endAt";
+  public static final String COL_CREATED_AT = "createdAt";
+  public static final String COL_UPDATED_AT = "updatedAt";
+
   @NotBlank
-  @BsonProperty("source_id")
+  @BsonProperty(COL_SOURCE_ID)
   private String sourceId;
 
   @NotNull
-  @BsonProperty("provider")
+  @BsonProperty(COL_PROVIDER)
   private Provider provider;
 
-  @BsonProperty("title")
   @NotBlank
+  @BsonProperty(COL_TITLE)
   private String title;
 
-  @BsonProperty("url")
+  @BsonProperty(COL_URL)
   private String url;
 
-  @BsonProperty("notes")
+  @BsonProperty(COL_DETAILS)
+  private String details;
+
+  @BsonProperty(COL_NOTES)
   private String notes;
 
-  @BsonProperty("all_day")
+  @BsonProperty(COL_ALL_DAY)
   private boolean allDay;
 
   @NotNull
-  @BsonProperty("start_at")
+  @BsonProperty(COL_START_AT)
   private Instant startAt;
 
-  @BsonProperty("end_at")
+  @BsonProperty(COL_END_AT)
   private Instant endAt;
 
-  @BsonProperty("created_at")
+  @BsonProperty(COL_CREATED_AT)
   private Instant createdAt;
 
-  @BsonProperty("updated_at")
+  @BsonProperty(COL_UPDATED_AT)
   private Instant updatedAt;
 
   @Override
@@ -81,5 +96,4 @@ public class Event extends PanacheMongoEntity {
   public void preUpdate() {
     updatedAt = Instant.now();
   }
-
 }

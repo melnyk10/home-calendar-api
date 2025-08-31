@@ -1,5 +1,8 @@
 package com.meln.app.event.hltv;
 
+import com.meln.app.event.hltv.model.HltvMatch;
+import com.meln.app.event.hltv.model.HltvMatchResponse;
+import com.meln.app.event.hltv.model.HltvTeam;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
@@ -7,11 +10,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = @Inject)
+@AllArgsConstructor(onConstructor_ = @Inject)
 public class HltvMatchService {
 
   private final HltvMatchRepo hltvMatchRepo;
@@ -34,7 +37,7 @@ public class HltvMatchService {
         .map(match -> {
           HltvTeam team1 = teamById.get(match.getTeam1Id());
           HltvTeam team2 = teamById.getOrDefault(match.getTeam2Id(), null);
-          return HltvMatchConverter.from(match, team1, team2);
+          return HltvConverter.from(match, team1, team2);
         })
         .toList();
 

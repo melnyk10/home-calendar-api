@@ -1,4 +1,4 @@
-package com.meln.common.event;
+package com.meln.app.common.event;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 

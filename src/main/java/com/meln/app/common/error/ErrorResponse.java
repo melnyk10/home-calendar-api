@@ -1,4 +1,4 @@
-package com.meln.common.error;
+package com.meln.app.common.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,13 +1,15 @@
 package com.meln.app.event.hltv;
 
+import com.meln.app.event.hltv.model.HltvTeam;
+import com.meln.app.event.hltv.model.HltvTeamResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = @Inject)
+@AllArgsConstructor(onConstructor_ = @Inject)
 public class HltvTeamService {
 
   private final HltvTeamRepo hltvTeamRepo;
@@ -18,10 +20,10 @@ public class HltvTeamService {
   }
 
   protected List<HltvTeam> syncTeams() {
-    List<HltvTeamResponse> teamsResponse = hltvTeamClient.syncTeams();
+    List<HltvTeamResponse> response = hltvTeamClient.syncTeams();
 
-    List<HltvTeam> hltvTeams = teamsResponse.stream()
-        .map(HltvTeamConverter::from)
+    List<HltvTeam> hltvTeams = response.stream()
+        .map(HltvConverter::from)
         .toList();
 
     return saveOrUpdate(hltvTeams);

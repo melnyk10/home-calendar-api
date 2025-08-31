@@ -1,17 +1,20 @@
 package com.meln.app.event.hltv;
 
+import com.meln.app.event.hltv.model.HltvTeam;
+import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = @Inject)
-public class HltvService {
+@AllArgsConstructor(onConstructor_ = @Inject)
+public class HltvScheduler {
 
   private final HltvTeamService hltvTeamService;
   private final HltvMatchService hltvMatchService;
 
+  @Scheduled(every = "15m")
   protected void sync() {
     List<HltvTeam> hltvTeams = hltvTeamService.syncTeams();
     hltvMatchService.syncMatches(hltvTeams);

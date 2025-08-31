@@ -1,6 +1,6 @@
-package com.meln.app.subscription;
+package com.meln.app.subscription.model;
 
-import com.meln.common.event.Criteria;
+import com.meln.app.common.event.Criteria;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import lombok.Getter;
@@ -12,13 +12,15 @@ import org.bson.types.ObjectId;
 @Setter
 @MongoEntity(collection = "subscriptions")
 public class Subscription extends PanacheMongoEntity {
+  public static final String COL_USER_ID = "userId";
+  public static final String COL_ACTIVE = "active";
 
-  @BsonProperty("user_id")
+  @BsonProperty(COL_USER_ID)
   private ObjectId userId;
 
-  @BsonProperty("active")
+  @BsonProperty(COL_ACTIVE)
   private boolean active = true;
 
-  @BsonProperty(value = "criteria", useDiscriminator = true)
+  @BsonProperty(useDiscriminator = true)
   public Criteria criteria;
 }

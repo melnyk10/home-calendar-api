@@ -1,4 +1,4 @@
-package com.meln.app.event.hltv;
+package com.meln.app.event.hltv.model;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
@@ -26,25 +26,31 @@ import org.bson.types.ObjectId;
 @MongoEntity(collection = "hltv_team")
 public class HltvTeam extends PanacheMongoEntity {
 
-  @BsonProperty("logo_url")
+  public static final String COL_LOGO_URL = "logoUrl";
+  public static final String COL_SOURCE_ID = "sourceId";
+  public static final String COL_SLUG = "slug";
+  public static final String COL_TEAM_NAME = "teamName";
+  public static final String COL_RANK = "rank";
+
+  @BsonProperty(COL_LOGO_URL)
   @Pattern(regexp = "^https?://.+", message = "logoUrl must be http(s) URL")
   private String logoUrl;
 
   @NotBlank
-  @BsonProperty("source_id")
+  @BsonProperty(COL_SOURCE_ID)
   private String sourceId;
 
   @NotBlank
   @Size(max = 128)
-  @BsonProperty("slug")
+  @BsonProperty(COL_SLUG)
   private String slug;
 
   @NotBlank
   @Size(max = 128)
-  @BsonProperty("team_name")
+  @BsonProperty(COL_TEAM_NAME)
   private String teamName;
 
-  @BsonProperty("rank")
+  @BsonProperty(COL_RANK)
   private Integer rank;
 
   public ObjectId getId() {

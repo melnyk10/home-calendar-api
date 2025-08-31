@@ -1,4 +1,4 @@
-package com.meln.app.event.hltv;
+package com.meln.app.event.hltv.model;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
@@ -25,29 +25,37 @@ import org.bson.types.ObjectId;
 @MongoEntity(collection = "hltv_match")
 public class HltvMatch extends PanacheMongoEntity {
 
+  public static final String COL_MATCH_ID = "matchId";
+  public static final String COL_MATCH_URL = "matchUrl";
+  public static final String COL_STARTS_AT = "startsAt";
+  public static final String COL_SCORE1 = "score1";
+  public static final String COL_SCORE2 = "score2";
+  public static final String COL_TEAM1_ID = "team1Id";
+  public static final String COL_TEAM2_ID = "team2Id";
+
   @NotBlank
-  @BsonProperty("match_id")
+  @BsonProperty(COL_MATCH_ID)
   private String matchId;
 
   @NotBlank
-  @BsonProperty("match_url")
+  @BsonProperty(COL_MATCH_URL)
   private String matchUrl;
 
   @NotNull
-  @BsonProperty("starts_at")
+  @BsonProperty(COL_STARTS_AT)
   private Instant startsAt;
 
-  @BsonProperty("score1")
+  @BsonProperty(COL_SCORE1)
   private Integer score1;
 
-  @BsonProperty("score2")
+  @BsonProperty(COL_SCORE2)
   private Integer score2;
 
   @NotNull
-  @BsonProperty("team1_id")
+  @BsonProperty(COL_TEAM1_ID)
   private ObjectId team1Id;
 
   @NotNull
-  @BsonProperty("team2_id")
+  @BsonProperty(COL_TEAM2_ID)
   private ObjectId team2Id;
 }

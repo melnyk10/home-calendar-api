@@ -1,32 +1,25 @@
 package com.meln.app.user;
 
-import com.meln.common.CacheNames;
-import com.meln.common.user.UserClient;
-import com.meln.common.user.UserDto;
+import com.meln.app.common.CacheNames;
+import com.meln.app.user.model.UserDto;
 import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = @Inject)
-public class UserService implements UserClient {
+@AllArgsConstructor(onConstructor_ = @Inject)
+public class UserService {
 
   private final UserRepo userRepo;
 
-  public UserMe me(String email) {
-    User user = userRepo.findByEmail(email);
-    return UserConverter.toUserMe(user);
-  }
-
   public UserDto getByEmail(String email) {
-    User user = userRepo.findByEmail(email);
-    return UserConverter.toUserDto(user);
+    var user = userRepo.findByEmail(email);
+    return UserDto.from(user);
   }
 
-  @Override
-  @CacheResult(cacheName = CacheNames.USER_EXISTS_CACHE_NAME)
   //todo: don't forget to add @CacheInvalidate for future deleteUser method
+  @CacheResult(cacheName = CacheNames.USER_EXISTS_CACHE_NAME)
   public boolean existsByEmail(String email) {
     return userRepo.existsByEmail(email);
   }

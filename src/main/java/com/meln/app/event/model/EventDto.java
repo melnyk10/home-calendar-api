@@ -1,4 +1,4 @@
-package com.meln.app.event;
+package com.meln.app.event.model;
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;

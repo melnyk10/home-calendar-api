@@ -1,4 +1,4 @@
-package com.meln.common.error;
+package com.meln.app.common.error;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

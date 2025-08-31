@@ -1,14 +1,16 @@
 package com.meln.app.event.hltv;
 
-import com.meln.app.event.EventDto;
+import com.meln.app.event.hltv.model.HltvMatch;
+import com.meln.app.event.hltv.model.HltvTeam;
+import com.meln.app.event.model.EventDto;
 import com.meln.app.event.EventProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = @Inject)
+@AllArgsConstructor(onConstructor_ = @Inject)
 public class HltvEventProvider implements EventProvider<CriteriaHltv> {
 
   private final HltvTeamService hltvTeamService;
@@ -31,6 +33,6 @@ public class HltvEventProvider implements EventProvider<CriteriaHltv> {
     //todo: improve! on each event creation we will query DB
     HltvTeam team1 = hltvTeamService.getById(hltvMatch.getTeam1Id());
     HltvTeam team2 = hltvTeamService.getById(hltvMatch.getTeam2Id());
-    return HltvMatchConverter.from(hltvMatch, team1, team2);
+    return HltvConverter.from(hltvMatch, team1, team2);
   }
 }

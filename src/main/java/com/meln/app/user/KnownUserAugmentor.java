@@ -1,6 +1,5 @@
-package com.meln.common.auth;
+package com.meln.app.user;
 
-import com.meln.common.user.UserClient;
 import io.quarkus.security.AuthenticationFailedException;
 import io.quarkus.security.identity.AuthenticationRequestContext;
 import io.quarkus.security.identity.SecurityIdentity;
@@ -8,13 +7,13 @@ import io.quarkus.security.identity.SecurityIdentityAugmentor;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = @Inject)
+@AllArgsConstructor(onConstructor_ = @Inject)
 public class KnownUserAugmentor implements SecurityIdentityAugmentor {
 
-  private final UserClient userClient;
+  private final UserService userService;
 
   @Override
   public int priority() {
@@ -33,7 +32,7 @@ public class KnownUserAugmentor implements SecurityIdentityAugmentor {
       return Uni.createFrom().failure(new AuthenticationFailedException("Missing email claim"));
     }
 
-    boolean exists = userClient.existsByEmail(email);
+    boolean exists = userService.existsByEmail(email);
     if (!exists) {
       return Uni.createFrom().failure(new AuthenticationFailedException("Unknown user"));
     }

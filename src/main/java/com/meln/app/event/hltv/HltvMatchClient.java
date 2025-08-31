@@ -1,5 +1,7 @@
 package com.meln.app.event.hltv;
 
+import com.meln.app.event.hltv.model.HltvMatchResponse;
+import com.meln.app.event.hltv.model.HltvTeam;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.Instant;
 import java.util.ArrayList;

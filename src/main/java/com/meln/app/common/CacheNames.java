@@ -1,4 +1,4 @@
-package com.meln.common;
+package com.meln.app.common;
 
 public interface CacheNames {
 

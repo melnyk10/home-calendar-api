@@ -1,4 +1,4 @@
-package com.meln.app.user;
+package com.meln.app.user.model;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 @MongoEntity(collection = "users")
 public class User extends PanacheMongoEntity {
+
+  public static final String COL_EMAIL = "email";
 
   private String firstName;
   private String lastName;

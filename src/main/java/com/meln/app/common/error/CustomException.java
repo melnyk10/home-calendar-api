@@ -1,4 +1,4 @@
-package com.meln.common.error;
+package com.meln.app.common.error;
 
 import jakarta.ws.rs.core.Response;
 import lombok.Getter;

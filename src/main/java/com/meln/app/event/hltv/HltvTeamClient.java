@@ -1,5 +1,6 @@
 package com.meln.app.event.hltv;
 
+import com.meln.app.event.hltv.model.HltvTeamResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 

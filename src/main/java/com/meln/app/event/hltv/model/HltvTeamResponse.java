@@ -1,4 +1,4 @@
-package com.meln.common.user;
+package com.meln.app.event.hltv.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +11,11 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class HltvTeamResponse {
 
-  private String id;
-  private String firstName;
-  private String lastName;
-  private String email;
+  private Integer rank;
+  private String name;
+  private String logoUrl;
+  private Integer teamId;
+  private String teamIdName;
 }

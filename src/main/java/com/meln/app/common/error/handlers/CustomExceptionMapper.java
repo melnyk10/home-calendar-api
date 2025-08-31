@@ -1,8 +1,8 @@
-package com.meln.common.error.handlers;
+package com.meln.app.common.error.handlers;
 
-import com.meln.common.error.CustomException;
-import com.meln.common.error.Error;
-import com.meln.common.error.ErrorResponse;
+import com.meln.app.common.error.CustomException;
+import com.meln.app.common.error.Error;
+import com.meln.app.common.error.ErrorResponse;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;

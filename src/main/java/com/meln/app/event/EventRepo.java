@@ -1,5 +1,6 @@
 package com.meln.app.event;
 
+import com.meln.app.event.model.Event;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOneModel;
@@ -24,28 +25,26 @@ public class EventRepo implements PanacheMongoRepository<Event> {
           Instant now = Instant.now();
 
           Bson filter = Filters.and(
-              Filters.eq("provider", e.getProvider()),
-              Filters.eq("external_id", e.getSourceId())
+              Filters.eq(Event.COL_PROVIDER, e.getProvider()),
+              Filters.eq(Event.COL_SOURCE_ID, e.getSourceId())
           );
 
           List<Bson> sets = new ArrayList<>();
-          Optional.ofNullable(e.getTitle()).ifPresent(v -> sets.add(Updates.set("title", v)));
-          Optional.ofNullable(e.getUrl()).ifPresent(v -> sets.add(Updates.set("url", v)));
-          Optional.ofNullable(e.getNotes()).ifPresent(v -> sets.add(Updates.set("details", v)));
-          Optional.ofNullable(e.getStartAt()).ifPresent(v -> sets.add(Updates.set("start_at", v)));
-          Optional.ofNullable(e.getEndAt()).ifPresent(v -> sets.add(Updates.set("end_at", v)));
-          Optional.ofNullable(e.getSourceId())
-              .ifPresent(v -> sets.add(Updates.set("event_source_id", v)));
+          Optional.ofNullable(e.getTitle()).ifPresent(v -> sets.add(Updates.set(Event.COL_TITLE, v)));
+          Optional.ofNullable(e.getUrl()).ifPresent(v -> sets.add(Updates.set(Event.COL_URL, v)));
+          Optional.ofNullable(e.getNotes()).ifPresent(v -> sets.add(Updates.set(Event.COL_DETAILS, v)));
+          Optional.ofNullable(e.getStartAt()).ifPresent(v -> sets.add(Updates.set(Event.COL_START_AT, v)));
+          Optional.ofNullable(e.getEndAt()).ifPresent(v -> sets.add(Updates.set(Event.COL_END_AT, v)));
 
-          sets.add(Updates.set("all_day", e.isAllDay()));
-          sets.add(Updates.set("updated_at", now));
+          sets.add(Updates.set(Event.COL_ALL_DAY, e.isAllDay()));
+          sets.add(Updates.set(Event.COL_UPDATED_AT, now));
 
           Bson setStage = Updates.combine(sets.toArray(new Bson[0]));
 
           Bson setOnInsertStage = Updates.combine(
-              Updates.setOnInsert("provider", e.getProvider()),
-              Updates.setOnInsert("external_id", e.getSourceId()),
-              Updates.setOnInsert("created_at", now)
+              Updates.setOnInsert(Event.COL_PROVIDER, e.getProvider()),
+              Updates.setOnInsert(Event.COL_SOURCE_ID, e.getSourceId()),
+              Updates.setOnInsert(Event.COL_CREATED_AT, now)
           );
 
           Bson update = Updates.combine(setStage, setOnInsertStage);

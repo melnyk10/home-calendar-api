@@ -1,6 +1,6 @@
 package com.meln.app.event.hltv;
 
-import com.meln.common.event.Criteria;
+import com.meln.app.common.event.Criteria;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

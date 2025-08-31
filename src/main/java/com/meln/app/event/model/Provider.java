@@ -1,4 +1,4 @@
-package com.meln.app.event;
+package com.meln.app.event.model;
 
 public enum Provider {
   HLTV
