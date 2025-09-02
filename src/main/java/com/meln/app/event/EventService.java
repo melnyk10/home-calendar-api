@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(onConstructor_ = @Inject)
 public class EventService {
 
-  private final EventRepo eventRepo;
+  private final EventRepository eventRepo;
 
   public void saveOrUpdate(Collection<EventDto> events) {
     var eventEntities = events.stream().map(EventConverter::from).toList();

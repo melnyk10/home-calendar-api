@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(onConstructor_ = @Inject)
 public class UserService {
 
-  private final UserRepo userRepo;
+  private final UserRepository userRepo;
 
   public UserInfo getByEmail(String email) {
     var user = userRepo.findByEmail(email);

@@ -11,7 +11,7 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor(onConstructor_ = @Inject)
 public class SubscriptionService {
 
-  private final SubscriptionRepo subscriptionRepo;
+  private final SubscriptionRepository subscriptionRepo;
 
   public List<Subscription> getAllUserSubscriptions(String userId) {
     return subscriptionRepo.find(Subscription.COL_USER_ID, new ObjectId(userId)).list();
