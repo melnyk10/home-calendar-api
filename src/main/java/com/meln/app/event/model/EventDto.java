@@ -15,6 +15,7 @@ import lombok.Setter;
 public class EventDto {
 
   private String sourceId;
+  private String calendarEventSourceId;
   private String provider;
   private String title;
   private String url;

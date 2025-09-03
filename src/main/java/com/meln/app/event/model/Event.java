@@ -26,6 +26,7 @@ public class Event extends PanacheMongoEntity {
 
   public static final String COL_PROVIDER = "provider";
   public static final String COL_SOURCE_ID = "sourceId";
+  public static final String COL_CALENDAR_EVENT_SOURCE_ID = "calendarEventSourceId";
   public static final String COL_TITLE = "title";
   public static final String COL_URL = "url";
   public static final String COL_DETAILS = "details";
@@ -39,6 +40,10 @@ public class Event extends PanacheMongoEntity {
   @NotBlank
   @BsonProperty(COL_SOURCE_ID)
   private String sourceId;
+
+  @NotBlank
+  @BsonProperty(COL_CALENDAR_EVENT_SOURCE_ID)
+  private String calendarEventSourceId;
 
   @NotNull
   @BsonProperty(COL_PROVIDER)

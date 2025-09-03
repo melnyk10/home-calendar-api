@@ -14,6 +14,7 @@ public class EventConverter {
 
     return EventDto.builder()
         .sourceId(event.getSourceId())
+        .calendarEventSourceId(event.getCalendarEventSourceId())
         .title(event.getTitle())
         .url(event.getUrl())
         .notes(event.getNotes())
@@ -30,6 +31,7 @@ public class EventConverter {
 
     return Event.builder()
         .sourceId(dto.getSourceId())
+        .calendarEventSourceId(dto.getCalendarEventSourceId())
         .title(dto.getTitle())
         .url(dto.getUrl())
         .notes(dto.getNotes())
