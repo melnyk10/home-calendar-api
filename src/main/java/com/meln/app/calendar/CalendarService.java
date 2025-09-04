@@ -1,9 +1,8 @@
 package com.meln.app.calendar;
 
-import com.meln.app.calendar.model.CalendarIntegration;
+import com.meln.app.calendar.model.Calendar;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +12,14 @@ import org.bson.types.ObjectId;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CalendarService {
 
-  private final CalendarIntegrationRepository repository;
+  private final CalendarRepository repository;
 
-  public Map<ObjectId, CalendarIntegrationProperties> getCalendarIntegrationPropsByUserId() {
-    List<CalendarIntegration> calendarIntegrations = repository.listAll();
-    return calendarIntegrations.stream()
+  public Map<ObjectId, CalendarProperties> getCalendarIntegrationPropsByUserId() {
+    var calendars = repository.listAll();
+    return calendars.stream()
         .collect(Collectors.toMap(
-            CalendarIntegration::getUserId,
-            CalendarIntegration::getProperties)
+            Calendar::getUserId,
+            Calendar::getProperties)
         );
   }
 

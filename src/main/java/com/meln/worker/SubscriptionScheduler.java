@@ -1,15 +1,17 @@
 package com.meln.worker;
 
+import com.meln.app.calendar.CalendarClient;
+import com.meln.app.calendar.CalendarProperties;
 import com.meln.app.calendar.CalendarProviderRegistry;
 import com.meln.app.calendar.CalendarService;
 import com.meln.app.event.EventProviderRegistry;
 import com.meln.app.event.EventService;
-import com.meln.app.event.model.EventDto;
 import com.meln.app.subscription.SubscriptionRepository;
 import com.meln.app.subscription.model.Subscription;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import javax.naming.AuthenticationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,12 +23,12 @@ public class SubscriptionScheduler {
   private final EventService eventService;
   private final EventProviderRegistry eventProviderRegistry;
   private final SubscriptionRepository subscriptionRepo;
-  private final CalendarProviderRegistry calendarRegistry;
   private final CalendarService calendarService;
+  private final CalendarProviderRegistry calendarRegistry;
 
   @Scheduled(every = "15m")
   void syncAll() {
-    var calendarIntegrationPropsByUserId = calendarService.getCalendarIntegrationPropsByUserId();
+    var calendarPropsByUserId = calendarService.getCalendarIntegrationPropsByUserId();
     var activeSubscriptions = subscriptionRepo.find(Subscription.COL_ACTIVE, true).list();
     for (var subscription : activeSubscriptions) {
       try {
@@ -34,17 +36,27 @@ public class SubscriptionScheduler {
         var eventProvider = eventProviderRegistry.get(criteria);
         var events = eventProvider.fetch(criteria);
 
-        var calendarIntegrationProps = calendarIntegrationPropsByUserId.get(
-            subscription.getUserId());
-        var calendarClient = calendarRegistry.get(calendarIntegrationProps);
+        CalendarClient<CalendarProperties> calendarClient;
+        try {
+          var userCalendarProps = calendarPropsByUserId.get(subscription.getUserId());
+          calendarClient = calendarRegistry.resolveAndAuthenticate(userCalendarProps);
+        } catch (AuthenticationException e) {
+          log.error("Can't authenticate with calendar provider for userId: {}",
+              subscription.getUserId(), e);
+          continue;
+        }
 
-        for (EventDto event : events) {
-          if (event.getCalendarEventSourceId() != null) {
-            calendarClient.updateEvent(calendarIntegrationProps, event.getCalendarEventSourceId(),
-                event);
-          } else {
-            String newEventId = calendarClient.createEvent(calendarIntegrationProps, event);
-            event.setCalendarEventSourceId(newEventId);
+        for (var event : events) {
+          try {
+            if (event.getCalendarEventSourceId() != null) {
+              calendarClient.updateEvent(event.getCalendarEventSourceId(), event);
+            } else {
+              String newEventId = calendarClient.createEvent(event);
+              event.setCalendarEventSourceId(newEventId);
+            }
+          } catch (Exception e) {
+            events.remove(event);
+            log.error("Error while creating or updating event in calendar. Skipping...", e);
           }
         }
 

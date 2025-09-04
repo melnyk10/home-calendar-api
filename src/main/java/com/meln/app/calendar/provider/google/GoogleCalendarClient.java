@@ -1,39 +1,37 @@
 package com.meln.app.calendar.provider.google;
 
-import com.meln.app.calendar.CalendarIntegrationClient;
+import com.meln.app.calendar.CalendarClient;
 import com.meln.app.event.model.EventDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.UUID;
+import javax.naming.AuthenticationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ApplicationScoped
 @RequiredArgsConstructor
-public class GoogleCalendarIntegrationClient implements
-    CalendarIntegrationClient<GoogleCalendarProperties> {
+public class GoogleCalendarClient implements CalendarClient<GoogleCalendarProperties> {
 
   @Override
   public Class<GoogleCalendarProperties> propertiesType() {
     return GoogleCalendarProperties.class;
   }
 
-  private Object prepareClient(GoogleCalendarProperties props) {
-    //todo: prepare or auth and return client to make CRUD for Google Calendar
-    return null;
+  @Override
+  public void connect(GoogleCalendarProperties props) throws AuthenticationException {
+    //todo: take google client and auth by props
   }
 
   @Override
-  public String createEvent(GoogleCalendarProperties props, EventDto event) {
-    Object client = prepareClient(props);
+  public String createEvent(EventDto event) {
     String eventId = UUID.randomUUID().toString();
     log.info("Creating a new event with id {}", eventId);
     return eventId;
   }
 
   @Override
-  public void updateEvent(GoogleCalendarProperties props, String eventId, EventDto event) {
-    Object client = prepareClient(props);
+  public void updateEvent(String eventId, EventDto event) {
     log.debug("Updating event with id {}", eventId);
   }
 

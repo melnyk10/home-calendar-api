@@ -1,6 +1,6 @@
 package com.meln.app.calendar.model;
 
-import com.meln.app.calendar.CalendarIntegrationProperties;
+import com.meln.app.calendar.CalendarProperties;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import org.bson.types.ObjectId;
 @Getter
 @Setter
 @MongoEntity(collection = "calendarIntegrations")
-public class CalendarIntegration extends PanacheMongoEntity {
+public class Calendar extends PanacheMongoEntity {
 
   public static final String COL_USER_ID = "userId";
   public static final String COL_SOURCE_ID = "sourceId";
@@ -24,5 +24,5 @@ public class CalendarIntegration extends PanacheMongoEntity {
   private String sourceId;
 
   @BsonProperty(value = COL_PROPERTIES, useDiscriminator = true)
-  private CalendarIntegrationProperties properties;
+  private CalendarProperties properties;
 }
