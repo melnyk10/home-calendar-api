@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ApplicationScoped
 @RequiredArgsConstructor
+//todo: Make the client stateless
 public class GoogleCalendarClient implements CalendarClient<GoogleCalendarProperties> {
 
   @Override
