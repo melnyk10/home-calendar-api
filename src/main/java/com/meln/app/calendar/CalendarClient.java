@@ -7,9 +7,16 @@ public interface CalendarClient<P extends CalendarProperties> {
 
   Class<P> propertiesType();
 
-  void connect(P props) throws AuthenticationException;
+  CalendarConnection connect(P props) throws AuthenticationException;
 
-  String createEvent(EventDto event);
+  interface CalendarConnection extends AutoCloseable {
 
-  void updateEvent(String eventId, EventDto event);
+    String createEvent(EventDto event);
+
+    void updateEvent(EventDto event);
+
+    @Override
+    default void close() {
+    }
+  }
 }

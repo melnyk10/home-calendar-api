@@ -13,9 +13,11 @@ public class EventConverter {
     }
 
     return EventDto.builder()
+        .id(event.getId())
         .sourceId(event.getSourceId())
         .calendarEventSourceId(event.getCalendarEventSourceId())
         .title(event.getTitle())
+        .details(event.getDetails())
         .url(event.getUrl())
         .notes(event.getNotes())
         .allDay(event.isAllDay())
@@ -33,6 +35,7 @@ public class EventConverter {
         .sourceId(dto.getSourceId())
         .calendarEventSourceId(dto.getCalendarEventSourceId())
         .title(dto.getTitle())
+        .details(dto.getDetails())
         .url(dto.getUrl())
         .notes(dto.getNotes())
         .allDay(dto.isAllDay())

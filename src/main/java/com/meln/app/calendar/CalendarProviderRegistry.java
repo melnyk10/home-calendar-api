@@ -10,27 +10,20 @@ import javax.naming.AuthenticationException;
 @ApplicationScoped
 public class CalendarProviderRegistry {
 
-  private final Map<Class<? extends CalendarProperties>, CalendarClient<?>> calendarClientByProperties = new HashMap<>();
+  private final Map<Class<? extends CalendarProperties>, CalendarClient<?>> byProps = new HashMap<>();
 
   @Inject
   public CalendarProviderRegistry(Instance<CalendarClient<?>> calendarClients) {
-    calendarClients.forEach(p -> calendarClientByProperties.put(p.propertiesType(), p));
+    calendarClients.forEach(c -> byProps.put(c.propertiesType(), c));
   }
 
   @SuppressWarnings("unchecked")
-  public <C extends CalendarProperties> CalendarClient<C> resolveAndAuthenticate(C props)
+  public <P extends CalendarProperties> CalendarClient.CalendarConnection connect(P props)
       throws AuthenticationException {
-    if (props == null) {
-      throw new IllegalArgumentException("Calendar properties not provided");
-    }
-
-    var calendarClient = (CalendarClient<C>) calendarClientByProperties.get(props.getClass());
-    if (calendarClient == null) {
+    CalendarClient<P> client = (CalendarClient<P>) byProps.get(props.getClass());
+    if (client == null) {
       throw new IllegalArgumentException("No provider for " + props.getClass().getName());
     }
-
-    calendarClient.connect(props);
-    return calendarClient;
+    return client.connect(props);
   }
-
 }

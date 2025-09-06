@@ -1,7 +1,5 @@
 package com.meln.worker;
 
-import com.meln.app.calendar.CalendarClient;
-import com.meln.app.calendar.CalendarProperties;
 import com.meln.app.calendar.CalendarProviderRegistry;
 import com.meln.app.calendar.CalendarService;
 import com.meln.app.event.EventProviderRegistry;
@@ -11,7 +9,6 @@ import com.meln.app.subscription.model.Subscription;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import javax.naming.AuthenticationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,33 +28,25 @@ public class SubscriptionScheduler {
     var calendarPropsByUserId = calendarService.getCalendarIntegrationPropsByUserId();
     var activeSubscriptions = subscriptionRepo.find(Subscription.COL_ACTIVE, true).list();
     for (var subscription : activeSubscriptions) {
+      var criteria = subscription.getCriteria();
+      var eventProvider = eventProviderRegistry.get(criteria);
+
       try {
-        var criteria = subscription.getCriteria();
-        var eventProvider = eventProviderRegistry.get(criteria);
         var events = eventProvider.fetch(criteria);
 
-        CalendarClient<CalendarProperties> calendarClient;
-        try {
-          var userCalendarProps = calendarPropsByUserId.get(subscription.getUserId());
-          calendarClient = calendarRegistry.resolveAndAuthenticate(userCalendarProps);
-        } catch (AuthenticationException e) {
-          log.error("Can't authenticate with calendar provider for userId: {}",
-              subscription.getUserId(), e);
-          continue;
-        }
-
-        for (var event : events) {
-          try {
+        var userProps = calendarPropsByUserId.get(subscription.getUserId()); // fetched from DB
+        try (var conn = calendarRegistry.connect(userProps)) {
+          for (var event : events) {
             if (event.getCalendarEventSourceId() != null) {
-              calendarClient.updateEvent(event.getCalendarEventSourceId(), event);
+              conn.updateEvent(event);
             } else {
-              String newEventId = calendarClient.createEvent(event);
+              String newEventId = conn.createEvent(event);
               event.setCalendarEventSourceId(newEventId);
             }
-          } catch (Exception e) {
-            events.remove(event);
-            log.error("Error while creating or updating event in calendar. Skipping...", e);
           }
+        } catch (Exception e) {
+          log.warn("Can't connect to calendar", e);
+          continue;
         }
 
         if (!events.isEmpty()) {
@@ -66,6 +55,8 @@ public class SubscriptionScheduler {
       } catch (Exception e) {
         log.error("Sync failed for subscription: {}", subscription.id, e);
       }
+
     }
   }
+
 }

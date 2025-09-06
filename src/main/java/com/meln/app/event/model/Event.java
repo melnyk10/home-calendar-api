@@ -101,4 +101,8 @@ public class Event extends PanacheMongoEntity {
   public void preUpdate() {
     updatedAt = Instant.now();
   }
+
+  public String getId() {
+    return id.toString();
+  }
 }
