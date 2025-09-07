@@ -29,6 +29,7 @@ public class GoogleTokenService {
 
   @ConfigProperty(name = "app.google.client-id")
   String clientId;
+
   @ConfigProperty(name = "app.google.client-secret")
   String clientSecret;
 
@@ -47,16 +48,13 @@ public class GoogleTokenService {
         .scopes(Set.of(CalendarScopes.CALENDAR_EVENTS))
         .build();
 
+    repository.persist(googleToken);
     return googleToken;
   }
 
   public Calendar calendarClient(String userId) {
     GoogleToken userToken = findByUser(userId);
-    return calendarClient(userToken);
-  }
-
-  private Calendar calendarClient(GoogleToken token) {
-    return new Calendar.Builder(HTTP, JSON_FACTORY, requestInitializer(token))
+    return new Calendar.Builder(HTTP, JSON_FACTORY, requestInitializer(userToken))
         .setApplicationName("Home Calendar").build();
   }
 

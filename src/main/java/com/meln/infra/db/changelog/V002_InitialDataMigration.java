@@ -18,8 +18,8 @@ import org.bson.types.ObjectId;
 public class V002_InitialDataMigration {
 
   private static final String COL_USERS = "users";
-  private static final String COL_HLTV_TEAM = "hltv_team";
-  private static final String COL_HLTV_MATCH = "hltv_match";
+  private static final String COL_HLTV_TEAM = "hltvTeam";
+  private static final String COL_HLTV_MATCH = "hltvMatch";
   private static final String COL_SUBSCRIPTIONS = "subscriptions";
 
   @Execution

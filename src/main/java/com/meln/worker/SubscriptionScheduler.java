@@ -34,7 +34,7 @@ public class SubscriptionScheduler {
       try {
         var events = eventProvider.fetch(criteria);
 
-        var userProps = calendarPropsByUserId.get(subscription.getUserId()); // fetched from DB
+        var userProps = calendarPropsByUserId.get(subscription.getUserId());
         try (var conn = calendarRegistry.connect(userProps)) {
           for (var event : events) {
             if (event.getCalendarEventSourceId() != null) {
@@ -45,7 +45,8 @@ public class SubscriptionScheduler {
             }
           }
         } catch (Exception e) {
-          log.warn("Can't connect to calendar", e);
+          log.warn("Calendar sync failed (userId={}): {}", subscription.getUserId(),
+              e.getMessage());
           continue;
         }
 
