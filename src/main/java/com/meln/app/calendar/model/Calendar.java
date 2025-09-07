@@ -10,7 +10,7 @@ import org.bson.types.ObjectId;
 
 @Getter
 @Setter
-@MongoEntity(collection = "calendarIntegrations")
+@MongoEntity(collection = "calendar")
 public class Calendar extends PanacheMongoEntity {
 
   public static final String COL_USER_ID = "userId";

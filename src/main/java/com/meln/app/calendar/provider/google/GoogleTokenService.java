@@ -55,6 +55,10 @@ public class GoogleTokenService {
 
   public Calendar calendarClient(String userId) {
     GoogleToken userToken = findByUser(userId);
+    if (userToken == null) {
+      //todo: redirect user to connect/auth google
+      throw new IllegalStateException("Google account is not connected for user " + userId);
+    }
     return new Calendar.Builder(HTTP, JSON_FACTORY, requestInitializer(userToken))
         .setApplicationName("Home Calendar").build();
   }

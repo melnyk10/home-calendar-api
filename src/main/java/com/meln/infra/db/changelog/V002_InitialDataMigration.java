@@ -1,5 +1,6 @@
 package com.meln.infra.db.changelog;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOptions;
@@ -10,6 +11,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -30,6 +32,7 @@ public class V002_InitialDataMigration {
     seedMatches(db, teamId);
 
     seedHltvSubscription(db, "o.melnyk10@gmail.com", "natus-vincere");
+    addCalendar(db, "o.melnyk10@gmail.com");
   }
 
   private void users(MongoDatabase db) {
@@ -98,13 +101,13 @@ public class V002_InitialDataMigration {
     ObjectId userId = findUserIdByEmail(db, userEmail);
     ObjectId teamId = findTeamObjectId(db, teamKey);
 
-    Document subDoc = new Document("user_id", userId)
+    Document subDoc = new Document("userId", userId)
         .append("provider", "HLTV")
         .append("active", true)
         .append("criteria", new Document("_type", "hltv")
             .append("team_ids", List.of(teamId)));
 
-    Document filter = new Document("user_id", userId)
+    Document filter = new Document("userId", userId)
         .append("provider", "HLTV")
         .append("criteria._type", "hltv")
         .append("criteria.team_ids", new Document("$all", List.of(teamId)));
@@ -139,6 +142,25 @@ public class V002_InitialDataMigration {
       throw new IllegalStateException("Team not found: " + teamKey);
     }
     return team.getObjectId("_id");
+  }
+
+  private void addCalendar(MongoDatabase db, String userEmail) {
+    ObjectId userId = findUserIdByEmail(db, userEmail);
+
+    MongoCollection<Document> collection = db.getCollection("calendar");
+
+    Document properties = new Document(Map.of(
+        "_type", "google",
+        "userId", userId.toString(),
+        "calendarId", "d27cfb6cf4b09045227b9d431b67571128c2b6e1122053cb518fe1739b081574@group.calendar.google.com"
+    ));
+
+    Document calendar = new Document()
+        .append("userId", userId)
+        .append("sourceId", "d27cfb6cf4b09045227b9d431b67571128c2b6e1122053cb518fe1739b081574@group.calendar.google.com")
+        .append("properties", properties);
+
+    collection.insertOne(calendar);
   }
 
   @RollbackExecution
