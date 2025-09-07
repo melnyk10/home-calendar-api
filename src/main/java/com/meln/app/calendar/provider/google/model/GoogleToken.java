@@ -1,4 +1,4 @@
-package com.meln.app.calendar.provider.google;
+package com.meln.app.calendar.provider.google.model;
 
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
