@@ -12,7 +12,7 @@ public class HltvScheduler {
   private final HltvTeamService hltvTeamService;
   private final HltvMatchService hltvMatchService;
 
-  @Scheduled(every = "15m")
+  @Scheduled(every = "10m")
   protected void sync() {
     var hltvTeams = hltvTeamService.syncTeams();
     hltvMatchService.syncMatches(hltvTeams);

@@ -1,3 +1,9 @@
+app:
+  google:
+    auth-redirect-uri: http://localhost:8085/api/v1/google/callback
+    success-redirect: http://localhost:8085/api/v1/google/success
+    failure-redirect: http://localhost:8085/api/v1/google/failed
+
 quarkus:
   http:
     port: 8085

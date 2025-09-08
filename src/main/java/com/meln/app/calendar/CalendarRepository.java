@@ -5,6 +5,6 @@ import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class CalendarRepository implements PanacheMongoRepository<Calendar> {
+class CalendarRepository implements PanacheMongoRepository<Calendar> {
 
 }

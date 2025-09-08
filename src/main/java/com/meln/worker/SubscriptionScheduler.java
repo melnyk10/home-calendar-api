@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ApplicationScoped
 @AllArgsConstructor(onConstructor_ = @Inject)
-public class SubscriptionScheduler {
+class SubscriptionScheduler {
 
   private final EventService eventService;
   private final EventProviderRegistry eventProviderRegistry;
@@ -33,9 +33,13 @@ public class SubscriptionScheduler {
 
       try {
         var events = eventProvider.fetch(criteria);
+        if (events.isEmpty()) {
+          continue;
+        }
 
         var userProps = calendarPropsByUserId.get(subscription.getUserId());
-        try (var conn = calendarRegistry.connect(userProps)) {
+        try {
+          var conn = calendarRegistry.connect(userProps);
           for (var event : events) {
             if (event.getCalendarEventSourceId() != null) {
               conn.updateEvent(event);

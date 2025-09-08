@@ -14,16 +14,16 @@ import org.bson.types.ObjectId;
 
 @ApplicationScoped
 @AllArgsConstructor(onConstructor_ = @Inject)
-public class HltvMatchService {
+class HltvMatchService {
 
-  private final HltvMatchRepo hltvMatchRepo;
+  private final HltvMatchRepository hltvMatchRepository;
   private final HltvMatchClient hltvMatchClient;
 
   protected List<HltvMatch> getAllByTeamId(Collection<ObjectId> teamIds) {
     if (teamIds == null || teamIds.isEmpty()) {
       return new ArrayList<>();
     }
-    return hltvMatchRepo.findAllFeaturesMatchesByTeamIdIn(teamIds);
+    return hltvMatchRepository.findAllFeaturesMatchesByTeamIdIn(teamIds);
   }
 
   protected void syncMatches(Collection<HltvTeam> teams) {
@@ -45,7 +45,7 @@ public class HltvMatchService {
 
   private void saveOrUpdate(List<HltvMatch> hltvMatches) {
     try {
-      hltvMatchRepo.bulkUpsert(hltvMatches);
+      hltvMatchRepository.bulkUpsert(hltvMatches);
     } catch (Exception e) {
       throw new RuntimeException(e); //todo: add appropriate exception
     }

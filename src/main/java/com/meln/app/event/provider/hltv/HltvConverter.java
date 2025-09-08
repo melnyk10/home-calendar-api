@@ -4,12 +4,13 @@ import com.meln.app.event.provider.hltv.model.HltvMatch;
 import com.meln.app.event.provider.hltv.model.HltvMatchResponse;
 import com.meln.app.event.provider.hltv.model.HltvTeam;
 import com.meln.app.event.provider.hltv.model.HltvTeamResponse;
-import com.meln.app.event.model.EventDto;
+import com.meln.app.event.model.EventPayload;
 import com.meln.app.event.model.Provider;
+import java.time.ZoneId;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class HltvConverter {
+class HltvConverter {
 
   public HltvTeam from(HltvTeamResponse response) {
     if (response == null) {
@@ -41,12 +42,12 @@ public class HltvConverter {
         .build();
   }
 
-  public EventDto from(HltvMatch hltvMatch, HltvTeam team1, HltvTeam team2) {
+  public EventPayload from(HltvMatch hltvMatch, HltvTeam team1, HltvTeam team2) {
     if (hltvMatch == null || team1 == null) {
       return null;
     }
 
-    EventDto event = new EventDto();
+    EventPayload event = new EventPayload();
     event.setProvider(Provider.HLTV.toString());
     event.setAllDay(false);
     event.setSourceId(String.valueOf(hltvMatch.getMatchId()));
@@ -55,6 +56,7 @@ public class HltvConverter {
     String team2Name = team2 != null ? team2.getTeamName() : "TBD";
     event.setTitle(team1.getTeamName() + " vs " + team2Name);
 
+    event.setZone(ZoneId.systemDefault());
     event.setStartAt(hltvMatch.getStartsAt());
     event.setEndAt(hltvMatch.getStartsAt() != null
         ? hltvMatch.getStartsAt().plusSeconds(2 * 60 * 60)

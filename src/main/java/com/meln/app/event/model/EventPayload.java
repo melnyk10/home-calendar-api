@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventDto {
+public class EventPayload {
 
   private String id;
   private String sourceId;

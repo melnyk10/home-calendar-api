@@ -20,10 +20,10 @@ import org.bson.types.ObjectId;
 
 @ApplicationScoped
 @AllArgsConstructor(onConstructor_ = @Inject)
-public class HltvMatchRepo implements PanacheMongoRepository<HltvMatch> {
+class HltvMatchRepository implements PanacheMongoRepository<HltvMatch> {
 
   public List<HltvMatch> findAllFeaturesMatchesByTeamIdIn(Collection<ObjectId> teamIds) {
-    String query = "%s in ?1 or %s in ?1 and %s >= ?2"
+    String query = "(%s in ?1 or %s in ?1) and %s >= ?2"
         .formatted(HltvMatch.COL_TEAM1_ID, HltvMatch.COL_TEAM2_ID, HltvMatch.COL_STARTS_AT);
     return find(query, teamIds, Instant.now()).list();
   }

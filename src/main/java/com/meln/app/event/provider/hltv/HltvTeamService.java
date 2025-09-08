@@ -11,11 +11,11 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor(onConstructor_ = @Inject)
 public class HltvTeamService {
 
-  private final HltvTeamRepo hltvTeamRepo;
+  private final HltvTeamRepository hltvTeamRepository;
   private final HltvTeamClient hltvTeamClient;
 
   protected HltvTeam getById(ObjectId id) {
-    return hltvTeamRepo.findById(id);
+    return hltvTeamRepository.findById(id);
   }
 
   protected List<HltvTeam> syncTeams() {
@@ -30,9 +30,9 @@ public class HltvTeamService {
 
   private List<HltvTeam> saveOrUpdate(List<HltvTeam> hltvTeams) {
     try {
-      hltvTeamRepo.bulkUpsert(hltvTeams);
+      hltvTeamRepository.bulkUpsert(hltvTeams);
       var teamSourceIds = hltvTeams.stream().map(HltvTeam::getSourceId).toList();
-      return hltvTeamRepo.findAllBySourceId(teamSourceIds);
+      return hltvTeamRepository.findAllBySourceId(teamSourceIds);
     } catch (Exception e) {
       throw new RuntimeException(e); //todo: add appropriate exception
     }

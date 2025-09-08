@@ -10,6 +10,6 @@ import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 @BsonDiscriminator(key = "_type", value = "google")
 public final class GoogleCalendarProperties implements CalendarProperties {
 
-  String userId;
+  String userEmail;
   String calendarId;
 }

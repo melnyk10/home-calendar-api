@@ -1,8 +1,6 @@
 package com.meln.app.user;
 
-import com.meln.app.common.CacheNames;
-import com.meln.app.user.model.UserInfo;
-import io.quarkus.cache.CacheResult;
+import com.meln.app.user.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.AllArgsConstructor;
@@ -13,14 +11,11 @@ public class UserService {
 
   private final UserRepository userRepo;
 
-  public UserInfo getByEmail(String email) {
-    var user = userRepo.findByEmail(email);
-    return UserInfo.from(user);
+  public User getByEmail(String email) {
+    return userRepo.findByEmail(email);
   }
 
-  //todo: don't forget to add @CacheInvalidate for future deleteUser method
-  @CacheResult(cacheName = CacheNames.USER_EXISTS_CACHE_NAME)
-  public boolean existsByEmail(String email) {
+  boolean existsByEmail(String email) {
     return userRepo.existsByEmail(email);
   }
 

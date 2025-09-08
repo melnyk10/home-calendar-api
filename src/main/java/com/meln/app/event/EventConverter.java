@@ -1,18 +1,18 @@
 package com.meln.app.event;
 
 import com.meln.app.event.model.Event;
-import com.meln.app.event.model.EventDto;
+import com.meln.app.event.model.EventPayload;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class EventConverter {
+class EventConverter {
 
-  public static EventDto from(Event event) {
+  public static EventPayload from(Event event) {
     if (event == null) {
       return null;
     }
 
-    return EventDto.builder()
+    return EventPayload.builder()
         .id(event.getId())
         .sourceId(event.getSourceId())
         .calendarEventSourceId(event.getCalendarEventSourceId())
@@ -26,7 +26,7 @@ public class EventConverter {
         .build();
   }
 
-  public static Event from(EventDto dto) {
+  public static Event from(EventPayload dto) {
     if (dto == null) {
       return null;
     }

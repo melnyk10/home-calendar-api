@@ -9,7 +9,6 @@ import com.mongodb.client.model.Updates;
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +18,7 @@ import org.bson.conversions.Bson;
 
 @ApplicationScoped
 @AllArgsConstructor(onConstructor_ = @Inject)
-public class HltvTeamRepo implements PanacheMongoRepository<HltvTeam> {
+class HltvTeamRepository implements PanacheMongoRepository<HltvTeam> {
 
   public List<HltvTeam> findAllBySourceId(Collection<String> sourceIds) {
     return find(HltvTeam.COL_SOURCE_ID + " in ?1", sourceIds).list();

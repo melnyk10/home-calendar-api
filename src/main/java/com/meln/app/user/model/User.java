@@ -5,6 +5,7 @@ import io.quarkus.mongodb.panache.common.MongoEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
 
 @Getter
 @Setter
@@ -23,4 +24,8 @@ public class User extends PanacheMongoEntity {
 
   @BsonProperty(COL_EMAIL)
   private String email;
+
+  public ObjectId getId() {
+    return this.id;
+  }
 }

@@ -16,7 +16,7 @@ import java.util.Optional;
 import org.bson.conversions.Bson;
 
 @ApplicationScoped
-public class EventRepository implements PanacheMongoRepository<Event> {
+class EventRepository implements PanacheMongoRepository<Event> {
 
   public void bulkUpsert(Collection<Event> events) {
     List<UpdateOneModel<Event>> writes = events.stream()

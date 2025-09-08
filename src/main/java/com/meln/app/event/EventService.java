@@ -1,6 +1,6 @@
 package com.meln.app.event;
 
-import com.meln.app.event.model.EventDto;
+import com.meln.app.event.model.EventPayload;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.Collection;
@@ -12,7 +12,7 @@ public class EventService {
 
   private final EventRepository eventRepo;
 
-  public void saveOrUpdate(Collection<EventDto> events) {
+  public void saveOrUpdate(Collection<EventPayload> events) {
     var eventEntities = events.stream().map(EventConverter::from).toList();
     eventRepo.bulkUpsert(eventEntities);
   }

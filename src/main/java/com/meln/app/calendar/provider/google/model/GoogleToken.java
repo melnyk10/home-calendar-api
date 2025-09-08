@@ -4,18 +4,22 @@ import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import java.time.Instant;
 import java.util.Set;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 @Getter
 @Setter
 @Builder
-@MongoEntity(collection = "google_tokens")
+@AllArgsConstructor
+@NoArgsConstructor
+@MongoEntity(collection = "googleTokens")
 public class GoogleToken extends PanacheMongoEntity {
 
-  public static final String COL_USER_ID = "userId";
+  public static final String COL_USER_EMAIL = "userEmail";
   public static final String COL_GOOGLE_SUB = "googleSub";
   public static final String COL_EMAIL = "email";
   public static final String COL_ACCESS_TOKEN = "accessToken";
@@ -23,8 +27,8 @@ public class GoogleToken extends PanacheMongoEntity {
   public static final String COL_EXPIRES_AT = "expiresAt";
   public static final String COL_SCOPES = "scopes";
 
-  @BsonProperty(COL_USER_ID)
-  private String userId;
+  @BsonProperty(COL_USER_EMAIL)
+  private String userEmail;
 
   @BsonProperty(COL_GOOGLE_SUB)
   private String googleSub;

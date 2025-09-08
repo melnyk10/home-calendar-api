@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 
 @ApplicationScoped
 @AllArgsConstructor(onConstructor_ = @Inject)
-public class KnownUserAugmentor implements SecurityIdentityAugmentor {
+class KnownUserAugmentor implements SecurityIdentityAugmentor {
 
   private final UserService userService;
 
