@@ -19,7 +19,7 @@ class HltvMatchService {
   private final HltvMatchRepository hltvMatchRepository;
   private final HltvMatchClient hltvMatchClient;
 
-  protected List<HltvMatch> getAllByTeamId(Collection<ObjectId> teamIds) {
+  protected List<HltvMatch> listByTeamId(Collection<ObjectId> teamIds) {
     if (teamIds == null || teamIds.isEmpty()) {
       return new ArrayList<>();
     }

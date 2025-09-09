@@ -1,6 +1,6 @@
 package com.meln.api;
 
-import com.meln.app.user.UserService;
+import com.meln.app.user.UserRepository;
 import com.meln.app.user.model.User;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
@@ -15,14 +15,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(onConstructor_ = @Inject)
 public class UserResource {
 
-  private final UserService userService;
+  private final UserRepository userRepository;
 
   @GET
   @Path(Endpoints.User.ME)
   @Produces(MediaType.APPLICATION_JSON)
   public User me(@Context SecurityIdentity identity) {
     String email = identity.getPrincipal().getName();
-    return userService.getByEmail(email);
+    return userRepository.findByEmail(email);
   }
 
 }

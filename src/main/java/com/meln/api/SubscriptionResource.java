@@ -1,8 +1,8 @@
 package com.meln.api;
 
-import com.meln.app.subscription.SubscriptionService;
+import com.meln.app.subscription.SubscriptionRepository;
 import com.meln.app.subscription.model.Subscription;
-import com.meln.app.user.UserService;
+import com.meln.app.user.UserRepository;
 import com.meln.app.user.model.User;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
@@ -18,17 +18,17 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(onConstructor_ = @Inject)
 public class SubscriptionResource {
 
-  private final SubscriptionService subscriptionService;
-  private final UserService userService;
+  private final SubscriptionRepository subscriptionRepository;
+  private final UserRepository userRepository;
 
   @GET
   @Path(Endpoints.Subscription.SUBSCRIPTIONS)
   @Produces(MediaType.APPLICATION_JSON)
   public GetUserSubscriptions userSubscriptions(@Context SecurityIdentity identity) {
     String email = identity.getPrincipal().getName();
-    User user = userService.getByEmail(email);
+    User user = userRepository.findByEmail(email);
     return new GetUserSubscriptions(
-        subscriptionService.getAllUserSubscriptions(user.getId().toString()));
+        subscriptionRepository.listUserSubscriptions(user.getId().toString()));
   }
 
   public record GetUserSubscriptions(List<Subscription> subscriptions) {

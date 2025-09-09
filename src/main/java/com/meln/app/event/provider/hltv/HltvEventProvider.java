@@ -10,19 +10,19 @@ import lombok.AllArgsConstructor;
 
 @ApplicationScoped
 @AllArgsConstructor(onConstructor_ = @Inject)
-class HltvEventProvider implements EventProvider<CriteriaHltv> {
+class HltvEventProvider implements EventProvider<HltvCriteria> {
 
   private final HltvTeamService hltvTeamService;
   private final HltvMatchService hltvMatchService;
 
   @Override
-  public Class<CriteriaHltv> criteriaType() {
-    return CriteriaHltv.class;
+  public Class<HltvCriteria> criteriaType() {
+    return HltvCriteria.class;
   }
 
   @Override
-  public List<EventPayload> fetch(CriteriaHltv criteria) {
-    var matches = hltvMatchService.getAllByTeamId(criteria.getTeamIds());
+  public List<EventPayload> fetch(HltvCriteria criteria) {
+    var matches = hltvMatchService.listByTeamId(criteria.getTeamIds());
     return matches.stream()
         .map(this::from)
         .toList();
@@ -30,8 +30,8 @@ class HltvEventProvider implements EventProvider<CriteriaHltv> {
 
   private EventPayload from(HltvMatch hltvMatch) {
     //todo: improve! on each event creation we will query DB
-    var team1 = hltvTeamService.getById(hltvMatch.getTeam1Id());
-    var team2 = hltvTeamService.getById(hltvMatch.getTeam2Id());
+    var team1 = hltvTeamService.findById(hltvMatch.getTeam1Id());
+    var team2 = hltvTeamService.findById(hltvMatch.getTeam2Id());
     return HltvConverter.from(hltvMatch, team1, team2);
   }
 }

@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(onConstructor_ = @Inject)
 class KnownUserAugmentor implements SecurityIdentityAugmentor {
 
-  private final UserService userService;
+  private final UserRepository userRepository;
 
   @Override
   public int priority() {
@@ -32,7 +32,7 @@ class KnownUserAugmentor implements SecurityIdentityAugmentor {
       return Uni.createFrom().failure(new AuthenticationFailedException("Missing email claim"));
     }
 
-    boolean exists = userService.existsByEmail(email);
+    boolean exists = userRepository.existsByEmail(email);
     if (!exists) {
       return Uni.createFrom().failure(new AuthenticationFailedException("Unknown user"));
     }

@@ -18,12 +18,12 @@ public class InMemoryStateStore {
     return state;
   }
 
-  public Optional<String> consume(String state) {
-    Entry e = store.remove(state);
-    if (e == null || System.nanoTime() > e.expiresAtNanos) {
+  public Optional<String> findByState(String state) {
+    Entry entry = store.remove(state);
+    if (entry == null || System.nanoTime() > entry.expiresAtNanos) {
       return Optional.empty();
     }
-    return Optional.of(e.userId);
+    return Optional.of(entry.userId);
   }
 
   private record Entry(String userId, long expiresAtNanos) {

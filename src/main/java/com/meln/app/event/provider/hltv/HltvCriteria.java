@@ -1,6 +1,6 @@
 package com.meln.app.event.provider.hltv;
 
-import com.meln.app.common.event.Criteria;
+import com.meln.app.common.event.EventProviderCriteria;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor
 @NoArgsConstructor
 @BsonDiscriminator(key = "_type", value = "hltv")
-public final class CriteriaHltv implements Criteria {
+public final class HltvCriteria implements EventProviderCriteria {
 
   public static final String COL_TEAM_IDS = "teamIds";
 

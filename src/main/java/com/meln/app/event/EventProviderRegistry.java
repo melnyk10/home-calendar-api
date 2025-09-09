@@ -1,6 +1,6 @@
 package com.meln.app.event;
 
-import com.meln.app.common.event.Criteria;
+import com.meln.app.common.event.EventProviderCriteria;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
@@ -10,15 +10,15 @@ import java.util.Map;
 @ApplicationScoped
 public class EventProviderRegistry {
 
-  private final Map<Class<? extends Criteria>, EventProvider<? extends Criteria>> eventProviderByCriteria = new HashMap<>();
+  private final Map<Class<? extends EventProviderCriteria>, EventProvider<? extends EventProviderCriteria>> eventProviderByCriteria = new HashMap<>();
 
   @Inject
-  public EventProviderRegistry(Instance<EventProvider<? extends Criteria>> providers) {
+  public EventProviderRegistry(Instance<EventProvider<? extends EventProviderCriteria>> providers) {
     providers.forEach(p -> eventProviderByCriteria.put(p.criteriaType(), p));
   }
 
   @SuppressWarnings("unchecked")
-  public <C extends Criteria> EventProvider<C> get(C criteria) {
+  public <C extends EventProviderCriteria> EventProvider<C> get(C criteria) {
     if (criteria == null) {
       throw new IllegalArgumentException("Calendar properties not provided");
     }

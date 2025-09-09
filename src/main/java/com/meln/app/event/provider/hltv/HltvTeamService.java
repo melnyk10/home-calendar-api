@@ -14,7 +14,7 @@ public class HltvTeamService {
   private final HltvTeamRepository hltvTeamRepository;
   private final HltvTeamClient hltvTeamClient;
 
-  protected HltvTeam getById(ObjectId id) {
+  protected HltvTeam findById(ObjectId id) {
     return hltvTeamRepository.findById(id);
   }
 

@@ -54,7 +54,7 @@ public class GoogleOAuthResource {
       return redirectOrJsonError(400, "missing state");
     }
 
-    String userId = stateStore.consume(state).orElse(null);
+    String userId = stateStore.findByState(state).orElse(null);
     try {
       GoogleTokenResponse tokenResp = authService.requestToken(code);
       tokenService.saveOrUpdate(userId, tokenResp);
