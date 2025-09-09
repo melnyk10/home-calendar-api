@@ -1,0 +1,41 @@
+package com.meln.app.event;
+
+import com.meln.app.event.model.Event;
+import com.meln.app.event.model.EventDto;
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class EventConverter {
+
+  public static EventDto from(Event event) {
+    if (event == null) {
+      return null;
+    }
+
+    return EventDto.builder()
+        .sourceId(event.getSourceId())
+        .title(event.getTitle())
+        .url(event.getUrl())
+        .notes(event.getNotes())
+        .allDay(event.isAllDay())
+        .startAt(event.getStartAt())
+        .endAt(event.getEndAt())
+        .build();
+  }
+
+  public static Event from(EventDto dto) {
+    if (dto == null) {
+      return null;
+    }
+
+    return Event.builder()
+        .sourceId(dto.getSourceId())
+        .title(dto.getTitle())
+        .url(dto.getUrl())
+        .notes(dto.getNotes())
+        .allDay(dto.isAllDay())
+        .startAt(dto.getStartAt())
+        .endAt(dto.getEndAt())
+        .build();
+  }
+}

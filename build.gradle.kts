@@ -1,6 +1,7 @@
 plugins {
     java
     id("io.quarkus")
+    checkstyle
 }
 
 repositories {
@@ -8,13 +9,18 @@ repositories {
     mavenLocal()
 }
 
-group = "com.meln"
-version = "1.0.0-SNAPSHOT"
+checkstyle {
+    toolVersion = "10.21.0"
+    configFile = rootProject.file("codestyle/google_checks.xml")
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
+
+group = "com.meln"
+version = "1.0.0-SNAPSHOT"
 
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
@@ -58,8 +64,12 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.add("-parameters")
 }
-tasks.withType<Checkstyle> {
-    configFile = rootProject.file("codestyle/google_checks.xml")
-    isIgnoreFailures = false
+
+tasks.withType<Checkstyle>().configureEach {
+    isIgnoreFailures = true
     maxWarnings = 0
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
 }
