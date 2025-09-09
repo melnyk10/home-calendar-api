@@ -47,6 +47,10 @@ dependencies {
     implementation("io.mongock:mongodb-sync-v4-driver")
     implementation("io.quarkus:quarkus-mongodb-panache")
 
+    implementation("com.google.api-client:google-api-client:2.8.1")
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.31.0") // or latest compatible
+    implementation("com.google.apis:google-api-services-calendar:v3-rev20250404-2.0.0")
+
     // Lombok
     compileOnly("org.projectlombok:lombok:$lombokVersion")
     annotationProcessor("org.projectlombok:lombok:$lombokVersion")

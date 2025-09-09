@@ -16,7 +16,7 @@ import java.util.Optional;
 import org.bson.conversions.Bson;
 
 @ApplicationScoped
-public class EventRepository implements PanacheMongoRepository<Event> {
+class EventRepository implements PanacheMongoRepository<Event> {
 
   public void bulkUpsert(Collection<Event> events) {
     List<UpdateOneModel<Event>> writes = events.stream()
@@ -30,11 +30,17 @@ public class EventRepository implements PanacheMongoRepository<Event> {
           );
 
           List<Bson> sets = new ArrayList<>();
-          Optional.ofNullable(e.getTitle()).ifPresent(v -> sets.add(Updates.set(Event.COL_TITLE, v)));
+          Optional.ofNullable(e.getCalendarEventSourceId())
+              .ifPresent(v -> sets.add(Updates.set(Event.COL_CALENDAR_EVENT_SOURCE_ID, v)));
+          Optional.ofNullable(e.getTitle())
+              .ifPresent(v -> sets.add(Updates.set(Event.COL_TITLE, v)));
           Optional.ofNullable(e.getUrl()).ifPresent(v -> sets.add(Updates.set(Event.COL_URL, v)));
-          Optional.ofNullable(e.getNotes()).ifPresent(v -> sets.add(Updates.set(Event.COL_DETAILS, v)));
-          Optional.ofNullable(e.getStartAt()).ifPresent(v -> sets.add(Updates.set(Event.COL_START_AT, v)));
-          Optional.ofNullable(e.getEndAt()).ifPresent(v -> sets.add(Updates.set(Event.COL_END_AT, v)));
+          Optional.ofNullable(e.getNotes())
+              .ifPresent(v -> sets.add(Updates.set(Event.COL_DETAILS, v)));
+          Optional.ofNullable(e.getStartAt())
+              .ifPresent(v -> sets.add(Updates.set(Event.COL_START_AT, v)));
+          Optional.ofNullable(e.getEndAt())
+              .ifPresent(v -> sets.add(Updates.set(Event.COL_END_AT, v)));
 
           sets.add(Updates.set(Event.COL_ALL_DAY, e.isAllDay()));
           sets.add(Updates.set(Event.COL_UPDATED_AT, now));

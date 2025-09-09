@@ -1,3 +1,8 @@
+app:
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
+
 quarkus:
   application:
     name: home-calendar-api
@@ -6,12 +11,11 @@ quarkus:
     database: ${MONGODB_DB_NAME}
   mongock:
     migrate-at-start: true
-    transaction-enabled: false #todo: check me!
+    transaction-enabled: false
   oidc:
     application-type: service
     provider: google
     auth-server-url: https://accounts.google.com
-    auth-type: bearer
     client-id: ${GOOGLE_CLIENT_ID}
     credentials:
       secret: ${GOOGLE_CLIENT_SECRET}
@@ -27,6 +31,7 @@ quarkus:
             - /health/*
             - /openapi
             - /swagger-ui/*
+            - /api/v1/google/callback
           policy: permit
         authenticated:
           paths: /*

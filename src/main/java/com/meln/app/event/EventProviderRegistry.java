@@ -19,6 +19,10 @@ public class EventProviderRegistry {
 
   @SuppressWarnings("unchecked")
   public <C extends Criteria> EventProvider<C> get(C criteria) {
+    if (criteria == null) {
+      throw new IllegalArgumentException("Calendar properties not provided");
+    }
+
     var eventProvider = (EventProvider<C>) eventProviderByCriteria.get(criteria.getClass());
     if (eventProvider == null) {
       throw new IllegalArgumentException("No provider for " + criteria.getClass().getName());

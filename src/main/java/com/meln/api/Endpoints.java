@@ -16,4 +16,12 @@ public interface Endpoints {
 
     String SUBSCRIPTIONS = "/subscriptions";
   }
+
+  interface GoogleCalendar {
+
+    String GOOGLE = "/google";
+    String CONNECT = GOOGLE + "/connect";
+    String CALLBACK = GOOGLE + "/callback";
+    String DISCONNECT = GOOGLE + "/disconnect";
+  }
 }

@@ -27,11 +27,13 @@ public class HltvMatch extends PanacheMongoEntity {
 
   public static final String COL_MATCH_ID = "matchId";
   public static final String COL_MATCH_URL = "matchUrl";
+  public static final String COL_EVENT_URL = "eventUrl";
   public static final String COL_STARTS_AT = "startsAt";
   public static final String COL_SCORE1 = "score1";
   public static final String COL_SCORE2 = "score2";
   public static final String COL_TEAM1_ID = "team1Id";
   public static final String COL_TEAM2_ID = "team2Id";
+  public static final String COL_BEST_OF = "bestOf";
 
   @NotBlank
   @BsonProperty(COL_MATCH_ID)
@@ -40,6 +42,9 @@ public class HltvMatch extends PanacheMongoEntity {
   @NotBlank
   @BsonProperty(COL_MATCH_URL)
   private String matchUrl;
+
+  @BsonProperty(COL_EVENT_URL)
+  private String eventUrl;
 
   @NotNull
   @BsonProperty(COL_STARTS_AT)
@@ -58,4 +63,7 @@ public class HltvMatch extends PanacheMongoEntity {
   @NotNull
   @BsonProperty(COL_TEAM2_ID)
   private ObjectId team2Id;
+
+  @BsonProperty(COL_BEST_OF)
+  private Short bestOf;
 }

@@ -17,7 +17,9 @@ import org.bson.types.ObjectId;
 @BsonDiscriminator(key = "_type", value = "hltv")
 public final class CriteriaHltv implements Criteria {
 
-  @BsonProperty("team_ids")
+  public static final String COL_TEAM_IDS = "teamIds";
+
+  @BsonProperty(COL_TEAM_IDS)
   private List<ObjectId> teamIds;
 
 }

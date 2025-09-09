@@ -1,5 +1,6 @@
 package com.meln.infra.db.changelog;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOptions;
@@ -10,6 +11,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -18,8 +20,8 @@ import org.bson.types.ObjectId;
 public class V002_InitialDataMigration {
 
   private static final String COL_USERS = "users";
-  private static final String COL_HLTV_TEAM = "hltv_team";
-  private static final String COL_HLTV_MATCH = "hltv_match";
+  private static final String COL_HLTV_TEAM = "hltvTeam";
+  private static final String COL_HLTV_MATCH = "hltvMatch";
   private static final String COL_SUBSCRIPTIONS = "subscriptions";
 
   @Execution
@@ -30,6 +32,7 @@ public class V002_InitialDataMigration {
     seedMatches(db, teamId);
 
     seedHltvSubscription(db, "o.melnyk10@gmail.com", "natus-vincere");
+    addCalendar(db, "o.melnyk10@gmail.com");
   }
 
   private void users(MongoDatabase db) {
@@ -48,8 +51,8 @@ public class V002_InitialDataMigration {
     Document filter = new Document("team_id", "4608");
     Document teamDoc = new Document("team_name", "Natus Vincere")
         .append("slug", "natus-vincere")
-        .append("logo_url", "https://hltv.org/img/static/team/navi.png")
-        .append("team_id", "4608")
+        .append("logoUrl", "https://hltv.org/img/static/team/navi.png")
+        .append("teamId", "4608")
         .append("rank", 1);
 
     db.getCollection(COL_HLTV_TEAM)
@@ -68,7 +71,7 @@ public class V002_InitialDataMigration {
     int matchCounter = 1;
     for (int i = 1; i <= 3; i++) { // insert 3 matches as example
       String matchId = String.valueOf(matchCounter++);
-      Document filter = new Document("match_id", matchId);
+      Document filter = new Document("matchId", matchId);
 
       Instant eventStartDate = Instant.now()
           .plus(i, ChronoUnit.DAYS)
@@ -76,16 +79,16 @@ public class V002_InitialDataMigration {
           .plusYears(5)
           .toInstant();
       Document matchDoc = new Document("event_name", "IEM Katowice " + i)
-          .append("event_url", "https://hltv.org/events/" + (2000 + i) + "/iem-katowice-" + i)
-          .append("match_id", matchId)
-          .append("match_url",
+          .append("eventUrl", "https://hltv.org/events/" + (2000 + i) + "/iem-katowice-" + i)
+          .append("matchId", matchId)
+          .append("matchUrl",
               "https://hltv.org/matches/" + (3000 + i) + "/natus-vincere-vs-team" + i)
-          .append("date_time", eventStartDate)
-          .append("team1_id", teamId)
-          .append("team2_id", null)
+          .append("startsAt", eventStartDate)
+          .append("team1Id", teamId)
+          .append("team2Id", null)
           .append("score1", 16)
           .append("score2", 10 + i)
-          .append("best_of", 3);
+          .append("bestOf", 3);
 
       db.getCollection(COL_HLTV_MATCH)
           .updateOne(filter,
@@ -95,19 +98,19 @@ public class V002_InitialDataMigration {
   }
 
   private void seedHltvSubscription(MongoDatabase db, String userEmail, String teamKey) {
-    ObjectId userId = findUserIdByEmail(db, userEmail);
+    ObjectId userId = findUserByEmail(db, userEmail).id();
     ObjectId teamId = findTeamObjectId(db, teamKey);
 
-    Document subDoc = new Document("user_id", userId)
+    Document subDoc = new Document("userId", userId)
         .append("provider", "HLTV")
         .append("active", true)
         .append("criteria", new Document("_type", "hltv")
-            .append("team_ids", List.of(teamId)));
+            .append("teamIds", List.of(teamId)));
 
-    Document filter = new Document("user_id", userId)
+    Document filter = new Document("userId", userId)
         .append("provider", "HLTV")
         .append("criteria._type", "hltv")
-        .append("criteria.team_ids", new Document("$all", List.of(teamId)));
+        .append("criteria.teamIds", new Document("$all", List.of(teamId)));
 
     db.getCollection(COL_SUBSCRIPTIONS)
         .updateOne(filter,
@@ -115,23 +118,25 @@ public class V002_InitialDataMigration {
             new UpdateOptions().upsert(true));
   }
 
-  private ObjectId findUserIdByEmail(MongoDatabase db, String email) {
+  private UserRef findUserByEmail(MongoDatabase db, String email) {
     Document u = db.getCollection(COL_USERS)
         .find(new Document("email", email))
-        .projection(Projections.include("_id"))
+        .projection(Projections.include("_id", "email"))
         .first();
     if (u == null) {
       throw new IllegalStateException("User not found: " + email);
     }
-    return u.getObjectId("_id");
+    return new UserRef(u.getObjectId("_id"), u.getString("email"));
   }
+
+  public record UserRef(ObjectId id, String email) {}
 
   private ObjectId findTeamObjectId(MongoDatabase db, String teamKey) {
     Document team = db.getCollection(COL_HLTV_TEAM)
         .find(new Document("$or", List.of(
-            new Document("team_id", teamKey),
+            new Document("teamId", teamKey),
             new Document("slug", teamKey),
-            new Document("team_name", teamKey)
+            new Document("teamName", teamKey)
         )))
         .projection(Projections.include("_id"))
         .first();
@@ -139,6 +144,25 @@ public class V002_InitialDataMigration {
       throw new IllegalStateException("Team not found: " + teamKey);
     }
     return team.getObjectId("_id");
+  }
+
+  private void addCalendar(MongoDatabase db, String userEmail) {
+    UserRef user = findUserByEmail(db, userEmail);
+
+    MongoCollection<Document> collection = db.getCollection("calendar");
+
+    Document properties = new Document(Map.of(
+        "_type", "google",
+        "userEmail", user.email(),
+        "calendarId", "d27cfb6cf4b09045227b9d431b67571128c2b6e1122053cb518fe1739b081574@group.calendar.google.com"
+    ));
+
+    Document calendar = new Document()
+        .append("userId", user.id())
+        .append("sourceId", "d27cfb6cf4b09045227b9d431b67571128c2b6e1122053cb518fe1739b081574@group.calendar.google.com")
+        .append("properties", properties);
+
+    collection.insertOne(calendar);
   }
 
   @RollbackExecution

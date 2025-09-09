@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 @ApplicationScoped
-public class HltvMatchClient {
+class HltvMatchClient {
 
   public List<HltvMatchResponse> syncMatches(Collection<HltvTeam> teams) {
     List<HltvMatchResponse> matches = new ArrayList<>();

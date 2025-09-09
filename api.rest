@@ -18,3 +18,7 @@ Content-Type: */*
 ### Get all Subscirptiona
 GET {{baseUrl}}/api/v1/subscriptions
 Authorization: Bearer {{bearerToken}}
+
+### Google Connect
+GET {{baseUrl}}/api/v1/google/connect
+Authorization: Bearer {{bearerToken}}

@@ -58,7 +58,7 @@ public class V001_InitialMigration {
 
   private void hltvTeam(MongoDatabase db) {
     db.getCollection(COL_HLTV_TEAM)
-        .createIndex(Indexes.ascending("teamId"),
+        .createIndex(Indexes.ascending("sourceId"),
             new IndexOptions().unique(true).name(IDX_TEAM_TEAMID_UNIQ));
   }
 

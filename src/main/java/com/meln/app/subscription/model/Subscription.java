@@ -21,6 +21,6 @@ public class Subscription extends PanacheMongoEntity {
   @BsonProperty(COL_ACTIVE)
   private boolean active = true;
 
-  @BsonProperty(useDiscriminator = true)
+  @BsonProperty(value = "criteria", useDiscriminator = true)
   public Criteria criteria;
 }

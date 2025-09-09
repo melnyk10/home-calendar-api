@@ -5,7 +5,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped
-public class HltvTeamClient {
+class HltvTeamClient {
 
   public List<HltvTeamResponse> syncTeams() {
     HltvTeamResponse team1 = HltvTeamResponse.builder()

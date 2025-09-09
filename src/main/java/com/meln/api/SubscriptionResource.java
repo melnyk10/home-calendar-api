@@ -1,12 +1,11 @@
 package com.meln.api;
 
-import com.meln.app.subscription.model.Subscription;
 import com.meln.app.subscription.SubscriptionService;
-import com.meln.app.user.model.UserInfo;
+import com.meln.app.subscription.model.Subscription;
 import com.meln.app.user.UserService;
+import com.meln.app.user.model.User;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -16,8 +15,6 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 
 @Path(Endpoints.API_V1)
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
 @AllArgsConstructor(onConstructor_ = @Inject)
 public class SubscriptionResource {
 
@@ -26,10 +23,12 @@ public class SubscriptionResource {
 
   @GET
   @Path(Endpoints.Subscription.SUBSCRIPTIONS)
+  @Produces(MediaType.APPLICATION_JSON)
   public GetUserSubscriptions userSubscriptions(@Context SecurityIdentity identity) {
     String email = identity.getPrincipal().getName();
-    UserInfo user = userService.getByEmail(email);
-    return new GetUserSubscriptions(subscriptionService.getAllUserSubscriptions(user.getId()));
+    User user = userService.getByEmail(email);
+    return new GetUserSubscriptions(
+        subscriptionService.getAllUserSubscriptions(user.getId().toString()));
   }
 
   public record GetUserSubscriptions(List<Subscription> subscriptions) {
