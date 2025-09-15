@@ -15,6 +15,7 @@ import com.meln.app.common.error.ErrorMessage;
 import com.meln.app.event.model.EventPayload;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 import javax.naming.AuthenticationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,70 +53,42 @@ class GoogleCalendarClient implements CalendarClient<GoogleCalendarConnectionPro
 
     @Override
     public String createEvent(EventPayload event) {
-      if (event == null) {
-        throw new CustomBadRequestException(
-            ErrorMessage.Common.Code.REQUEST_BODY_REQUIRED,
-            ErrorMessage.Common.Message.REQUEST_BODY_REQUIRED);
-      }
-      if (event.getCalendarEventSourceId() == null || event.getCalendarEventSourceId().isBlank()) {
-        throw new CustomBadRequestException(
-            ErrorMessage.Calendar.Code.CALENDAR_EVENT_SOURCE_ID_NOT_PROVIDED,
-            ErrorMessage.Calendar.Message.CALENDAR_EVENT_SOURCE_ID_NOT_PROVIDED);
-      }
-      if (calendarId == null || calendarId.isBlank()) {
-        throw new CustomBadRequestException(
-            ErrorMessage.Calendar.Code.CALENDAR_ID_NOT_PROVIDED,
-            ErrorMessage.Calendar.Message.CALENDAR_ID_NOT_PROVIDED);
-      }
+      Event newEventRes = withGoogleExceptionHandling(() -> {
+        Event newEvent = buildEvent(event, new Event());
+        Map<String, String> extraProps = Map.of("eventSourceId", event.getSourceId());
+        updateExtraProps(newEvent, extraProps);
 
-      Event newEvent = buildEvent(event, new Event());
-      Map<String, String> extraProps = Map.of("eventSourceId", event.getSourceId());
-      updateExtraProps(newEvent, extraProps);
-
-      try {
-        Event eventRes = calendar.events().insert(calendarId, newEvent).execute();
-        log.debug("Created event; id={}, etag={}", newEvent.getId(), newEvent.getEtag());
-        return eventRes.getId();
-      } catch (GoogleJsonResponseException e) {
-        int status = e.getStatusCode();
-        String reason = e.getDetails() != null ? e.getDetails().getMessage() : e.getMessage();
-
-        switch (status) {
-          case 400 -> throw new CustomBadRequestException(
-              ErrorMessage.Common.Code.INVALID_REQUEST,
-              ErrorMessage.Common.Message.INVALID_REQUEST(reason));
-          case 401, 403 -> throw new CustomAuthException(
-              ErrorMessage.Auth.Code.UNAUTHORIZED_OR_FORBIDDEN,
-              ErrorMessage.GoogleCalendar.Message.UNAUTHORIZED_OR_FORBIDDEN(reason));
-          case 404 -> throw new CustomBadRequestException(
-              ErrorMessage.Calendar.Code.EVENT_NOT_FOUND,
-              ErrorMessage.Calendar.Message.EVENT_NOT_FOUND(event.getSourceId()));
-          case 429 -> throw new CustomRetryableException(
-              ErrorMessage.Common.Code.RATE_LIMITED,
-              ErrorMessage.GoogleCalendar.Message.RATE_LIMITED);
-          default -> {
-            log.error("Google API error updating event; status={}, id={}, reason={}",
-                status, event.getSourceId(), reason);
-            throw new CustomBadRequestException(
-                ErrorMessage.Common.Code.SOMETHING_WENT_WRONG,
-                ErrorMessage.Common.Message.SOMETHING_WENT_WRONG);
-          }
+        try {
+          Event eventRes = calendar.events().insert(calendarId, newEvent).execute();
+          log.debug("Created event; id={}, etag={}", newEvent.getId(), newEvent.getEtag());
+          return eventRes;
+        } catch (IOException e) {
+          throw new RuntimeException(e);
         }
+      }, event);
 
-      } catch (java.net.SocketTimeoutException | java.net.ConnectException e) {
-        log.warn("Transient network error updating event; id={}", event.getSourceId(), e);
-        throw new CustomRetryableException(ErrorMessage.Common.Code.NETWORK_TIMEOUT,
-            ErrorMessage.Common.Message.NETWORK_TIMEOUT);
-      } catch (Exception exception) {
-        throw new CustomBadRequestException(
-            ErrorMessage.Common.Code.SOMETHING_WENT_WRONG,
-            ErrorMessage.Common.Message.SOMETHING_WENT_WRONG,
-            exception);
-      }
+      return newEventRes.getId();
     }
 
     @Override
     public void updateEvent(EventPayload event) {
+      withGoogleExceptionHandling(() -> {
+        Event updateEvent = buildEvent(event, new Event());
+        updateEvent.setId(event.getCalendarEventSourceId());
+        Event updated;
+        try {
+          updated = calendar.events()
+              .update(calendarId, event.getCalendarEventSourceId(), updateEvent)
+              .execute();
+          log.debug("Updated event; id={}, etag={}", updated.getId(), updated.getEtag());
+          return updated;
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }, event);
+    }
+
+    private <T> T withGoogleExceptionHandling(Supplier<T> call, EventPayload event) {
       if (event == null) {
         throw new CustomBadRequestException(
             ErrorMessage.Common.Code.REQUEST_BODY_REQUIRED,
@@ -131,49 +105,43 @@ class GoogleCalendarClient implements CalendarClient<GoogleCalendarConnectionPro
             ErrorMessage.Calendar.Message.CALENDAR_ID_NOT_PROVIDED);
       }
 
-      Event updateEvent = buildEvent(event, new Event());
-      updateEvent.setId(event.getCalendarEventSourceId());
-
       try {
-        Event updated = calendar.events()
-            .update(calendarId, event.getCalendarEventSourceId(), updateEvent)
-            .execute();
-        log.debug("Updated event; id={}, etag={}", updated.getId(), updated.getEtag());
-      } catch (GoogleJsonResponseException e) {
-        int status = e.getStatusCode();
-        String reason = e.getDetails() != null ? e.getDetails().getMessage() : e.getMessage();
+        return call.get();
+      } catch (Exception e) {
+        Throwable cause = e.getCause();
+        if (cause instanceof GoogleJsonResponseException googleEx) {
+          int status = googleEx.getStatusCode();
+          String reason = googleEx.getDetails() != null ?
+              googleEx.getDetails().getMessage() :
+              googleEx.getMessage();
 
-        switch (status) {
-          case 400 -> throw new CustomBadRequestException(
-              ErrorMessage.Common.Code.INVALID_REQUEST,
-              ErrorMessage.Common.Message.INVALID_REQUEST(reason));
-          case 401, 403 -> throw new CustomAuthException(
-              ErrorMessage.Auth.Code.UNAUTHORIZED_OR_FORBIDDEN,
-              ErrorMessage.GoogleCalendar.Message.UNAUTHORIZED_OR_FORBIDDEN(reason));
-          case 404 -> throw new CustomBadRequestException(
-              ErrorMessage.Calendar.Code.EVENT_NOT_FOUND,
-              ErrorMessage.Calendar.Message.EVENT_NOT_FOUND(event.getSourceId()));
-          case 429 -> throw new CustomRetryableException(
-              ErrorMessage.Common.Code.RATE_LIMITED,
-              ErrorMessage.GoogleCalendar.Message.RATE_LIMITED);
-          default -> {
-            log.error("Google API error updating event; status={}, id={}, reason={}",
-                status, event.getSourceId(), reason);
-            throw new CustomBadRequestException(
+          switch (status) {
+            case 400 -> throw new CustomBadRequestException(
+                ErrorMessage.Common.Code.INVALID_REQUEST,
+                ErrorMessage.Common.Message.INVALID_REQUEST(reason));
+            case 401, 403 -> throw new CustomAuthException(
+                ErrorMessage.Auth.Code.UNAUTHORIZED_OR_FORBIDDEN,
+                ErrorMessage.GoogleCalendar.Message.UNAUTHORIZED_OR_FORBIDDEN(reason));
+            case 404 -> throw new CustomBadRequestException(
+                ErrorMessage.Calendar.Code.EVENT_NOT_FOUND,
+                ErrorMessage.Calendar.Message.EVENT_NOT_FOUND(event.getSourceId()));
+            case 429 -> throw new CustomRetryableException(
+                ErrorMessage.Common.Code.RATE_LIMITED,
+                ErrorMessage.GoogleCalendar.Message.RATE_LIMITED);
+            default -> throw new CustomBadRequestException(
                 ErrorMessage.Common.Code.SOMETHING_WENT_WRONG,
                 ErrorMessage.Common.Message.SOMETHING_WENT_WRONG);
           }
+        } else if (cause instanceof java.net.SocketTimeoutException
+            || cause instanceof java.net.ConnectException) {
+          throw new CustomRetryableException(ErrorMessage.Common.Code.NETWORK_TIMEOUT,
+              ErrorMessage.Common.Message.NETWORK_TIMEOUT);
+        } else {
+          throw new CustomBadRequestException(
+              ErrorMessage.Common.Code.SOMETHING_WENT_WRONG,
+              ErrorMessage.Common.Message.SOMETHING_WENT_WRONG,
+              e);
         }
-
-      } catch (java.net.SocketTimeoutException | java.net.ConnectException e) {
-        log.warn("Transient network error updating event; id={}", event.getSourceId(), e);
-        throw new CustomRetryableException(ErrorMessage.Common.Code.NETWORK_TIMEOUT,
-            ErrorMessage.Common.Message.NETWORK_TIMEOUT);
-      } catch (Exception exception) {
-        throw new CustomBadRequestException(
-            ErrorMessage.Common.Code.SOMETHING_WENT_WRONG,
-            ErrorMessage.Common.Message.SOMETHING_WENT_WRONG,
-            exception);
       }
     }
 
