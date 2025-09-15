@@ -28,7 +28,8 @@ public class SubscriptionResource {
     String email = identity.getPrincipal().getName();
     User user = userRepository.findByEmail(email);
     return new GetUserSubscriptions(
-        subscriptionRepository.listUserSubscriptions(user.getId().toString()));
+        subscriptionRepository.listUserSubscriptions(user.getId().toString())
+    );
   }
 
   public record GetUserSubscriptions(List<Subscription> subscriptions) {

@@ -14,7 +14,7 @@ public class CalendarService {
 
   private final CalendarRepository repository;
 
-  public Map<ObjectId, CalendarProperties> getCalendarIntegrationPropsByUserId() {
+  public Map<ObjectId, CalendarConnectionProperties> getCalendarIntegrationPropsByUserId() {
     var calendars = repository.listAll();
     return calendars.stream()
         .collect(Collectors.toMap(

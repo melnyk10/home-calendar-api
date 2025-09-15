@@ -4,6 +4,7 @@ import com.meln.app.event.provider.hltv.model.HltvTeamResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
+//todo: implement me!
 @ApplicationScoped
 class HltvTeamClient {
 

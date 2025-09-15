@@ -1,6 +1,6 @@
 package com.meln.app.calendar.model;
 
-import com.meln.app.calendar.CalendarProperties;
+import com.meln.app.calendar.CalendarConnectionProperties;
 import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import lombok.Getter;
@@ -24,5 +24,5 @@ public class Calendar extends PanacheMongoEntity {
   private String sourceId;
 
   @BsonProperty(value = COL_PROPERTIES, useDiscriminator = true)
-  private CalendarProperties properties;
+  private CalendarConnectionProperties properties;
 }

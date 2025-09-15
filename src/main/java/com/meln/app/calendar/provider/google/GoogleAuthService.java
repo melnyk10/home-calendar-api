@@ -11,6 +11,8 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.UserCredentials;
 import com.meln.app.calendar.provider.google.model.GoogleToken;
+import com.meln.app.common.error.CustomException.CustomAuthException;
+import com.meln.app.common.error.ErrorMessage;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.sql.Date;
@@ -78,11 +80,11 @@ public class GoogleAuthService {
         .execute();
   }
 
-  Calendar calendarClient(String userEmail) {
-    GoogleToken userToken = findByUserEmail(userEmail);
+  Calendar calendarClient(String email) {
+    GoogleToken userToken = findByUserEmail(email);
     if (userToken == null) {
-      //todo: redirect user to connect/auth google
-      throw new IllegalStateException("Google account is not connected for user " + userEmail);
+      throw new CustomAuthException(ErrorMessage.GoogleCalendar.Code.GOOGLE_UNAUTHORIZED,
+          ErrorMessage.GoogleCalendar.Message.GOOGLE_UNAUTHORIZED(email));
     }
     return new Calendar.Builder(HTTP, JSON_FACTORY, requestInitializer(userToken))
         .setApplicationName("Home Calendar").build();

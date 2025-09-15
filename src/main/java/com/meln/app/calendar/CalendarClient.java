@@ -3,7 +3,7 @@ package com.meln.app.calendar;
 import com.meln.app.event.model.EventPayload;
 import javax.naming.AuthenticationException;
 
-public interface CalendarClient<P extends CalendarProperties> {
+public interface CalendarClient<P extends CalendarConnectionProperties> {
 
   Class<P> propertiesType();
 
