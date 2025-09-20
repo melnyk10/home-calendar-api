@@ -1,0 +1,59 @@
+name: Version bump on PR merge
+
+on:
+  pull_request:
+    types: [ closed ]
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.base.ref }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Decide bump kind
+        id: decide
+        run: |
+          KIND=minor
+          echo '${{ toJson(github.event.pull_request.labels) }}' > labels.json
+          if grep -Eiq '"name":\s*"major"' labels.json; then
+            KIND=major
+          fi
+          echo "kind=$KIND" >> $GITHUB_OUTPUT
+          echo "Bump kind: $KIND"
+
+      - name: Configure Git identity
+        run: |
+          git config user.email "actions@users.noreply.github.com"
+          git config user.name  "github-actions"
+
+      - name: Run bump task and tag
+        env:
+          GIT_USER_EMAIL: "actions@users.noreply.github.com"
+          GIT_USER_NAME: "github-actions"
+        run: |
+          if [ "${{ steps.decide.outputs.kind }}" = "major" ]; then
+            ./gradlew bumpMajorAndTag
+          else
+            ./gradlew bumpMinorAndTag
+          fi
+
+      - name: Push commit and tags
+        run: |
+          git push origin HEAD:${{ github.event.pull_request.base.ref }}
+          git push --tags
