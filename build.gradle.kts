@@ -4,6 +4,8 @@ plugins {
     checkstyle
 }
 
+apply(from = "gradle/versioning.gradle.kts")
+
 repositories {
     mavenCentral()
     mavenLocal()
@@ -18,9 +20,6 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
-
-group = "com.meln"
-version = "1.0.0-SNAPSHOT"
 
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
