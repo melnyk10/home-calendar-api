@@ -1,14 +1,18 @@
 package com.meln.worker;
 
+import com.meln.app.calendar.CalendarConnectionProperties;
 import com.meln.app.calendar.CalendarProviderRegistry;
 import com.meln.app.calendar.CalendarService;
 import com.meln.app.event.EventProviderRegistry;
 import com.meln.app.event.EventService;
+import com.meln.app.event.model.EventPayload;
 import com.meln.app.subscription.SubscriptionRepository;
 import com.meln.app.subscription.model.Subscription;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.util.List;
+import javax.naming.AuthenticationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,29 +42,24 @@ class SubscriptionScheduler {
         }
 
         var userProps = calendarPropsByUserId.get(subscription.getUserId());
-        try {
-          var conn = calendarRegistry.connect(userProps);
-          for (var event : events) {
-            if (event.getCalendarEventSourceId() != null) {
-              conn.updateEvent(event);
-            } else {
-              String newEventId = conn.createEvent(event);
-              event.setCalendarEventSourceId(newEventId);
-            }
-          }
-        } catch (Exception e) {
-          log.warn("Calendar sync failed (userId={}): {}", subscription.getUserId(),
-              e.getMessage());
-          continue;
-        }
-
-        if (!events.isEmpty()) {
-          eventService.saveOrUpdate(events);
-        }
+        createOrUpdateEvents(userProps, events);
+        eventService.saveOrUpdate(events);
       } catch (Exception e) {
         log.error("Sync failed for subscription: {}", subscription.id, e);
       }
+    }
+  }
 
+  private void createOrUpdateEvents(CalendarConnectionProperties userProperties,
+      List<EventPayload> events) throws AuthenticationException {
+    var calendarClient = calendarRegistry.connect(userProperties);
+    for (var event : events) {
+      if (event.getCalendarEventSourceId() != null) {
+        calendarClient.updateEvent(event);
+      } else {
+        String newEventId = calendarClient.createEvent(event);
+        event.setCalendarEventSourceId(newEventId);
+      }
     }
   }
 
