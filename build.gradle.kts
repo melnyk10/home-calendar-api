@@ -26,8 +26,6 @@ val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
-val mongockPlatformVersion: String by project
-
 val lombokVersion = "1.18.38"
 
 dependencies {
@@ -41,11 +39,9 @@ dependencies {
     implementation("io.quarkus:quarkus-scheduler")
     implementation("io.quarkus:quarkus-hibernate-validator")
 
-    // DB
-    implementation(enforcedPlatform("io.mongock:mongock-bom:$mongockPlatformVersion"))
-    implementation("io.quarkiverse.mongock:quarkus-mongock:0.6.0")
-    implementation("io.mongock:mongodb-sync-v4-driver")
-    implementation("io.quarkus:quarkus-mongodb-panache")
+    // --- Database / ORM ---
+    implementation("io.quarkus:quarkus-hibernate-orm-panache")
+    implementation("io.quarkus:quarkus-jdbc-postgresql")
 
     implementation("com.google.api-client:google-api-client:2.8.1")
     implementation("com.google.auth:google-auth-library-oauth2-http:1.31.0") // or latest compatible

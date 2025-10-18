@@ -10,13 +10,10 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -25,60 +22,42 @@ import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(
-    name = "event",
+    name = "subject",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "subject_unique_external",
+            columnNames = {"provider_id", "type", "external_id"}
+        )
+    },
     indexes = {
-        @Index(name = "idx_event_subject_time", columnList = "subject_id,occurred_at"),
-        @Index(name = "idx_event_type_time", columnList = "event_type,occurred_at"),
-        @Index(name = "idx_event_provider_time", columnList = "provider_id,occurred_at")
+        @Index(name = "idx_subject_provider_type", columnList = "provider_id,type")
     }
 )
-public class Event {
+public class Subject {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(columnDefinition = "uuid")
   private Long id;
 
-  @Column(name = "source_id", nullable = false, unique = true)
-  private String sourceId;
-
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn(name = "provider_id", nullable = false)
   private Provider provider;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "subject_id", nullable = false)
-  private Subject subject;
+  @Column(nullable = false)
+  private String type; // e.g. "tournament", "tv_show", "team"
 
-  @Column(name = "type", nullable = false)
-  private String type; // e.g. "match.scheduled", "episode.released"
+  @Column(name = "source_id", nullable = false)
+  private String sourceId;
 
-  @Column(name = "name", nullable = false)
+  @Column(nullable = false)
   private String name;
-
-  @Column(name = "title", nullable = false)
-  private String description;
 
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(columnDefinition = "jsonb", nullable = false)
-  private Map<String, Object> payload = new HashMap<>();
-
-  @Column(name = "hash")
-  private String hash;
-
-  @Column(name = "is_all_day", nullable = false)
-  private boolean allDay;
-
-  @Column(name = "start_at", nullable = false)
-  private Instant startAt;
-
-  @Column(name = "end_at", nullable = false)
-  private Instant endAt;
+  private Map<String, Object> data = Map.of();
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false)

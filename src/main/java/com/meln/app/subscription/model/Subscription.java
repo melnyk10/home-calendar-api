@@ -1,26 +1,42 @@
 package com.meln.app.subscription.model;
 
-import com.meln.app.common.event.EventProviderCriteria;
-import io.quarkus.mongodb.panache.PanacheMongoEntity;
-import io.quarkus.mongodb.panache.common.MongoEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.bson.types.ObjectId;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
-@MongoEntity(collection = "subscriptions")
-public class Subscription extends PanacheMongoEntity {
-  public static final String COL_USER_ID = "userId";
-  public static final String COL_ACTIVE = "active";
+@Entity
+@Table(name = "subscription")
+public class Subscription {
 
-  @BsonProperty(COL_USER_ID)
-  private ObjectId userId;
+  public static final String COL_USER_ID = "user_id";
+  public static final String COL_IS_ACTIVE = "is_active";
+  public static final String SUBJECT_ID = "subject_id";
+  public static final String COL_CREATED_AT = "created_at";
 
-  @BsonProperty(COL_ACTIVE)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(name = COL_USER_ID, nullable = false)
+  private Long userId;
+
+  @Column(name = COL_IS_ACTIVE, nullable = false)
   private boolean active = true;
 
-  @BsonProperty(value = "criteria", useDiscriminator = true)
-  public EventProviderCriteria criteria;
+  @Column(name = SUBJECT_ID, nullable = false)
+  private UUID subjectId;
+
+  @CreationTimestamp
+  @Column(name = COL_CREATED_AT, nullable = false)
+  private Instant createdAt;
 }

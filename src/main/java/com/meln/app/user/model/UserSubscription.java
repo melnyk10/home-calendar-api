@@ -1,6 +1,5 @@
-package com.meln.app.calendar.model;
+package com.meln.app.user.model;
 
-import com.meln.app.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,46 +17,34 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(
-    name = "calendar",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "name"})
+    name = "user_subscription",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "provider", "subject_id"})
 )
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Calendar {
+public class UserSubscription {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "source_calendar_id")
-  private String sourceCalendarId;
-
-  @Column(nullable = false)
-  private String name;
-
-  @Column(nullable = false)
-  private String provider;
-
-  @Column(name = "account_email")
-  private String accountEmail;
-
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
+  @Column
+  private String provider;
+
+  @Column(name = "subject_id", nullable = false)
+  private String subjectId;
+
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
-
-  @UpdateTimestamp
-  @Column(name = "updated_at", nullable = false)
-  private Instant updatedAt;
-
 }

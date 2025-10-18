@@ -1,10 +1,13 @@
 package com.meln.app.event.provider.hltv;
 
-import com.meln.app.event.provider.hltv.model.HltvMatch;
-import com.meln.app.event.model.EventPayload;
 import com.meln.app.event.EventProvider;
+import com.meln.app.event.model.EventPayload;
+import com.meln.app.event.model.ProviderType;
+import com.meln.app.event.provider.hltv.model.HltvMatchResponse;
+import com.meln.app.event.provider.hltv.model.HltvTeamResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 
@@ -12,26 +15,32 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(onConstructor_ = @Inject)
 class HltvEventProvider implements EventProvider<HltvCriteria> {
 
-  private final HltvTeamService hltvTeamService;
-  private final HltvMatchService hltvMatchService;
+  private HltvTeamClient hltvTeamClient;
+  private HltvMatchClient hltvMatchClient;
 
   @Override
-  public Class<HltvCriteria> criteriaType() {
-    return HltvCriteria.class;
+  public ProviderType providerType() {
+    return ProviderType.HLTV;
   }
 
   @Override
-  public List<EventPayload> fetch(HltvCriteria criteria) {
-    var matches = hltvMatchService.listByTeamId(criteria.getTeamIds());
-    return matches.stream()
-        .map(this::from)
-        .toList();
+  public List<EventPayload> fetchAll() {
+    List<EventPayload> events = new ArrayList<>();
+
+    var hltvTeamResponses = hltvTeamClient.syncTeams();
+    for (var hltvTeamResponse : hltvTeamResponses) {
+      var matchResponses = hltvMatchClient.syncMatches(hltvTeamResponse);
+      for (var matchResponse : matchResponses) {
+        var eventPayload = from(hltvTeamResponse, matchResponse);
+        events.add(eventPayload);
+      }
+    }
+
+    return events;
   }
 
-  private EventPayload from(HltvMatch hltvMatch) {
-    //todo: improve! on each event creation we will query DB
-    var team1 = hltvTeamService.findById(hltvMatch.getTeam1Id());
-    var team2 = hltvTeamService.findById(hltvMatch.getTeam2Id());
-    return HltvConverter.from(hltvMatch, team1, team2);
+  private EventPayload from(HltvTeamResponse hltvTeam, HltvMatchResponse hltvMatch) {
+    return null;
   }
+
 }

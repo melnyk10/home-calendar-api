@@ -16,6 +16,6 @@ public class HltvTeamResponse {
   private Integer rank;
   private String name;
   private String logoUrl;
-  private Integer teamId;
+  private String teamId;
   private String teamIdName;
 }

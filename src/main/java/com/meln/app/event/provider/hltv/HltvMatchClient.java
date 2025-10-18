@@ -1,53 +1,51 @@
 package com.meln.app.event.provider.hltv;
 
 import com.meln.app.event.provider.hltv.model.HltvMatchResponse;
-import com.meln.app.event.provider.hltv.model.HltvTeam;
+import com.meln.app.event.provider.hltv.model.HltvTeamResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 //todo: implement me!
 @ApplicationScoped
 class HltvMatchClient {
 
-  public List<HltvMatchResponse> syncMatches(Collection<HltvTeam> teams) {
+  public List<HltvMatchResponse> syncMatches(HltvTeamResponse team) {
     List<HltvMatchResponse> matches = new ArrayList<>();
     int matchCounter = 1000;
 
-    for (HltvTeam team : teams) {
-      if (team.getSourceId().equals("9565")) {
-        for (int i = 1; i <= 3; i++) {
-          matches.add(HltvMatchResponse.builder()
-              .eventName("IEM Katowice " + i)
-              .eventUrl("https://hltv.org/events/" + (2000 + i) + "/iem-katowice-" + i)
-              .matchId(String.valueOf(matchCounter++))
-              .matchUrl("https://hltv.org/matches/" + (3000 + i) + "/natus-vincere-vs-team" + i)
-              .dateTime(Instant.now().plusSeconds(86400L * i))
-              .team1Id(team.getSourceId())
-              .team2Id(null)
-              .score1(16)
-              .score2(10 + i)
-              .bestOf(3)
-              .build());
-        }
-      } else {
+    if (team.getTeamId().equals("9565")) {
+      for (int i = 1; i <= 3; i++) {
         matches.add(HltvMatchResponse.builder()
-            .eventName("Blast Premier vs " + team.getTeamName())
-            .eventUrl("https://hltv.org/events/" + (4000 + matchCounter) + "/blast-premier-vs-"
-                + team.getSlug())
+            .eventName("IEM Katowice " + i)
+            .eventUrl("https://hltv.org/events/" + (2000 + i) + "/iem-katowice-" + i)
             .matchId(String.valueOf(matchCounter++))
-            .matchUrl(
-                "https://hltv.org/matches/" + (5000 + matchCounter) + "/match-vs-" + team.getSlug())
-            .dateTime(Instant.now().plusSeconds(172800L))
-            .team1Id(team.getSourceId())
+            .matchUrl("https://hltv.org/matches/" + (3000 + i) + "/natus-vincere-vs-team" + i)
+            .dateTime(Instant.now().plusSeconds(86400L * i))
+            .team1Id(team.getTeamId())
             .team2Id(null)
-            .score1(14)
-            .score2(16)
-            .bestOf(1)
+            .score1(16)
+            .score2(10 + i)
+            .bestOf(3)
             .build());
       }
+    } else {
+      matches.add(HltvMatchResponse.builder()
+          .eventName("Blast Premier vs " + team.getName())
+          .eventUrl("https://hltv.org/events/" + (4000 + matchCounter) + "/blast-premier-vs-"
+              + team.getTeamIdName())
+          .matchId(String.valueOf(matchCounter++))
+          .matchUrl(
+              "https://hltv.org/matches/" + (5000 + matchCounter) + "/match-vs-"
+                  + team.getTeamIdName())
+          .dateTime(Instant.now().plusSeconds(172800L))
+          .team1Id(team.getTeamId())
+          .team2Id(null)
+          .score1(14)
+          .score2(16)
+          .bestOf(1)
+          .build());
     }
 
     return matches;

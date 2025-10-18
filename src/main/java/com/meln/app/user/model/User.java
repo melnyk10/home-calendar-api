@@ -1,31 +1,39 @@
 package com.meln.app.user.model;
 
-import io.quarkus.mongodb.panache.PanacheMongoEntity;
-import io.quarkus.mongodb.panache.common.MongoEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.bson.types.ObjectId;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
-@MongoEntity(collection = "users")
-public class User extends PanacheMongoEntity {
-
+@Entity
+@Table(name = "user")
+public class User {
   public static final String COL_EMAIL = "email";
-  public static final String COL_FIRST_NAME = "firstName";
-  public static final String COL_LAST_NAME = "lastName";
+  public static final String COL_FIRST_NAME = "first_name";
+  public static final String COL_LAST_NAME = "last_name";
 
-  @BsonProperty(COL_FIRST_NAME)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(name = COL_FIRST_NAME, nullable = false)
   private String firstName;
 
-  @BsonProperty(COL_LAST_NAME)
+  @Column(name = COL_LAST_NAME, nullable = false)
   private String lastName;
 
-  @BsonProperty(COL_EMAIL)
+  @Column(name = COL_EMAIL, nullable = false, unique = true)
   private String email;
 
-  public ObjectId getId() {
-    return this.id;
-  }
+  @CreationTimestamp
+  @Column(name = "created_at", nullable = false)
+  private Instant createdAt;
 }

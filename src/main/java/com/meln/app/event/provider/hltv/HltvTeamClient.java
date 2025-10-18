@@ -13,7 +13,7 @@ class HltvTeamClient {
         .rank(1)
         .name("Natus Vincere")
         .logoUrl("https://hltv.org/img/static/team/navi.png")
-        .teamId(4608)
+        .teamId("4608")
         .teamIdName("natus-vincere")
         .build();
 
@@ -21,7 +21,7 @@ class HltvTeamClient {
         .rank(2)
         .name("Team Vitality")
         .logoUrl("https://hltv.org/img/static/team/vitality.png")
-        .teamId(9565)
+        .teamId("9565")
         .teamIdName("vitality")
         .build();
 
@@ -29,7 +29,7 @@ class HltvTeamClient {
         .rank(3)
         .name("FaZe Clan")
         .logoUrl("https://hltv.org/img/static/team/faze.png")
-        .teamId(6667)
+        .teamId("6667")
         .teamIdName("faze")
         .build();
 

@@ -1,65 +1,69 @@
 package com.meln.worker;
 
-import com.meln.app.calendar.CalendarConnectionProperties;
-import com.meln.app.calendar.CalendarProviderRegistry;
-import com.meln.app.calendar.CalendarService;
-import com.meln.app.event.EventProviderRegistry;
+import com.meln.app.calendar.CalendarClient;
+import com.meln.app.calendar.CalendarClient.CalendarConnection;
 import com.meln.app.event.EventService;
+import com.meln.app.event.model.Event;
 import com.meln.app.event.model.EventPayload;
-import com.meln.app.subscription.SubscriptionRepository;
-import com.meln.app.subscription.model.Subscription;
+import com.meln.app.user.UserCalendarEventService;
+import com.meln.app.user.UserCalendarRepository;
+import com.meln.app.user.model.UserCalendarEventId;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.util.List;
-import javax.naming.AuthenticationException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ApplicationScoped
 @AllArgsConstructor(onConstructor_ = @Inject)
-class SubscriptionScheduler {
+public class SubscriptionScheduler {
 
   private final EventService eventService;
-  private final EventProviderRegistry eventProviderRegistry;
-  private final SubscriptionRepository subscriptionRepo;
-  private final CalendarService calendarService;
-  private final CalendarProviderRegistry calendarRegistry;
+  private final UserCalendarRepository userCalendarRepository;
+  private final UserCalendarEventService userCalendarEventService;
 
-  @Scheduled(every = "15m")
-  void syncAll() {
-    var calendarPropsByUserId = calendarService.getCalendarIntegrationPropsByUserId();
-    var activeSubscriptions = subscriptionRepo.find(Subscription.COL_ACTIVE, true).list();
-    for (var subscription : activeSubscriptions) {
-      var criteria = subscription.getCriteria();
-      var eventProvider = eventProviderRegistry.get(criteria);
-
-      try {
-        var events = eventProvider.fetch(criteria);
-        if (events.isEmpty()) {
-          continue;
-        }
-
-        var userProps = calendarPropsByUserId.get(subscription.getUserId());
-        createOrUpdateEvents(userProps, events);
-        eventService.saveOrUpdate(events);
-      } catch (Exception e) {
-        log.error("Sync failed for subscription: {}", subscription.id, e);
-      }
-    }
+  //todo: find better way to update events. Something like webhook
+  @Scheduled(every = "20m")
+  private void sync() {
+    var calendarByUserId = new HashMap<String, CalendarClient.CalendarConnection>();
+    createUserEvents(calendarByUserId);
+    updateUserEvents(calendarByUserId);
   }
 
-  private void createOrUpdateEvents(CalendarConnectionProperties userProperties,
-      List<EventPayload> events) throws AuthenticationException {
-    var calendarClient = calendarRegistry.connect(userProperties);
-    for (var event : events) {
-      if (event.getCalendarEventSourceId() != null) {
-        calendarClient.updateEvent(event);
-      } else {
-        String newEventId = calendarClient.createEvent(event);
-        event.setCalendarEventSourceId(newEventId);
-      }
+  private void createUserEvents(Map<String, CalendarConnection> calendarByUserId) {
+    var events = eventService.findAllByNotFoundEvents();
+    if (events.isEmpty()) {
+      log.info("No events found for creation");
+      return;
+    }
+
+    //todo: find calendar by user and event type and pass ?
+
+    var newUserEvents = events.stream()
+        .map(it -> new UserCalendarEventId(it.getId(), it.getSourceId()))
+        .toList();
+    userCalendarEventService.create(newUserEvents);
+  }
+
+  private void updateUserEvents(Map<String, CalendarConnection> calendarByUserId) {
+    var eventById = eventService.listAllChangedEvents().stream()
+        .collect(Collectors.toMap(Event::getId, Function.identity()));
+    if (eventById.isEmpty()) {
+      log.info("No events found for update");
+      return;
+    }
+    //todo: filter events what are changed. Maybe to use something like eTag/MD5 hash
+
+    var userCalendarEvents = userCalendarRepository.findAllByEventIds(eventById.keySet());
+    for (var userCalendarEvent : userCalendarEvents) {
+      var event = eventById.get(userCalendarEvent.getEventId());
+      var calendarClient = calendarByUserId.get(null);
+      calendarClient.updateEvent(EventPayload.toPayload(event));
     }
   }
 
