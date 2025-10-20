@@ -1,7 +1,7 @@
 create table if not exists provider
 (
-    id          bigserial primary key,
-    name        text unique not null, -- e.g. 'hltv', 'sonarr'
+    id          serial primary key,
+    name        text unique not null unique, -- e.g. 'hltv', 'sonarr'
     description text
 );
 
@@ -30,17 +30,44 @@ create table if not exists subject
 -- That makes PostgreSQL check the constraint only when you commit, not right after each insert/update.
 );
 
+create or replace function event_hash(
+    p_name text,
+    p_description text,
+    p_status text,
+    p_subject_id bigint,
+    p_type text,
+    p_provider_id bigint,
+    p_start_at timestamptz,
+    p_payload jsonb
+) returns text
+    language sql
+    immutable
+as
+$$
+select md5(
+               coalesce(p_name, '') || '|' ||
+               coalesce(p_description, '') || '|' ||
+               coalesce(p_status, '') || '|' ||
+               p_subject_id::text || '|' ||
+               coalesce(p_type, '') || '|' ||
+               p_provider_id::text || '|' ||
+               (extract(epoch from p_start_at))::bigint::text || '|' ||
+               p_payload::text
+       );
+$$;
+
 create table if not exists event
 (
-    id          uuid primary key     default gen_random_uuid(),
+    id          bigserial primary key,
     source_id   varchar(64) not null,
     provider_id bigint      not null references provider (id) on delete cascade,
     subject_id  bigint      not null references subject (id) on delete cascade,
     type        text        not null,                     -- 'match.scheduled', 'match.resulted', 'episode.released', ...
-    title       text,
+    name        text,
     description text,
+    is_all_day  bool        not null default false,
     start_at    timestamptz not null,
-    endAt       timestamptz not null,
+    end_at      timestamptz not null,
     status      text        not null check (status in ('scheduled', 'completed', 'canceled', 'updated')),
     payload     jsonb       not null default '{}'::jsonb, -- event-type-specific data
     tags        text[]      not null default '{}',        -- free-form labels
@@ -48,17 +75,10 @@ create table if not exists event
     updated_at  timestamptz not null default now(),
 
     -- precomputed change detector (hash of stable presentation fields)
-    hash        text generated always as
-        (md5(
-                coalesce(title, '') || '|' ||
-                coalesce(description, '') || '|' ||
-                coalesce(status::text, '') || '|' ||
-                coalesce(subject_id, '') || '|' ||
-                coalesce(type, '') || '|' ||
-                coalesce(provider_id, '') || '|' ||
-                coalesce(start_at::text, '') || '|' ||
-                coalesce((payload #>> '{}'), '')          -- flatten json to text
-         )) stored
+
+    hash        text generated always as (
+        event_hash(name, description, status, subject_id, type, provider_id, start_at, payload)
+        ) stored
 );
 
 -- indexes for common queries
@@ -68,7 +88,7 @@ create index if not exists idx_event_provider_time on event (provider_id, start_
 create index if not exists idx_event_tags_gin on event using gin (tags);
 create index if not exists idx_event_payload_gin on event using gin (payload jsonb_path_ops);
 
-create table if not exists user
+create table if not exists "user"
 (
     id         bigserial primary key,
     first_name varchar(32),
@@ -80,7 +100,7 @@ create table if not exists user
 create table if not exists subscription
 (
     id         bigserial primary key,
-    user_id    bigint      not null references user (id) on delete cascade,
+    user_id    bigint      not null references "user" (id) on delete cascade,
     is_active  bool        not null default true,
     subject_id bigint      not null references subject (id) on delete cascade,
     created_at timestamptz not null default now(),
@@ -93,13 +113,13 @@ create index if not exists idx_subscription_subject on subscription (subject_id)
 
 create table user_subscription
 (
-    id         bigserial primary key,
-    user_id    bigint      not null references user (id) on delete cascade,
-    provider   text, -- optional filter by provider
-    subject_id text, -- 'sonarr:series:the-boys-2019'
-    created_at timestamptz not null default now(),
+    id          bigserial primary key,
+    user_id     bigint      not null references "user" (id) on delete cascade,
+    provider_id int         not null references provider (id) on delete cascade, -- optional filter by provider
+    subject_id  bigint      not null references subject (id) on delete cascade,  -- 'sonarr:series:the-boys-2019'
+    created_at  timestamptz not null default now(),
 
-    unique (user_id, provider, subject_id)
+    unique (user_id, provider_id, subject_id)
 );
 
 create table if not exists calendar
@@ -109,7 +129,7 @@ create table if not exists calendar
     name               text        not null,
     provider           text        not null, -- e.g. 'google','outlook','ics'
     account_email      text,
-    user_id            bigint      not null references user (id) on delete cascade,
+    user_id            bigint      not null references "user" (id) on delete cascade,
     created_at         timestamptz not null default now(),
     updated_at         timestamptz not null default now(),
     unique (user_id, name)
@@ -118,11 +138,11 @@ create table if not exists calendar
 create table calendar_connection
 (
     id                 bigserial primary key,
-    user_id            bigint      not null references user (id) on delete cascade,
-    calendar_id        bigint      not null references calendar (id) on delete cascade,
+    user_id            bigint      not null references "user" (id) on delete cascade,
+    calendar_id        int         not null references calendar (id) on delete cascade,
     access_token       text,
     refresh_token      text,
-    token_expires_at   timestamptz,
+    expires_at         timestamptz,
     scopes             text[],
     source_calendar_id text,
     created_at         timestamptz not null default now(),
@@ -135,7 +155,7 @@ create table user_calendar_event
     id               bigserial primary key,
     user_calendar_id bigint      not null references calendar_connection (id),
     event_id         bigint      not null references event (id) on delete cascade,
-    source_event_id  text, -- id in Google/Outlook/etc.
+    source_event_id  varchar(64), -- id in Google/Outlook/etc.
     created_at       timestamptz not null default now(),
     updated_at       timestamptz not null default now(),
 

@@ -70,7 +70,7 @@ public class GoogleOAuthResource {
     String userId = identity.getPrincipal().getName();
     var token = tokenService.findByUserEmail(userId);
     if (token != null) {
-      token.delete();
+      tokenService.delete(token);
     }
     return Response.noContent().build();
   }

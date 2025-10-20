@@ -27,9 +27,9 @@ public class SubscriptionScheduler {
   private final UserCalendarRepository userCalendarRepository;
   private final UserCalendarEventService userCalendarEventService;
 
-  //todo: find better way to update events. Something like webhook
-  @Scheduled(every = "20m")
-  private void sync() {
+  //todo: find better way to update events. Something like webhook, Queue?
+//  @Scheduled(every = "20m")
+  public void sync() {
     var calendarByUserId = new HashMap<String, CalendarClient.CalendarConnection>();
     createUserEvents(calendarByUserId);
     updateUserEvents(calendarByUserId);

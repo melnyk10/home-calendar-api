@@ -7,21 +7,22 @@ volumes:
   home-calendar-data:
 
 services:
+
   db:
-    image: mongo:8.0.12
-    container_name: home-calendar-db
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
+    container_name: homecalendardb-db
+    image: postgres:17-alpine
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: home-calendar-db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: homecalendardb
+    ports:
+      - "5435:5432"
     volumes:
-      - home-calendar-data:/data/db
-      - home-calendar-data:/data/configdb
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-    #    command: ["--replSet", "rs0", "--bind_ip_all"]
+      - home-calendar-data:/var/lib/postgresql/data
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
     networks:
       - home-calendar-network
 
@@ -30,9 +31,6 @@ services:
       context: ./
       dockerfile: Dockerfile
     container_name: home-calendar-api
-    environment:
-      MONGODB_CONNECTION_STRING: mongodb://admin:admin@home-calendar-api:27017
-      MONGODB_DB_NAME: homecalendardb
     ports:
       - "8085:8080"
     depends_on:

@@ -6,12 +6,6 @@ app:
 quarkus:
   application:
     name: home-calendar-api
-  mongodb:
-    connection-string: ${MONGODB_CONNECTION_STRING}
-    database: ${MONGODB_DB_NAME}
-  mongock:
-    migrate-at-start: true
-    transaction-enabled: false
   oidc:
     application-type: service
     provider: google

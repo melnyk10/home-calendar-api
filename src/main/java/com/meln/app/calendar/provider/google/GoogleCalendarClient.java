@@ -55,7 +55,7 @@ class GoogleCalendarClient implements CalendarClient<GoogleCalendarConnectionPro
     public String createEvent(EventPayload event) {
       Event newEventRes = withGoogleExceptionHandling(() -> {
         Event newEvent = buildEvent(event, new Event());
-        Map<String, String> extraProps = Map.of("eventSourceId", event.getSourceId());
+        Map<String, String> extraProps = Map.of("eventSourceId", event.idempotencyKey());
         updateExtraProps(newEvent, extraProps);
 
         try {
@@ -74,11 +74,11 @@ class GoogleCalendarClient implements CalendarClient<GoogleCalendarConnectionPro
     public void updateEvent(EventPayload event) {
       withGoogleExceptionHandling(() -> {
         Event updateEvent = buildEvent(event, new Event());
-        updateEvent.setId(event.getCalendarEventSourceId());
+        updateEvent.setId(event.calendarEventSourceId());
         Event updated;
         try {
           updated = calendar.events()
-              .update(calendarId, event.getCalendarEventSourceId(), updateEvent)
+              .update(calendarId, event.calendarEventSourceId(), updateEvent)
               .execute();
           log.debug("Updated event; id={}, etag={}", updated.getId(), updated.getEtag());
           return updated;
@@ -94,7 +94,7 @@ class GoogleCalendarClient implements CalendarClient<GoogleCalendarConnectionPro
             ErrorMessage.Common.Code.REQUEST_BODY_REQUIRED,
             ErrorMessage.Common.Message.REQUEST_BODY_REQUIRED);
       }
-      if (event.getCalendarEventSourceId() == null || event.getCalendarEventSourceId().isBlank()) {
+      if (event.calendarEventSourceId() == null || event.calendarEventSourceId().isBlank()) {
         throw new CustomBadRequestException(
             ErrorMessage.Calendar.Code.CALENDAR_EVENT_SOURCE_ID_NOT_PROVIDED,
             ErrorMessage.Calendar.Message.CALENDAR_EVENT_SOURCE_ID_NOT_PROVIDED);
@@ -124,7 +124,7 @@ class GoogleCalendarClient implements CalendarClient<GoogleCalendarConnectionPro
                 ErrorMessage.GoogleCalendar.Message.UNAUTHORIZED_OR_FORBIDDEN(reason));
             case 404 -> throw new CustomBadRequestException(
                 ErrorMessage.Calendar.Code.EVENT_NOT_FOUND,
-                ErrorMessage.Calendar.Message.EVENT_NOT_FOUND(event.getSourceId()));
+                ErrorMessage.Calendar.Message.EVENT_NOT_FOUND(event.idempotencyKey()));
             case 429 -> throw new CustomRetryableException(
                 ErrorMessage.Common.Code.RATE_LIMITED,
                 ErrorMessage.GoogleCalendar.Message.RATE_LIMITED);
@@ -146,19 +146,19 @@ class GoogleCalendarClient implements CalendarClient<GoogleCalendarConnectionPro
     }
 
     private Event buildEvent(EventPayload dto, Event event) {
-      event.setSummary(dto.getTitle());
-      event.setDescription(dto.getDetails());
-      event.setLocation(dto.getUrl());
+      event.setSummary(dto.name());
+      event.setDescription(dto.name());
+      event.setLocation(dto.url());
 
       EventDateTime googleStartDate;
       EventDateTime googleEndDate;
       if (dto.isAllDay()) {
         // Use date-only; Google interprets as all-day in calendar’googleStartDate TZ
-        LocalDate startDate = dto.getStartAt() != null
-            ? LocalDateTime.ofInstant(dto.getStartAt(), dto.getZone()).toLocalDate()
-            : LocalDate.now(dto.getZone());
-        LocalDate endDate = dto.getEndAt() != null
-            ? LocalDateTime.ofInstant(dto.getEndAt(), dto.getZone()).toLocalDate()
+        LocalDate startDate = dto.startAt() != null
+            ? LocalDateTime.ofInstant(dto.startAt(), dto.zone()).toLocalDate()
+            : LocalDate.now(dto.zone());
+        LocalDate endDate = dto.endAt() != null
+            ? LocalDateTime.ofInstant(dto.endAt(), dto.zone()).toLocalDate()
             : startDate.plusDays(1); // Google expects end to be exclusive
 
         googleStartDate = new EventDateTime().setDate(
@@ -168,16 +168,16 @@ class GoogleCalendarClient implements CalendarClient<GoogleCalendarConnectionPro
             .setDate(new DateTime(true,
                 Date.valueOf(endDate).getTime(), 0));
       } else {
-        if (dto.getStartAt() == null || dto.getEndAt() == null) {
+        if (dto.startAt() == null || dto.endAt() == null) {
           throw new CustomUnprocessableEntityException(ErrorMessage.Validation.Code.INVALID_VALUE,
               ErrorMessage.Calendar.Message.START_AT_AND_END_AT_REQUIRED);
         }
         googleStartDate = new EventDateTime()
-            .setDateTime(new DateTime(Date.from(dto.getStartAt())))
-            .setTimeZone(dto.getZone().getId());
+            .setDateTime(new DateTime(Date.from(dto.startAt())))
+            .setTimeZone(dto.zone().getId());
         googleEndDate = new EventDateTime()
-            .setDateTime(new DateTime(Date.from(dto.getEndAt())))
-            .setTimeZone(dto.getZone().getId());
+            .setDateTime(new DateTime(Date.from(dto.endAt())))
+            .setTimeZone(dto.zone().getId());
       }
       event.setStart(googleStartDate);
       event.setEnd(googleEndDate);

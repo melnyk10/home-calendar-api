@@ -61,7 +61,7 @@ public class Event {
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "title", nullable = false)
+  @Column(name = "description", nullable = false)
   private String description;
 
   @JdbcTypeCode(SqlTypes.JSON)

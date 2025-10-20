@@ -38,7 +38,7 @@ public class UserCalendarEvent {
   @Column(name = "event_id")
   private Long eventId;
 
-  @Column(name = "source_event_id")
+  @Column(name = "source_event_id", nullable = false, unique = true)
   private String sourceEventId;
 
   @CreationTimestamp

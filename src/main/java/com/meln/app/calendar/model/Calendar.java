@@ -34,7 +34,7 @@ public class Calendar {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Integer id;
 
   @Column(name = "source_calendar_id")
   private String sourceCalendarId;

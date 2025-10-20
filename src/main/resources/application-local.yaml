@@ -7,9 +7,30 @@ app:
 quarkus:
   http:
     port: 8085
-  mongodb:
-    connection-string: ${MONGODB_CONNECTION_STRING:mongodb://app_user:admin@localhost:27017/home-calendar-db?retryWrites=false}
-    database: ${MONGODB_DB_NAME:home-calendar-db}
+  datasource:
+    db-kind: postgresql
+    username: ${DB_USER:admin}
+    password: ${DB_PASSWORD:admin}
+    jdbc:
+      url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5435}/${DB_NAME:homecalendardb}
+      driver: org.postgresql.Driver
+      max-size: 20
+      initial-size: 5
+      telemetry: true
+  hibernate-orm:
+    database:
+      generation: none            # Use Flyway for schema changes
+      default-schema: public         # Your target schema
+      globally-quoted-identifiers: true
+    log:
+      sql: false
+      bind-parameters: false
+  flyway:
+    migrate-at-start: true
+    table: flyway_schema_history
+    schemas: public
+    locations: classpath:db/migration
+    connect-retries: 10
   log:
     console:
       level: DEBUG

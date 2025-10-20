@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -34,7 +33,7 @@ public class Subscription {
   private boolean active = true;
 
   @Column(name = SUBJECT_ID, nullable = false)
-  private UUID subjectId;
+  private Long subjectId;
 
   @CreationTimestamp
   @Column(name = COL_CREATED_AT, nullable = false)

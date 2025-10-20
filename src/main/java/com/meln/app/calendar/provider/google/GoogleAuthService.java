@@ -10,7 +10,8 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.UserCredentials;
-import com.meln.app.calendar.provider.google.model.GoogleToken;
+import com.meln.app.calendar.CalendarConnectionRepository;
+import com.meln.app.calendar.model.CalendarConnection;
 import com.meln.app.common.error.CustomException.CustomAuthException;
 import com.meln.app.common.error.ErrorMessage;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -18,7 +19,6 @@ import jakarta.inject.Inject;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -32,7 +32,7 @@ public class GoogleAuthService {
       "https://www.googleapis.com/auth/calendar.events"
   );
 
-  private final GoogleTokenRepository repository;
+  private final CalendarConnectionRepository repository;
 
   @ConfigProperty(name = "app.google.client-id")
   String clientId;
@@ -81,7 +81,7 @@ public class GoogleAuthService {
   }
 
   Calendar calendarClient(String email) {
-    GoogleToken userToken = findByUserEmail(email);
+    CalendarConnection userToken = findByUserEmail(email);
     if (userToken == null) {
       throw new CustomAuthException(ErrorMessage.GoogleCalendar.Code.GOOGLE_UNAUTHORIZED,
           ErrorMessage.GoogleCalendar.Message.GOOGLE_UNAUTHORIZED(email));
@@ -90,7 +90,7 @@ public class GoogleAuthService {
         .setApplicationName("Home Calendar").build();
   }
 
-  private HttpCredentialsAdapter requestInitializer(GoogleToken token) {
+  private HttpCredentialsAdapter requestInitializer(CalendarConnection token) {
     var accessExpiry = token.getExpiresAt() == null ? null : Date.from(token.getExpiresAt());
 
     var creds = UserCredentials.newBuilder()
@@ -103,21 +103,25 @@ public class GoogleAuthService {
     return new HttpCredentialsAdapter(creds);
   }
 
-  public GoogleToken findByUserEmail(String email) {
+  public CalendarConnection findByUserEmail(String email) {
     return repository.findByUserEmail(email);
   }
 
   public void saveOrUpdate(String userEmail, GoogleTokenResponse tokens) {
 
     var expiresIn = tokens.getExpiresInSeconds() == null ? 3600L : tokens.getExpiresInSeconds();
-    GoogleToken googleToken = GoogleToken.builder()
-        .userEmail(userEmail)
+    CalendarConnection googleToken = CalendarConnection.builder()
+//        .userEmail(userEmail)
         .accessToken(tokens.getAccessToken())
         .refreshToken(tokens.getRefreshToken())
         .expiresAt(Instant.now().plusSeconds(expiresIn - 60))
-        .scopes(Set.of(CalendarScopes.CALENDAR_EVENTS))
+        .scopes(List.of(CalendarScopes.CALENDAR_EVENTS))
         .build();
 
-    repository.persist(googleToken);
+    repository.save(googleToken);
+  }
+
+  public void delete(CalendarConnection connection) {
+    repository.delete(connection);
   }
 }

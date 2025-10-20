@@ -1,12 +1,25 @@
 package com.meln.app.event.model;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import lombok.Builder;
 
 @Builder
 public record EventPayload(
+    String id,
+    String sourceId,
+    String calendarEventSourceId,
+    String name,
+    String details,
+    String url,
+    String notes,
+    boolean isAllDay,
+    Instant startAt,
+    Instant endAt,
+    ZoneId zone,
+
     String provider,           // "hltv" | "sonarr"
     String eventType,          // "match.scheduled", "episode.released", ...
     Instant occurredAt,

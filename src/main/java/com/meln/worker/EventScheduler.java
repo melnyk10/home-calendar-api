@@ -14,8 +14,8 @@ public class EventScheduler {
   private final EventRegistry eventRegistry;
   private final EventService eventService;
 
-  @Scheduled(every = "15m")
-  private void hltv() {
+//  @Scheduled(every = "15m")
+  public void hltv() {
     var hltvProvider = eventRegistry.get(ProviderType.HLTV);
     var events = hltvProvider.fetchAll();
     if (!events.isEmpty()) {

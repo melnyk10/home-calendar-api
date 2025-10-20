@@ -8,11 +8,12 @@ import java.util.Optional;
 @ApplicationScoped
 public class SubjectRepository implements PanacheRepository<Subject> {
 
-  public Optional<Subject> findByProviderAndTypeAndExternalId(Long id, String type, String id1) {
+  public Optional<Subject> findByProviderAndTypeAndSourceId(Integer providerId, String type,
+      String sourceId) {
     return Optional.empty();
   }
 
-  public Subject save(Subject newSubject) {
+  public Subject save(Subject subject) {
     return null;
   }
 }

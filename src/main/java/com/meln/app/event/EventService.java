@@ -36,7 +36,7 @@ public class EventService {
         .orElseThrow(
             () -> new IllegalArgumentException("Unknown provider: " + eventPayload.provider()));
 
-    var subject = subjectRepository.findByProviderAndTypeAndExternalId(
+    var subject = subjectRepository.findByProviderAndTypeAndSourceId(
             provider.getId(), eventPayload.subject().type(), eventPayload.subject().id())
         .orElseGet(() -> {
           var newSubject = new Subject();

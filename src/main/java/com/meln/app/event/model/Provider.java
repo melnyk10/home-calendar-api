@@ -16,7 +16,7 @@ import lombok.Setter;
 public class Provider {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Integer id;
 
   @Column(name = "name", nullable = false, unique = true)
   private String name;

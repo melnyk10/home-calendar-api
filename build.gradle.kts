@@ -42,6 +42,7 @@ dependencies {
     // --- Database / ORM ---
     implementation("io.quarkus:quarkus-hibernate-orm-panache")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
+    implementation("io.quarkus:quarkus-flyway")
 
     implementation("com.google.api-client:google-api-client:2.8.1")
     implementation("com.google.auth:google-auth-library-oauth2-http:1.31.0") // or latest compatible
