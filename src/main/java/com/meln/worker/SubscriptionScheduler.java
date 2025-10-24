@@ -7,7 +7,6 @@ import com.meln.app.event.model.Event;
 import com.meln.app.event.model.EventPayload;
 import com.meln.app.user.UserCalendarEventService;
 import com.meln.app.user.UserCalendarRepository;
-import com.meln.app.user.model.UserCalendarEventId;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.HashMap;
@@ -43,10 +42,10 @@ public class SubscriptionScheduler {
 
     //todo: find calendar by user and event type and pass ?
 
-    var newUserEvents = events.stream()
-        .map(it -> new UserCalendarEventId(it.getId(), it.getSourceId()))
-        .toList();
-    userCalendarEventService.create(newUserEvents);
+//    var newUserEvents = events.stream()
+//        .map(it -> new UserCalendarEventId(it.getId(), it.getSourceId()))
+//        .toList();
+//    userCalendarEventService.create(newUserEvents);
   }
 
   private void updateUserEvents(Map<String, CalendarConnection> calendarByUserId) {

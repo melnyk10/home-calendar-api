@@ -5,7 +5,7 @@ import com.meln.app.common.error.ServerException;
 import com.meln.app.event.model.Event;
 import com.meln.app.event.model.EventPayload;
 import com.meln.app.event.model.EventPayload.TargetPayload;
-import com.meln.app.event.model.EventTarget;
+import com.meln.app.event.model.Target;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class EventService {
 
   private final EventRepository eventRepository;
   private final ProviderRepository providerRepository;
-  private final EventTargetRepository eventTargetRepository;
+  private final TargetRepository targetRepository;
 
   public List<Event> listAllChangedEvents() {
     return eventRepository.findAllByUserSubscriptionsEvents();
@@ -58,34 +58,34 @@ public class EventService {
   }
 
   //todo: decouple save and get?
-  private List<EventTarget> getTargets(Integer providerId, EventPayload eventPayload) {
+  private List<Target> getTargets(Integer providerId, EventPayload eventPayload) {
     var targetSourceIds = eventPayload.targets().stream()
         .map(TargetPayload::id)
         .map(String::valueOf)
         .toList();
 
-    var eventTargets = eventTargetRepository.listAllBySourceIdIn(providerId, targetSourceIds);
+    var eventTargets = targetRepository.listAllBySourceIdIn(providerId, targetSourceIds);
     var eventTargetBySourceId = eventTargets.stream()
-        .collect(Collectors.toMap(EventTarget::getSourceId, Function.identity()));
+        .collect(Collectors.toMap(Target::getSourceId, Function.identity()));
 
-    List<EventTarget> allTargets = new ArrayList<>();
-    List<EventTarget> newEventTargets = new ArrayList<>();
+    List<Target> allTargets = new ArrayList<>();
+    List<Target> newTargets = new ArrayList<>();
     for (var target : eventPayload.targets()) {
       var eventTarget = eventTargetBySourceId.get(target.id());
       if (eventTarget == null) {
-        eventTarget = EventTarget.builder()
+        eventTarget = Target.builder()
             .sourceId(target.id())
             .name(target.name())
             .type(target.type())
             .providerId(providerId)
             .data(target.data())
             .build();
-        newEventTargets.add(eventTarget);
+        newTargets.add(eventTarget);
       }
       allTargets.add(eventTarget);
     }
 
-    eventTargetRepository.saveAll(newEventTargets);
+    targetRepository.saveAll(newTargets);
     return allTargets;
   }
 }

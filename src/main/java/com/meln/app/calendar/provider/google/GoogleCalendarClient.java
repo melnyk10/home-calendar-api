@@ -55,8 +55,8 @@ class GoogleCalendarClient implements CalendarClient<GoogleCalendarConnectionPro
     public String createEvent(EventPayload event) {
       Event newEventRes = withGoogleExceptionHandling(() -> {
         Event newEvent = buildEvent(event, new Event());
-        Map<String, String> extraProps = Map.of("eventSourceId", event.idempotencyKey());
-        updateExtraProps(newEvent, extraProps);
+//        Map<String, String> extraProps = Map.of("eventSourceId", event.idempotencyKey());
+//        updateExtraProps(newEvent, extraProps);
 
         try {
           Event eventRes = calendar.events().insert(calendarId, newEvent).execute();
@@ -124,7 +124,7 @@ class GoogleCalendarClient implements CalendarClient<GoogleCalendarConnectionPro
                 ErrorMessage.GoogleCalendar.Message.UNAUTHORIZED_OR_FORBIDDEN(reason));
             case 404 -> throw new CustomBadRequestException(
                 ErrorMessage.Calendar.Code.EVENT_NOT_FOUND,
-                ErrorMessage.Calendar.Message.EVENT_NOT_FOUND(event.idempotencyKey()));
+                ErrorMessage.Calendar.Message.EVENT_NOT_FOUND(event.sourceId()));
             case 429 -> throw new CustomRetryableException(
                 ErrorMessage.Common.Code.RATE_LIMITED,
                 ErrorMessage.GoogleCalendar.Message.RATE_LIMITED);

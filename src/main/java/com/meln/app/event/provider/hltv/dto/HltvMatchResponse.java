@@ -34,6 +34,7 @@ public class HltvMatchResponse {
 
     private String id;
     private String name;
+    private String slug;
   }
 
 }

@@ -56,13 +56,13 @@ public record EventPayload(
         .build();
   }
 
-  private static TargetPayload from(EventTarget target) {
+  private static TargetPayload from(Target target) {
     if (target == null) {
       return null;
     }
 
     return TargetPayload.builder()
-        .id(Optional.of(target).map(EventTarget::getId).map(String::valueOf).orElse(null))
+        .id(Optional.of(target).map(Target::getId).map(String::valueOf).orElse(null))
         .sourceId(target.getSourceId())
         .type(target.getType())
         .name(target.getName())

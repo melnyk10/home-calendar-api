@@ -20,18 +20,19 @@ import org.hibernate.type.SqlTypes;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventTarget {
+public class Target {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(name = "source_id", nullable = false)
   private String sourceId;
 
-  @Column
+  @Column(nullable = false)
   private String name;
 
-  @Column
+  @Column(nullable = false)
   private TargetType type;
 
   @Column(name = "provider_id", nullable = false)

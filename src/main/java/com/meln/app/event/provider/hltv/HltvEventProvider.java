@@ -1,14 +1,15 @@
 package com.meln.app.event.provider.hltv;
 
-import com.meln.app.event.EventProvider;
-import com.meln.app.event.EventTargetRepository;
+import com.meln.app.event.Provider;
+import com.meln.app.event.TargetRepository;
 import com.meln.app.event.model.DateRange;
 import com.meln.app.event.model.EventPayload;
 import com.meln.app.event.model.EventPayload.TargetPayload;
-import com.meln.app.event.model.EventTarget;
+import com.meln.app.event.model.Target;
 import com.meln.app.event.model.ProviderType;
 import com.meln.app.event.model.TargetType;
 import com.meln.app.event.provider.hltv.dto.HltvMatchResponse;
+import com.meln.app.event.provider.hltv.dto.HltvMatchResponse.Team;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.time.Instant;
@@ -22,10 +23,10 @@ import lombok.AllArgsConstructor;
 
 @ApplicationScoped
 @AllArgsConstructor(onConstructor_ = @Inject)
-class HltvEventProvider implements EventProvider<HltvCriteria> {
+class HltvEventProvider implements Provider {
 
   private final HltvMatchClient hltvMatchClient;
-  private final EventTargetRepository eventTargetRepository;
+  private final TargetRepository targetRepository;
 
   @Override
   public ProviderType providerType() {
@@ -36,8 +37,8 @@ class HltvEventProvider implements EventProvider<HltvCriteria> {
   public List<EventPayload> fetchAll() {
     List<EventPayload> events = new ArrayList<>();
 
-    var hltvTeamIds = eventTargetRepository.listAllByProvider(providerType()).stream()
-        .map(EventTarget::getData)
+    var hltvTeamIds = targetRepository.listAllByProvider(providerType()).stream()
+        .map(Target::getData)
         .map(it -> it.get("id"))
         .filter(Objects::nonNull)
         .map(String::valueOf)
@@ -93,20 +94,22 @@ class HltvEventProvider implements EventProvider<HltvCriteria> {
     }
 
     List<TargetPayload> targets = new ArrayList<>();
-    if (hltvMatch.getTeam1() != null) {
+    Team team1 = hltvMatch.getTeam1();
+    if (team1 != null) {
       targets.add(TargetPayload.builder()
-          .id(buildTargetId(hltvMatch.getTeam1()))
-          .name(hltvMatch.getTeam1().getName())
+          .id(buildTargetId(team1))
+          .name(team1.getName())
           .type(TargetType.TEAM)
-          .data(Map.of("id", hltvMatch.getTeam1().getId(), "slug", null))
+          .data(Map.of("id", team1.getId(), "slug", team1.getSlug()))
           .build());
     }
-    if (hltvMatch.getTeam2() != null) {
+    Team team2 = hltvMatch.getTeam2();
+    if (team2 != null) {
       targets.add(TargetPayload.builder()
-          .sourceId(buildTargetId(hltvMatch.getTeam2()))
-          .name(hltvMatch.getTeam2().getName())
+          .sourceId(buildTargetId(team2))
+          .name(team2.getName())
           .type(TargetType.TEAM)
-          .data(Map.of("id", hltvMatch.getTeam2().getId(), "slug", null))
+          .data(Map.of("id", team2.getId(), "slug", team2.getSlug()))
           .build());
     }
 

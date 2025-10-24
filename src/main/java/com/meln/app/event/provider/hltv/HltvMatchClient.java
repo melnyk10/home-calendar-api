@@ -2,7 +2,6 @@ package com.meln.app.event.provider.hltv;
 
 import com.meln.app.event.provider.hltv.dto.HltvMatchResponse;
 import com.meln.app.event.provider.hltv.dto.HltvMatchResponse.Team;
-import com.meln.app.event.provider.hltv.dto.HltvTeamResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -24,8 +23,8 @@ class HltvMatchClient {
             .matchId(String.valueOf(matchCounter++))
             .matchUrl("https://hltv.org/matches/" + (3000 + i) + "/natus-vincere-vs-team" + i)
             .dateTime(Instant.now().plusSeconds(86400L * i))
-            .team1(new Team("9565", "Navi"))
-            .team2(new Team("12352", "Spirit"))
+            .team1(new Team("9565", "Navi", "navi"))
+            .team2(new Team("12352", "Spirit", "spirit"))
             .score1(16)
             .score2(10 + i)
             .bestOf(3)

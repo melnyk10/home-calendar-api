@@ -10,31 +10,10 @@ values ('HLTV', 'hltv.org: CS2 tournaments & matches'),
        ('SONARR', 'sonarr: tv series & episodes')
 on conflict (type) do nothing;
 
--- ==============
--- subjects (things users subscribe to: tournament, tv_show, movie, team, etc.)
--- ==============
-create table if not exists subject
-(
-    id          bigserial primary key,
-    source_id   varchar(64) not null,                     -- provider-scoped id/slug
-    provider_id bigint      not null references provider (id) on delete cascade,
-    type        text        not null,                     -- 'tournament', 'tv_show', 'team', ...
-    name        varchar(64) not null,
-    data        jsonb       not null default '{}'::jsonb, -- arbitrary metadata/external_refs
-    created_at  timestamptz not null default now(),
-    updated_at  timestamptz not null default now(),
-
-    constraint subject_unique_external
-        unique (provider_id, type, source_id)
-            deferrable initially immediate
--- That makes PostgreSQL check the constraint only when you commit, not right after each insert/update.
-);
-
 create or replace function event_hash(
     p_name text,
     p_description text,
     p_status text,
-    p_subject_id bigint,
     p_type text,
     p_provider_id bigint,
     p_start_at timestamptz,
@@ -48,7 +27,6 @@ select md5(
                coalesce(p_name, '') || '|' ||
                coalesce(p_description, '') || '|' ||
                coalesce(p_status, '') || '|' ||
-               p_subject_id::text || '|' ||
                coalesce(p_type, '') || '|' ||
                p_provider_id::text || '|' ||
                (extract(epoch from p_start_at))::bigint::text || '|' ||
@@ -61,7 +39,6 @@ create table if not exists event
     id          bigserial primary key,
     source_id   varchar(64) not null,
     provider_id bigint      not null references provider (id) on delete cascade,
-    subject_id  bigint      not null references subject (id) on delete cascade,
     target_id   bigint      not null references event_target (id) on delete cascade,
     type        text        not null,                     -- 'match.scheduled', 'match.resulted', 'episode.released', ...
     name        text,
@@ -78,10 +55,9 @@ create table if not exists event
     -- precomputed change detector (hash of stable presentation fields)
 
     hash        text generated always as (
-        event_hash(name, details, status, subject_id, type, provider_id, start_at, payload)
+        event_hash(name, details, status, type, provider_id, start_at, payload)
         ) stored
 );
-create index if not exists idx_event_subject_time on event (subject_id, start_at);
 create index if not exists idx_event_type_time on event (type, start_at);
 create index if not exists idx_event_provider_time on event (provider_id, start_at);
 create index if not exists idx_event_tags_gin on event using gin (tags);
@@ -104,25 +80,11 @@ create table if not exists "user"
     created_at timestamptz not null default now()
 );
 
-create table if not exists subscription
-(
-    id         bigserial primary key,
-    user_id    bigint      not null references "user" (id) on delete cascade,
-    is_active  bool        not null default true,
-    subject_id bigint      not null references subject (id) on delete cascade,
-    created_at timestamptz not null default now(),
-
-    constraint uq_subscription unique (user_id, subject_id)
-);
-
-create index if not exists idx_subscription_user on subscription (user_id);
-create index if not exists idx_subscription_subject on subscription (subject_id);
-
 create table user_subscription
 (
     id         bigserial primary key,
     user_id    bigint      not null references "user" (id) on delete cascade,
-    subject_id bigint references subject (id) on delete cascade, -- 'sonarr:series:the-boys-2019'
+    is_active  bool        not null default true,
     target_id  bigint references event_target (id) on delete cascade,
     created_at timestamptz not null default now(),
 

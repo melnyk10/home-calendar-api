@@ -69,7 +69,7 @@ public class Event {
   private Map<String, Object> payload = new HashMap<>();
 
   @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<EventTarget> targets = new ArrayList<>();
+  private List<Target> targets = new ArrayList<>();
 
   @Column(name = "hash")
   private String hash;
