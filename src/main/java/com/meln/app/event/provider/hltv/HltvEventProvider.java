@@ -97,7 +97,7 @@ class HltvEventProvider implements Provider {
     Team team1 = hltvMatch.getTeam1();
     if (team1 != null) {
       targets.add(TargetPayload.builder()
-          .id(buildTargetId(team1))
+          .sourceId(buildTargetId(team1))
           .name(team1.getName())
           .type(TargetType.TEAM)
           .data(Map.of("id", team1.getId(), "slug", team1.getSlug()))

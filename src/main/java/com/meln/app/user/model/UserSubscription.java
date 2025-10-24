@@ -38,11 +38,11 @@ public class UserSubscription {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @Column(name = "provider_id", nullable = false)
-  private Integer providerId;
+  @Column(name = "is_active", nullable = false)
+  private Boolean active = true;
 
-  @Column(name = "subject_id", nullable = false)
-  private Long subjectId;
+  @Column(name = "target_id", nullable = false)
+  private Integer targetId;
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)

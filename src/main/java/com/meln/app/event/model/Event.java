@@ -1,22 +1,24 @@
 package com.meln.app.event.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,6 +57,7 @@ public class Event {
   @JoinColumn(name = "provider_id", nullable = false)
   private Provider provider;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "type", nullable = false)
   private TargetType type;
 
@@ -68,8 +71,13 @@ public class Event {
   @Column(columnDefinition = "jsonb", nullable = false)
   private Map<String, Object> payload = new HashMap<>();
 
-  @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Target> targets = new ArrayList<>();
+  @ManyToMany
+  @JoinTable(
+      name = "event_target",
+      joinColumns = @JoinColumn(name = "event_id"),
+      inverseJoinColumns = @JoinColumn(name = "target_id")
+  )
+  private Set<Target> targets = new HashSet<>();
 
   @Column(name = "hash")
   private String hash;

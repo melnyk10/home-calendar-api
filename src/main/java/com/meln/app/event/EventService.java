@@ -10,7 +10,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -58,7 +60,7 @@ public class EventService {
   }
 
   //todo: decouple save and get?
-  private List<Target> getTargets(Integer providerId, EventPayload eventPayload) {
+  private Set<Target> getTargets(Integer providerId, EventPayload eventPayload) {
     var targetSourceIds = eventPayload.targets().stream()
         .map(TargetPayload::id)
         .map(String::valueOf)
@@ -68,8 +70,8 @@ public class EventService {
     var eventTargetBySourceId = eventTargets.stream()
         .collect(Collectors.toMap(Target::getSourceId, Function.identity()));
 
-    List<Target> allTargets = new ArrayList<>();
-    List<Target> newTargets = new ArrayList<>();
+    Set<Target> allTargets = new HashSet<>();
+    Set<Target> newTargets = new HashSet<>();
     for (var target : eventPayload.targets()) {
       var eventTarget = eventTargetBySourceId.get(target.id());
       if (eventTarget == null) {

@@ -39,7 +39,6 @@ create table if not exists event
     id          bigserial primary key,
     source_id   varchar(64) not null,
     provider_id bigint      not null references provider (id) on delete cascade,
-    target_id   bigint      not null references event_target (id) on delete cascade,
     type        text        not null,                     -- 'match.scheduled', 'match.resulted', 'episode.released', ...
     name        text,
     details     text,
@@ -63,12 +62,21 @@ create index if not exists idx_event_provider_time on event (provider_id, start_
 create index if not exists idx_event_tags_gin on event using gin (tags);
 create index if not exists idx_event_payload_gin on event using gin (payload jsonb_path_ops);
 
+create table target
+(
+    id          bigserial primary key,
+    name        varchar(64) not null,
+    source_id   varchar(64) not null,
+    type        text        not null,                     -- 'team','season','episode',...
+    data        jsonb       not null default '{}'::jsonb, -- arbitrary metadata/external_refs
+    provider_id bigint      not null references provider (id) on delete cascade
+);
+
 create table event_target
 (
-    id   bigserial primary key,
-    name varchar(64),
-    type text  not null,                    -- 'team','season','episode',...
-    data jsonb not null default '{}'::jsonb -- arbitrary metadata/external_refs
+    event_id  bigint not null references event (id) on delete cascade,
+    target_id bigint not null references target (id) on delete cascade,
+    primary key (event_id, target_id)
 );
 
 create table if not exists "user"
@@ -85,7 +93,7 @@ create table user_subscription
     id         bigserial primary key,
     user_id    bigint      not null references "user" (id) on delete cascade,
     is_active  bool        not null default true,
-    target_id  bigint references event_target (id) on delete cascade,
+    target_id  bigint references target (id) on delete cascade,
     created_at timestamptz not null default now(),
 
     unique (user_id, target_id)
