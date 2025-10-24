@@ -118,7 +118,7 @@ public interface ErrorMessage {
       }
 
       static String GOOGLE_UNAUTHORIZED(String email) {
-        return "Google account is not connected for user ".formatted(email);
+        return "Google account is not connected for user with email: %s".formatted(email);
       }
 
     }
