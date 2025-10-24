@@ -8,7 +8,6 @@ import com.meln.app.event.model.EventPayload;
 import com.meln.app.user.UserCalendarEventService;
 import com.meln.app.user.UserCalendarRepository;
 import com.meln.app.user.model.UserCalendarEventId;
-import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.HashMap;
@@ -63,7 +62,7 @@ public class SubscriptionScheduler {
     for (var userCalendarEvent : userCalendarEvents) {
       var event = eventById.get(userCalendarEvent.getEventId());
       var calendarClient = calendarByUserId.get(null);
-      calendarClient.updateEvent(EventPayload.toPayload(event));
+      calendarClient.updateEvent(EventPayload.from(event));
     }
   }
 

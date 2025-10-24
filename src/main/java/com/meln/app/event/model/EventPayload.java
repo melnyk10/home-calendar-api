@@ -4,72 +4,69 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.Builder;
 
 @Builder
 public record EventPayload(
     String id,
     String sourceId,
-    String calendarEventSourceId,
+    String calendarEventSourceId, //todo: move to another obj ?
     String name,
     String details,
     String url,
-    String notes,
     boolean isAllDay,
     Instant startAt,
     Instant endAt,
     ZoneId zone,
-
-    String provider,           // "hltv" | "sonarr"
-    String eventType,          // "match.scheduled", "episode.released", ...
-    Instant occurredAt,
-    Instant receivedAt,
-    String status,             // "scheduled" | "completed" | ...
-    String privacy,            // optional
-    SubjectPayload subject,
-    Map<String, Object> payload,
-    List<String> tags,
-    String idempotencyKey      // if provider gives one; else we’ll compute
+    ProviderType provider,
+    TargetType type,
+    List<TargetPayload> targets
 ) {
 
   @Builder
-  public record SubjectPayload(
-      String type,           // "tournament" | "tv_show" | ...
+  public record TargetPayload(
       String id,
-      // provider-scoped external id/slug (e.g. "hltv:event:iem-katowice-2025")
+      String sourceId,
+      TargetType type,
       String name,
-      Map<String, Object> externalRefs
+      Map<String, Object> data,
+      ProviderType provider
   ) {
 
   }
 
-  public static EventPayload toPayload(Event event) {
+  public static EventPayload from(Event event) {
     if (event == null) {
       return null;
     }
 
     return EventPayload.builder()
-        .provider(event.getProvider() != null ? event.getProvider().getName() : null)
-        .eventType(event.getType())
-        .occurredAt(event.getStartAt())
-        .receivedAt(event.getCreatedAt())
-        .status("scheduled") // or derive dynamically
-        .privacy(null)
-        .subject(toSubjectPayload(event.getSubject()))
-        .payload(event.getPayload())
-        .tags(List.of())
-        .idempotencyKey(event.getHash())
+        .id(Optional.of(event).map(Event::getId).map(String::valueOf).orElse(null))
+        .sourceId(event.getSourceId())
+        .provider(event.getProvider() != null ? event.getProvider().getType() : null)
+        .provider(Optional.of(event).map(Event::getProvider).map(Provider::getType).orElse(null))
+        .type(event.getType())
+        .name(event.getName())
+        .details(event.getDetails())
+        .targets(event.getTargets().stream().map(EventPayload::from).toList())
+        .isAllDay(event.isAllDay())
+        .startAt(event.getStartAt())
+        .endAt(event.getEndAt())
         .build();
   }
 
-  private static EventPayload.SubjectPayload toSubjectPayload(Subject subject) {
-    if (subject == null) {
+  private static TargetPayload from(EventTarget target) {
+    if (target == null) {
       return null;
     }
-    return EventPayload.SubjectPayload.builder()
-        .type(subject.getType())
-        .id(subject.getId().toString())
-        .name(subject.getName())
+
+    return TargetPayload.builder()
+        .id(Optional.of(target).map(EventTarget::getId).map(String::valueOf).orElse(null))
+        .sourceId(target.getSourceId())
+        .type(target.getType())
+        .name(target.getName())
+        .data(target.getData())
         .build();
   }
 }

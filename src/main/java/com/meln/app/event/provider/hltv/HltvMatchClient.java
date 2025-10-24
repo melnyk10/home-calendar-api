@@ -1,7 +1,8 @@
 package com.meln.app.event.provider.hltv;
 
-import com.meln.app.event.provider.hltv.model.HltvMatchResponse;
-import com.meln.app.event.provider.hltv.model.HltvTeamResponse;
+import com.meln.app.event.provider.hltv.dto.HltvMatchResponse;
+import com.meln.app.event.provider.hltv.dto.HltvMatchResponse.Team;
+import com.meln.app.event.provider.hltv.dto.HltvTeamResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -11,11 +12,11 @@ import java.util.List;
 @ApplicationScoped
 class HltvMatchClient {
 
-  public List<HltvMatchResponse> syncMatches(HltvTeamResponse team) {
+  public List<HltvMatchResponse> syncMatches(String teamId) {
     List<HltvMatchResponse> matches = new ArrayList<>();
     int matchCounter = 1000;
 
-    if (team.getTeamId().equals("9565")) {
+    if (teamId.equals("9565")) {
       for (int i = 1; i <= 3; i++) {
         matches.add(HltvMatchResponse.builder()
             .eventName("IEM Katowice " + i)
@@ -23,8 +24,8 @@ class HltvMatchClient {
             .matchId(String.valueOf(matchCounter++))
             .matchUrl("https://hltv.org/matches/" + (3000 + i) + "/natus-vincere-vs-team" + i)
             .dateTime(Instant.now().plusSeconds(86400L * i))
-            .team1Id(team.getTeamId())
-            .team2Id(null)
+            .team1(new Team("9565", "Navi"))
+            .team2(new Team("12352", "Spirit"))
             .score1(16)
             .score2(10 + i)
             .bestOf(3)
@@ -32,16 +33,16 @@ class HltvMatchClient {
       }
     } else {
       matches.add(HltvMatchResponse.builder()
-          .eventName("Blast Premier vs " + team.getName())
-          .eventUrl("https://hltv.org/events/" + (4000 + matchCounter) + "/blast-premier-vs-"
-              + team.getTeamIdName())
+//          .eventName("Blast Premier vs " + team.getName())
+//          .eventUrl("https://hltv.org/events/" + (4000 + matchCounter) + "/blast-premier-vs-"
+//              + team.getTeamIdName())
           .matchId(String.valueOf(matchCounter++))
-          .matchUrl(
-              "https://hltv.org/matches/" + (5000 + matchCounter) + "/match-vs-"
-                  + team.getTeamIdName())
+//          .matchUrl(
+//              "https://hltv.org/matches/" + (5000 + matchCounter) + "/match-vs-"
+//                  + team.getTeamIdName())
           .dateTime(Instant.now().plusSeconds(172800L))
-          .team1Id(team.getTeamId())
-          .team2Id(null)
+          .team1(null)
+          .team2(null)
           .score1(14)
           .score2(16)
           .bestOf(1)

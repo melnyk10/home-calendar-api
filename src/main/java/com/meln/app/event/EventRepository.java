@@ -33,7 +33,7 @@ class EventRepository implements PanacheRepository<Event> {
   }
 
   public void bulkUpsert(List<Event> eventEntities) {
-
+    //todo: finish me!
   }
 
 }

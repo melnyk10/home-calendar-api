@@ -1,5 +1,6 @@
 package com.meln.app.event.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,9 +10,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,22 +55,21 @@ public class Event {
   @JoinColumn(name = "provider_id", nullable = false)
   private Provider provider;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  @JoinColumn(name = "subject_id", nullable = false)
-  private Subject subject;
-
   @Column(name = "type", nullable = false)
-  private String type; // e.g. "match.scheduled", "episode.released"
+  private TargetType type;
 
   @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(name = "description", nullable = false)
-  private String description;
+  @Column(name = "details", nullable = false)
+  private String details;
 
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(columnDefinition = "jsonb", nullable = false)
   private Map<String, Object> payload = new HashMap<>();
+
+  @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<EventTarget> targets = new ArrayList<>();
 
   @Column(name = "hash")
   private String hash;

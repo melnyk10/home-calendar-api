@@ -1,14 +1,14 @@
 create table if not exists provider
 (
     id          serial primary key,
-    name        text unique not null unique, -- e.g. 'hltv', 'sonarr'
+    type        varchar(32) unique not null unique,
     description text
 );
 
-insert into provider (name, description)
-values ('HLTV', 'hltv.org: cs2 tournaments & matches'),
+insert into provider (type, description)
+values ('HLTV', 'hltv.org: CS2 tournaments & matches'),
        ('SONARR', 'sonarr: tv series & episodes')
-on conflict (name) do nothing;
+on conflict (type) do nothing;
 
 -- ==============
 -- subjects (things users subscribe to: tournament, tv_show, movie, team, etc.)
@@ -62,9 +62,10 @@ create table if not exists event
     source_id   varchar(64) not null,
     provider_id bigint      not null references provider (id) on delete cascade,
     subject_id  bigint      not null references subject (id) on delete cascade,
+    target_id   bigint      not null references event_target (id) on delete cascade,
     type        text        not null,                     -- 'match.scheduled', 'match.resulted', 'episode.released', ...
     name        text,
-    description text,
+    details     text,
     is_all_day  bool        not null default false,
     start_at    timestamptz not null,
     end_at      timestamptz not null,
@@ -77,16 +78,22 @@ create table if not exists event
     -- precomputed change detector (hash of stable presentation fields)
 
     hash        text generated always as (
-        event_hash(name, description, status, subject_id, type, provider_id, start_at, payload)
+        event_hash(name, details, status, subject_id, type, provider_id, start_at, payload)
         ) stored
 );
-
--- indexes for common queries
 create index if not exists idx_event_subject_time on event (subject_id, start_at);
 create index if not exists idx_event_type_time on event (type, start_at);
 create index if not exists idx_event_provider_time on event (provider_id, start_at);
 create index if not exists idx_event_tags_gin on event using gin (tags);
 create index if not exists idx_event_payload_gin on event using gin (payload jsonb_path_ops);
+
+create table event_target
+(
+    id   bigserial primary key,
+    name varchar(64),
+    type text  not null,                    -- 'team','season','episode',...
+    data jsonb not null default '{}'::jsonb -- arbitrary metadata/external_refs
+);
 
 create table if not exists "user"
 (
@@ -113,13 +120,13 @@ create index if not exists idx_subscription_subject on subscription (subject_id)
 
 create table user_subscription
 (
-    id          bigserial primary key,
-    user_id     bigint      not null references "user" (id) on delete cascade,
-    provider_id int         not null references provider (id) on delete cascade, -- optional filter by provider
-    subject_id  bigint      not null references subject (id) on delete cascade,  -- 'sonarr:series:the-boys-2019'
-    created_at  timestamptz not null default now(),
+    id         bigserial primary key,
+    user_id    bigint      not null references "user" (id) on delete cascade,
+    subject_id bigint references subject (id) on delete cascade, -- 'sonarr:series:the-boys-2019'
+    target_id  bigint references event_target (id) on delete cascade,
+    created_at timestamptz not null default now(),
 
-    unique (user_id, provider_id, subject_id)
+    unique (user_id, target_id)
 );
 
 create table if not exists calendar
