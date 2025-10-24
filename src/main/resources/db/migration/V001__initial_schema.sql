@@ -67,9 +67,9 @@ create table target
     id          bigserial primary key,
     name        varchar(64) not null,
     source_id   varchar(64) not null,
-    type        text        not null,                     -- 'team','season','episode',...
-    data        jsonb       not null default '{}'::jsonb, -- arbitrary metadata/external_refs
-    provider_id bigint      not null references provider (id) on delete cascade
+    type        text        not null,                    -- 'team','season','episode',...
+    provider_id bigint      not null references provider (id) on delete cascade,
+    data        jsonb       not null default '{}'::jsonb -- arbitrary metadata/external_refs
 );
 
 create table event_target

@@ -5,8 +5,8 @@ import com.meln.app.event.TargetRepository;
 import com.meln.app.event.model.DateRange;
 import com.meln.app.event.model.EventPayload;
 import com.meln.app.event.model.EventPayload.TargetPayload;
-import com.meln.app.event.model.Target;
 import com.meln.app.event.model.ProviderType;
+import com.meln.app.event.model.Target;
 import com.meln.app.event.model.TargetType;
 import com.meln.app.event.provider.hltv.dto.HltvMatchResponse;
 import com.meln.app.event.provider.hltv.dto.HltvMatchResponse.Team;
@@ -48,7 +48,9 @@ class HltvEventProvider implements Provider {
       var matchResponses = hltvMatchClient.syncMatches(teamId);
       for (var matchResponse : matchResponses) {
         var eventPayload = from(matchResponse);
-        events.add(eventPayload);
+        if (eventPayload != null) {
+          events.add(eventPayload);
+        }
       }
     }
 
@@ -56,6 +58,13 @@ class HltvEventProvider implements Provider {
   }
 
   private EventPayload from(HltvMatchResponse hltvMatch) {
+    if (hltvMatch == null) {
+      return null;
+    }
+    if (hltvMatch.getTeam1() == null) {
+      return null;
+    }
+
     var eventName =
         hltvMatch.getTeam1().getName() + " vs " + parseTeamName(hltvMatch.getTeam2());
 

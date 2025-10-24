@@ -8,6 +8,7 @@ import com.meln.app.event.model.EventPayload.TargetPayload;
 import com.meln.app.event.model.Target;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ public class EventService {
     return eventRepository.findAllByNotFoundEvents();
   }
 
+  @Transactional
   public void saveOrUpdate(Collection<EventPayload> events) {
     var eventEntities = events.stream().map(this::from).toList();
     eventRepository.bulkUpsert(eventEntities);
@@ -62,21 +64,21 @@ public class EventService {
   //todo: decouple save and get?
   private Set<Target> getTargets(Integer providerId, EventPayload eventPayload) {
     var targetSourceIds = eventPayload.targets().stream()
-        .map(TargetPayload::id)
+        .map(TargetPayload::sourceId)
         .map(String::valueOf)
         .toList();
 
     var eventTargets = targetRepository.listAllBySourceIdIn(providerId, targetSourceIds);
     var eventTargetBySourceId = eventTargets.stream()
-        .collect(Collectors.toMap(Target::getSourceId, Function.identity()));
+        .collect(Collectors.toMap(it -> it.getSourceId(), Function.identity()));
 
     Set<Target> allTargets = new HashSet<>();
     Set<Target> newTargets = new HashSet<>();
     for (var target : eventPayload.targets()) {
-      var eventTarget = eventTargetBySourceId.get(target.id());
+      var eventTarget = eventTargetBySourceId.get(target.sourceId());
       if (eventTarget == null) {
         eventTarget = Target.builder()
-            .sourceId(target.id())
+            .sourceId(target.sourceId())
             .name(target.name())
             .type(target.type())
             .providerId(providerId)
