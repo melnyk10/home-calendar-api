@@ -6,7 +6,6 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,28 +20,36 @@ class EventRepository implements PanacheRepository<Event> {
   @PersistenceContext
   private final EntityManager entityManager;
 
+  @SuppressWarnings("unchecked")
   public List<Event> findAllByNotFoundEvents() {
     var sql = """
-        select e
+        select e.*
         from event e
-                 join user_subscription us on us.provider_id = e.provider_id and us.subject_id = e.subject_id
+                 join event_target et on e.id = et.event_id
+                 join user_subscription us on us.target_id = et.target_id
         where not exists (select 1
                           from user_calendar_event uce
-                          where uce.source_event_id = e.source_id)
+                          where uce.event_id = e.id)
         """;
-    return find(sql).list();
+    return getEntityManager()
+        .createNativeQuery(sql, Event.class)
+        .getResultList();
   }
 
+  @SuppressWarnings("unchecked")
   public List<Event> findAllByUserSubscriptionsEvents() {
     var sql = """
-        select e
+        select e.*
         from event e
-                 join user_subscription us on us.provider_id = e.provider_id and us.subject_id = e.subject_id
+                 join event_target et on e.id = et.event_id
+                 join user_subscription us on us.target_id = et.target_id
         where exists (select 1
-                          from user_calendar_event uce
-                          where uce.source_event_id = e.source_id)
+                      from user_calendar_event uce
+                      where uce.event_id = e.id)
         """;
-    return find(sql).list();
+    return getEntityManager()
+        .createNativeQuery(sql, Event.class)
+        .getResultList();
   }
 
   @SneakyThrows
@@ -91,6 +98,7 @@ class EventRepository implements PanacheRepository<Event> {
     }
 
     query.executeUpdate();
+    //todo: create event_target relations!
   }
 
 }

@@ -49,7 +49,7 @@ create table if not exists event
 
     -- precomputed change detector (hash of stable presentation fields)
 
-    hash        text generated always as (
+    hash        varchar(32) not null generated always as (
         event_hash(name, details, type, provider_id, start_at, payload)
         ) stored
 );
@@ -124,12 +124,13 @@ create table calendar_connection
 
 create table user_calendar_event
 (
-    id               bigserial primary key,
-    user_calendar_id bigint      not null references calendar_connection (id),
-    event_id         bigint      not null references event (id) on delete cascade,
-    source_event_id  varchar(64), -- id in Google/Outlook/etc.
-    created_at       timestamptz not null default now(),
-    updated_at       timestamptz not null default now(),
+    id                       bigserial primary key,
+    user_calendar_id         bigint      not null references calendar_connection (id),
+    event_id                 bigint      not null references event (id) on delete cascade,
+    calendar_source_event_id varchar(64) unique, -- id in Google/Outlook/etc.
+    hash                     varchar(32) not null,
+    created_at               timestamptz not null default now(),
+    updated_at               timestamptz not null default now(),
 
     unique (user_calendar_id, event_id)
 );

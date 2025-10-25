@@ -38,8 +38,11 @@ public class UserCalendarEvent {
   @Column(name = "event_id")
   private Long eventId;
 
-  @Column(name = "source_event_id", nullable = false, unique = true)
-  private String sourceEventId;
+  @Column(name = "calendar_source_event_id", nullable = false, unique = true)
+  private String calendarSourceEventId;
+
+  @Column(name = "hash", nullable = false)
+  private String hash;
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
