@@ -38,9 +38,9 @@ import org.hibernate.type.SqlTypes;
 @Table(
     name = "event",
     indexes = {
-        @Index(name = "idx_event_subject_time", columnList = "subject_id,occurred_at"),
-        @Index(name = "idx_event_type_time", columnList = "event_type,occurred_at"),
-        @Index(name = "idx_event_provider_time", columnList = "provider_id,occurred_at")
+        @Index(name = "idx_event_subject_time", columnList = "subject_id, occurred_at"),
+        @Index(name = "idx_event_type_time", columnList = "type, occurred_at"),
+        @Index(name = "idx_event_provider_time", columnList = "provider_id, occurred_at")
     }
 )
 public class Event {

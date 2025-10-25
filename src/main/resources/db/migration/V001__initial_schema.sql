@@ -13,7 +13,6 @@ on conflict (type) do nothing;
 create or replace function event_hash(
     p_name text,
     p_description text,
-    p_status text,
     p_type text,
     p_provider_id bigint,
     p_start_at timestamptz,
@@ -26,7 +25,6 @@ $$
 select md5(
                coalesce(p_name, '') || '|' ||
                coalesce(p_description, '') || '|' ||
-               coalesce(p_status, '') || '|' ||
                coalesce(p_type, '') || '|' ||
                p_provider_id::text || '|' ||
                (extract(epoch from p_start_at))::bigint::text || '|' ||
@@ -37,7 +35,7 @@ $$;
 create table if not exists event
 (
     id          bigserial primary key,
-    source_id   varchar(64) not null,
+    source_id   varchar(64) not null unique,
     provider_id bigint      not null references provider (id) on delete cascade,
     type        text        not null,                     -- 'match.scheduled', 'match.resulted', 'episode.released', ...
     name        text,
@@ -45,21 +43,18 @@ create table if not exists event
     is_all_day  bool        not null default false,
     start_at    timestamptz not null,
     end_at      timestamptz not null,
-    status      text        not null check (status in ('scheduled', 'completed', 'canceled', 'updated')),
     payload     jsonb       not null default '{}'::jsonb, -- event-type-specific data
-    tags        text[]      not null default '{}',        -- free-form labels
     created_at  timestamptz not null default now(),
     updated_at  timestamptz not null default now(),
 
     -- precomputed change detector (hash of stable presentation fields)
 
     hash        text generated always as (
-        event_hash(name, details, status, type, provider_id, start_at, payload)
+        event_hash(name, details, type, provider_id, start_at, payload)
         ) stored
 );
 create index if not exists idx_event_type_time on event (type, start_at);
 create index if not exists idx_event_provider_time on event (provider_id, start_at);
-create index if not exists idx_event_tags_gin on event using gin (tags);
 create index if not exists idx_event_payload_gin on event using gin (payload jsonb_path_ops);
 
 create table target

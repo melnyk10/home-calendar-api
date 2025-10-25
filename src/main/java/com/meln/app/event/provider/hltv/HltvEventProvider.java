@@ -15,12 +15,15 @@ import jakarta.inject.Inject;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @ApplicationScoped
 @AllArgsConstructor(onConstructor_ = @Inject)
 class HltvEventProvider implements Provider {
@@ -44,17 +47,28 @@ class HltvEventProvider implements Provider {
         .map(String::valueOf)
         .toList();
 
+    Instant now = Instant.now();
     for (var teamId : hltvTeamIds) {
-      var matchResponses = hltvMatchClient.syncMatches(teamId);
-      for (var matchResponse : matchResponses) {
-        var eventPayload = from(matchResponse);
-        if (eventPayload != null) {
-          events.add(eventPayload);
-        }
-      }
+      List<HltvMatchResponse> matchResponses = fetchMatchesByTeamId(teamId);
+      var teamMatches = matchResponses.stream()
+          .filter(Objects::nonNull)
+          .filter(it -> it.getDateTime().isAfter(now))
+          .map(this::from)
+          .toList();
+      events.addAll(teamMatches);
     }
 
     return events;
+  }
+
+  private List<HltvMatchResponse> fetchMatchesByTeamId(String teamId) {
+    try {
+      return hltvMatchClient.syncMatches(teamId);
+    } catch (Exception exception) {
+      log.error("Can't fetch matches by team id: {}. Error message: {}",
+          teamId, exception.getMessage(), exception);
+      return Collections.emptyList();
+    }
   }
 
   private EventPayload from(HltvMatchResponse hltvMatch) {
@@ -86,8 +100,8 @@ class HltvEventProvider implements Provider {
 
   //todo: maybe implement interface that will have buildSourceId ?
   private String buildSourceId(HltvMatchResponse eventPayload) {
-    return providerType().name().toLowerCase() +
-        TargetType.MATCH.name().toLowerCase() +
+    return providerType().name().toLowerCase().concat(":") +
+        TargetType.MATCH.name().toLowerCase().concat(":") +
         eventPayload.getMatchId();
   }
 

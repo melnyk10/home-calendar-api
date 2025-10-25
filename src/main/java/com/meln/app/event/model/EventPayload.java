@@ -21,7 +21,8 @@ public record EventPayload(
     ZoneId zone,
     ProviderType provider,
     TargetType type,
-    List<TargetPayload> targets
+    List<TargetPayload> targets,
+    Map<String, Object> payload
 ) {
 
   @Builder

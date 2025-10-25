@@ -9,7 +9,6 @@ import com.meln.app.event.model.Target;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +36,7 @@ public class EventService {
   @Transactional
   public void saveOrUpdate(Collection<EventPayload> events) {
     var eventEntities = events.stream().map(this::from).toList();
-    eventRepository.bulkUpsert(eventEntities);
+    eventRepository.upsertAll(eventEntities);
   }
 
   public Event from(EventPayload eventPayload) {
@@ -57,6 +56,10 @@ public class EventService {
     event.setAllDay(eventPayload.isAllDay());
     event.setStartAt(eventPayload.startAt());
     event.setEndAt(eventPayload.endAt());
+
+    if (eventPayload.payload() != null && !eventPayload.payload().isEmpty()) {
+      event.setPayload(eventPayload.payload());
+    }
 
     return event;
   }
