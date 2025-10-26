@@ -1,17 +1,21 @@
 package com.meln.worker;
 
-import com.meln.app.calendar.CalendarClient;
-import com.meln.app.calendar.CalendarClient.CalendarConnection;
+import com.meln.app.calendar.CalendarService;
 import com.meln.app.event.EventService;
 import com.meln.app.event.model.Event;
 import com.meln.app.event.model.EventPayload;
-import com.meln.app.user.UserCalendarEventService;
-import com.meln.app.user.UserCalendarRepository;
+import com.meln.app.event.model.Target;
+import com.meln.app.user.UserEventService;
+import com.meln.app.user.UserSubscriptionService;
+import com.meln.app.user.model.UserEvent;
+import com.meln.app.user.model.UserSubscription;
+import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,47 +26,56 @@ import lombok.extern.slf4j.Slf4j;
 public class SubscriptionScheduler {
 
   private final EventService eventService;
-  private final UserCalendarRepository userCalendarRepository;
-  private final UserCalendarEventService userCalendarEventService;
+  private final UserEventService userEventService;
+  private final UserSubscriptionService userSubscriptionService;
+  private final CalendarService calendarService;
 
   //todo: find better way to update events. Something like webhook, Queue?
-//  @Scheduled(every = "20m")
+  @Scheduled(every = "20m")
   public void sync() {
-    var calendarByUserId = new HashMap<String, CalendarClient.CalendarConnection>();
-    createUserEvents(calendarByUserId);
-    updateUserEvents(calendarByUserId);
+    createUserEvents();
+    //todo: updateUserEvents(calendarByUserId);
   }
 
-  private void createUserEvents(Map<String, CalendarConnection> calendarByUserId) {
+  private void createUserEvents() {
     var events = eventService.findAllByNotFoundEvents();
     if (events.isEmpty()) {
       log.info("No events found for creation");
       return;
     }
 
-    //todo: find calendar by user and event type and pass ?
+    Set<Long> eventTargetIds = events.stream()
+        .flatMap(e -> e.getTargets().stream())
+        .map(Target::getId)
+        .collect(Collectors.toSet());
 
-//    var newUserEvents = events.stream()
-//        .map(it -> new UserCalendarEventId(it.getId(), it.getSourceId()))
-//        .toList();
-//    userCalendarEventService.create(newUserEvents);
+    Map<Long, List<UserSubscription>> userSubscriptionByTargetId =
+        userSubscriptionService.listUserSubscriptionMap(eventTargetIds);
+
+    List<UserEvent> processedUserEvents = new ArrayList<>();
+    for (Event event : events) {
+      for (Target target : event.getTargets()) {
+        var userSubscription = userSubscriptionByTargetId.get(target.getId());
+        for (UserSubscription subscription : userSubscription) {
+          Long userId = subscription.getUser().getId();
+          var calendarClient = calendarService.auth(userId, event.getProvider().getId());
+          String newEventId = calendarClient.createEvent(EventPayload.from(event));
+
+          var userEvent = buildUserEvent(event, userId, newEventId);
+          processedUserEvents.add(userEvent);
+        }
+      }
+    }
+    userEventService.saveAll(processedUserEvents);
   }
 
-  private void updateUserEvents(Map<String, CalendarConnection> calendarByUserId) {
-    var eventById = eventService.listAllChangedEvents().stream()
-        .collect(Collectors.toMap(Event::getId, Function.identity()));
-    if (eventById.isEmpty()) {
-      log.info("No events found for update");
-      return;
-    }
-    //todo: filter events what are changed. Maybe to use something like eTag/MD5 hash
-
-    var userCalendarEvents = userCalendarRepository.findAllByEventIds(eventById.keySet());
-    for (var userCalendarEvent : userCalendarEvents) {
-      var event = eventById.get(userCalendarEvent.getEventId());
-      var calendarClient = calendarByUserId.get(null);
-      calendarClient.updateEvent(EventPayload.from(event));
-    }
+  private UserEvent buildUserEvent(Event event, Long userId, String calendarSourceEventId) {
+    UserEvent userEvent = new UserEvent();
+    userEvent.setEventId(event.getId());
+    userEvent.setHash(event.getHash());
+    userEvent.setCalendarSourceEventId(calendarSourceEventId);
+    userEvent.setUserId(userId);
+    return userEvent;
   }
 
 }
