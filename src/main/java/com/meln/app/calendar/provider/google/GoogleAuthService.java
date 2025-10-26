@@ -80,11 +80,10 @@ public class GoogleAuthService {
         .execute();
   }
 
-  Calendar calendarClient(String email) {
-    CalendarConnection userToken = findByUserEmail(email);
+  Calendar calendarClient(CalendarConnection userToken) {
     if (userToken == null) {
       throw new CustomAuthException(ErrorMessage.GoogleCalendar.Code.GOOGLE_UNAUTHORIZED,
-          ErrorMessage.GoogleCalendar.Message.GOOGLE_UNAUTHORIZED(email));
+          ErrorMessage.GoogleCalendar.Message.GOOGLE_UNAUTHORIZED);
     }
     return new Calendar.Builder(HTTP, JSON_FACTORY, requestInitializer(userToken))
         .setApplicationName("Home Calendar").build();

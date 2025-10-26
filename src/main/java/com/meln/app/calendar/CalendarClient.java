@@ -1,15 +1,16 @@
 package com.meln.app.calendar;
 
+import com.meln.app.calendar.model.CalendarConnection;
+import com.meln.app.calendar.model.CalendarProvider;
 import com.meln.app.event.model.EventPayload;
-import javax.naming.AuthenticationException;
 
-public interface CalendarClient<P extends CalendarConnectionProperties> {
+public interface CalendarClient {
 
-  Class<P> propertiesType();
+  CalendarProvider type();
 
-  CalendarConnection connect(P props) throws AuthenticationException;
+  CalendarClient.CalendarClientConnection connect(CalendarConnection connection);
 
-  interface CalendarConnection {
+  interface CalendarClientConnection {
 
     String createEvent(EventPayload event);
 

@@ -7,6 +7,8 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Event.ExtendedProperties;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.meln.app.calendar.CalendarClient;
+import com.meln.app.calendar.model.CalendarConnection;
+import com.meln.app.calendar.model.CalendarProvider;
 import com.meln.app.common.error.CustomException.CustomAuthException;
 import com.meln.app.common.error.CustomException.CustomBadRequestException;
 import com.meln.app.common.error.CustomException.CustomRetryableException;
@@ -24,32 +26,29 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-import javax.naming.AuthenticationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ApplicationScoped
 @RequiredArgsConstructor(onConstructor_ = @Inject)
-class GoogleCalendarClient implements CalendarClient<GoogleCalendarConnectionProperties> {
+class GoogleCalendarClient implements CalendarClient {
 
   private final GoogleAuthService googleAuthService;
 
   @Override
-  public Class<GoogleCalendarConnectionProperties> propertiesType() {
-    return GoogleCalendarConnectionProperties.class;
+  public CalendarProvider type() {
+    return CalendarProvider.GOOGLE;
   }
 
   @Override
-  public CalendarConnection connect(GoogleCalendarConnectionProperties props)
-      throws AuthenticationException {
-    var calendarClient = googleAuthService.calendarClient(props.getUserEmail());
-    var calendarId = Optional.ofNullable(props.getCalendarId()).orElse("primary");
-    return new GoogleConnection(calendarClient, calendarId);
+  public CalendarClientConnection connect(CalendarConnection connection) {
+    var calendarClient = googleAuthService.calendarClient(connection);
+    return new GoogleConnection(calendarClient, connection.getSourceCalendarId());
   }
 
   private record GoogleConnection(Calendar calendar, String calendarId) implements
-      CalendarConnection {
+      CalendarClientConnection {
 
     @Override
     public String createEvent(EventPayload event) {

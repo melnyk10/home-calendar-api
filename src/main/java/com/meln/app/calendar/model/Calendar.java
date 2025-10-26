@@ -3,6 +3,8 @@ package com.meln.app.calendar.model;
 import com.meln.app.user.model.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,7 +45,8 @@ public class Calendar {
   private String name;
 
   @Column(nullable = false)
-  private String provider;
+  @Enumerated(EnumType.STRING)
+  private CalendarProvider provider;
 
   @Column(name = "account_email")
   private String accountEmail;

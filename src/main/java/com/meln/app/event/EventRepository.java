@@ -23,12 +23,11 @@ class EventRepository implements PanacheRepository<Event> {
   @SuppressWarnings("unchecked")
   public List<Event> findAllByNotFoundEvents() {
     var sql = """
-        select e.*
-        from event e
+        select e.* from event e
                  join event_target et on e.id = et.event_id
                  join user_subscription us on us.target_id = et.target_id
         where not exists (select 1
-                          from user_calendar_event uce
+                          from user_event uce
                           where uce.event_id = e.id)
         """;
     return getEntityManager()
@@ -39,12 +38,12 @@ class EventRepository implements PanacheRepository<Event> {
   @SuppressWarnings("unchecked")
   public List<Event> findAllByUserSubscriptionsEvents() {
     var sql = """
-        select e.*
-        from event e
+        select e.* from event e
                  join event_target et on e.id = et.event_id
                  join user_subscription us on us.target_id = et.target_id
-        where exists (select 1
-                      from user_calendar_event uce
+        where e.hash != us.hash
+        and exists (select 1
+                      from user_event uce
                       where uce.event_id = e.id)
         """;
     return getEntityManager()

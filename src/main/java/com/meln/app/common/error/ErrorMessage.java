@@ -112,13 +112,10 @@ public interface ErrorMessage {
     interface Message {
 
       String RATE_LIMITED = "Rate limited by Google Calendar. Please retry with backoff.";
+      String GOOGLE_UNAUTHORIZED = "Google account is not connected for user";
 
       static String UNAUTHORIZED_OR_FORBIDDEN(String reason) {
         return "Google authorization failed or forbidden: %s".formatted(reason);
-      }
-
-      static String GOOGLE_UNAUTHORIZED(String email) {
-        return "Google account is not connected for user with email: %s".formatted(email);
       }
 
     }

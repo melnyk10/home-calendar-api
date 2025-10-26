@@ -83,23 +83,12 @@ create table if not exists "user"
     created_at timestamptz not null default now()
 );
 
-create table user_subscription
-(
-    id         bigserial primary key,
-    user_id    bigint      not null references "user" (id) on delete cascade,
-    is_active  bool        not null default true,
-    target_id  bigint references target (id) on delete cascade,
-    created_at timestamptz not null default now(),
-
-    unique (user_id, target_id)
-);
-
 create table if not exists calendar
 (
     id                 serial primary key,
     source_calendar_id text,
     name               text        not null,
-    provider           text        not null, -- e.g. 'google','outlook','ics'
+    provider           varchar(16) not null, -- e.g. 'google','outlook','ics'
     account_email      text,
     user_id            bigint      not null references "user" (id) on delete cascade,
     created_at         timestamptz not null default now(),
@@ -122,16 +111,29 @@ create table calendar_connection
     unique (user_id, calendar_id)
 );
 
-create table user_calendar_event
+create table provider_calendar
+(
+    id                     bigserial primary key,
+    calendar_connection_id bigint not null references calendar_connection (id),
+    provider_id            bigint not null references provider (id) on delete cascade,
+    unique (calendar_connection_id, provider_id)
+);
+
+create table user_subscription
+(
+    id        bigserial primary key,
+    user_id   bigint not null references "user" (id) on delete cascade,
+    target_id bigint references target (id) on delete cascade,
+    is_active bool   not null default true,
+    unique (user_id, target_id)
+);
+
+create table user_event
 (
     id                       bigserial primary key,
-    user_calendar_id         bigint      not null references calendar_connection (id),
-    event_id                 bigint      not null references event (id) on delete cascade,
+    user_id                  bigint      not null references "user" (id),
+    event_id                 bigint      not null references event (id),
     calendar_source_event_id varchar(64) unique, -- id in Google/Outlook/etc.
     hash                     varchar(32) not null,
-    created_at               timestamptz not null default now(),
-    updated_at               timestamptz not null default now(),
-
-    unique (user_calendar_id, event_id)
+    unique (user_id, event_id)
 );
-create index idx_uce_event on user_calendar_event (event_id);

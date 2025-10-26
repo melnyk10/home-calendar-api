@@ -34,9 +34,8 @@ public class CalendarConnection {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "calendar_id", nullable = false)
-  private Calendar calendar;
+  @Column(name = "calendar_id", nullable = false)
+  private Integer calendarId;
 
   @Column(name = "user_id", nullable = false)
   private Long userId;

@@ -10,13 +10,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(
@@ -38,13 +36,9 @@ public class UserSubscription {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
+  @Column(name = "target_id", nullable = false)
+  private Long targetId;
+
   @Column(name = "is_active", nullable = false)
   private Boolean active = true;
-
-  @Column(name = "target_id", nullable = false)
-  private Integer targetId;
-
-  @CreationTimestamp
-  @Column(name = "created_at", nullable = false, updatable = false)
-  private Instant createdAt;
 }
