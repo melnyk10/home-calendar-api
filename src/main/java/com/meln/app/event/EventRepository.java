@@ -27,8 +27,8 @@ class EventRepository implements PanacheRepository<Event> {
                  join event_target et on e.id = et.event_id
                  join user_subscription us on us.target_id = et.target_id
         where not exists (select 1
-                          from user_event uce
-                          where uce.event_id = e.id)
+                          from user_event ue
+                          where ue.event_id = e.id)
         """;
     return getEntityManager()
         .createNativeQuery(sql, Event.class)
@@ -43,8 +43,8 @@ class EventRepository implements PanacheRepository<Event> {
                  join user_subscription us on us.target_id = et.target_id
         where e.hash != us.hash
         and exists (select 1
-                      from user_event uce
-                      where uce.event_id = e.id)
+                      from user_event ue
+                      where ue.event_id = e.id)
         """;
     return getEntityManager()
         .createNativeQuery(sql, Event.class)

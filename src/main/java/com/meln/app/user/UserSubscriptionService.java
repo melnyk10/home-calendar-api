@@ -14,10 +14,8 @@ public class UserSubscriptionService {
 
   private final UserSubscriptionRepository userSubscriptionRepository;
 
-  public Map<Long, List<UserSubscription>> listUserSubscriptionMap(
-      Collection<Long> eventTargetIds) {
-    var allByTargetIdIn = userSubscriptionRepository.findAllByTargetIdIn(eventTargetIds);
-    return allByTargetIdIn.stream()
+  public Map<Long, List<UserSubscription>> listUserSubscriptionMap(Collection<Long> targetIds) {
+    return userSubscriptionRepository.findAllByTargetIdIn(targetIds).stream()
         .collect(Collectors.groupingBy(UserSubscription::getTargetId));
   }
 }

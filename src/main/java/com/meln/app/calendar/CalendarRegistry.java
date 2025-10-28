@@ -20,7 +20,7 @@ public class CalendarRegistry {
     calendarClients.forEach(c -> calendarClientByProvider.put(c.type(), c));
   }
 
-  public CalendarClient.CalendarClientConnection connect(CalendarConnection connection) {
+  public CalendarClient.CalendarClientConnection auth(CalendarConnection connection) {
     if (connection == null) {
       throw new ServerException(
           ErrorMessage.Calendar.Code.INVALID_CALENDAR_PROVIDER_PROPERTIES,
@@ -33,6 +33,6 @@ public class CalendarRegistry {
       throw new ServerException(ErrorMessage.Calendar.Code.INVALID_CALENDAR_PROVIDER,
           ErrorMessage.Calendar.Message.NO_PROVIDER_BY_PROPS(google.name()));
     }
-    return calendarClient.connect(connection);
+    return calendarClient.auth(connection);
   }
 }

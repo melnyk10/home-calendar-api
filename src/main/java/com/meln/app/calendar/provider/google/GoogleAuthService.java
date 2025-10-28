@@ -14,6 +14,7 @@ import com.meln.app.calendar.CalendarConnectionRepository;
 import com.meln.app.calendar.model.CalendarConnection;
 import com.meln.app.common.error.CustomException.CustomAuthException;
 import com.meln.app.common.error.ErrorMessage;
+import com.meln.app.common.error.ServerException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.sql.Date;
@@ -82,7 +83,7 @@ public class GoogleAuthService {
 
   Calendar calendarClient(CalendarConnection userToken) {
     if (userToken == null) {
-      throw new CustomAuthException(ErrorMessage.GoogleCalendar.Code.GOOGLE_UNAUTHORIZED,
+      throw new ServerException(ErrorMessage.GoogleCalendar.Code.GOOGLE_UNAUTHORIZED,
           ErrorMessage.GoogleCalendar.Message.GOOGLE_UNAUTHORIZED);
     }
     return new Calendar.Builder(HTTP, JSON_FACTORY, requestInitializer(userToken))
@@ -109,7 +110,7 @@ public class GoogleAuthService {
   public void saveOrUpdate(String userEmail, GoogleTokenResponse tokens) {
 
     var expiresIn = tokens.getExpiresInSeconds() == null ? 3600L : tokens.getExpiresInSeconds();
-    CalendarConnection googleToken = CalendarConnection.builder()
+    var googleToken = CalendarConnection.builder()
 //        .userEmail(userEmail)
         .accessToken(tokens.getAccessToken())
         .refreshToken(tokens.getRefreshToken())

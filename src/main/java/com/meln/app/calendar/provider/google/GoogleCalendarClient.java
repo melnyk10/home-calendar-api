@@ -14,6 +14,7 @@ import com.meln.app.common.error.CustomException.CustomBadRequestException;
 import com.meln.app.common.error.CustomException.CustomRetryableException;
 import com.meln.app.common.error.CustomException.CustomUnprocessableEntityException;
 import com.meln.app.common.error.ErrorMessage;
+import com.meln.app.common.error.ServerException;
 import com.meln.app.event.model.EventPayload;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -42,7 +43,7 @@ class GoogleCalendarClient implements CalendarClient {
   }
 
   @Override
-  public CalendarClientConnection connect(CalendarConnection connection) {
+  public CalendarClientConnection auth(CalendarConnection connection) {
     var calendarClient = googleAuthService.calendarClient(connection);
     return new GoogleConnection(calendarClient, connection.getSourceCalendarId());
   }
@@ -52,27 +53,25 @@ class GoogleCalendarClient implements CalendarClient {
 
     @Override
     public String createEvent(EventPayload event) {
-      Event newEventRes = withGoogleExceptionHandling(() -> {
-        Event newEvent = buildEvent(event, new Event());
-//        Map<String, String> extraProps = Map.of("eventSourceId", event.idempotencyKey());
-//        updateExtraProps(newEvent, extraProps);
+      Event response = withGoogleExceptionHandling(() -> {
+        var newEvent = buildEvent(event, new Event());
 
         try {
-          Event eventRes = calendar.events().insert(calendarId, newEvent).execute();
-          log.debug("Created event; id={}, etag={}", newEvent.getId(), newEvent.getEtag());
-          return eventRes;
+          var eventCreationResponse = calendar.events().insert(calendarId, newEvent).execute();
+          log.debug("Created event: id={}, etag={}", newEvent.getId(), newEvent.getEtag());
+          return eventCreationResponse;
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
       }, event);
 
-      return newEventRes.getId();
+      return response.getId();
     }
 
     @Override
     public void updateEvent(EventPayload event) {
       withGoogleExceptionHandling(() -> {
-        Event updateEvent = buildEvent(event, new Event());
+        var updateEvent = buildEvent(event, new Event());
         updateEvent.setId(event.calendarEventSourceId());
         Event updated;
         try {
@@ -89,17 +88,17 @@ class GoogleCalendarClient implements CalendarClient {
 
     private <T> T withGoogleExceptionHandling(Supplier<T> call, EventPayload event) {
       if (event == null) {
-        throw new CustomBadRequestException(
+        throw new ServerException(
             ErrorMessage.Common.Code.REQUEST_BODY_REQUIRED,
             ErrorMessage.Common.Message.REQUEST_BODY_REQUIRED);
       }
       if (event.calendarEventSourceId() == null || event.calendarEventSourceId().isBlank()) {
-        throw new CustomBadRequestException(
+        throw new ServerException(
             ErrorMessage.Calendar.Code.CALENDAR_EVENT_SOURCE_ID_NOT_PROVIDED,
             ErrorMessage.Calendar.Message.CALENDAR_EVENT_SOURCE_ID_NOT_PROVIDED);
       }
       if (calendarId == null || calendarId.isBlank()) {
-        throw new CustomBadRequestException(
+        throw new ServerException(
             ErrorMessage.Calendar.Code.CALENDAR_ID_NOT_PROVIDED,
             ErrorMessage.Calendar.Message.CALENDAR_ID_NOT_PROVIDED);
       }
@@ -115,7 +114,7 @@ class GoogleCalendarClient implements CalendarClient {
               googleEx.getMessage();
 
           switch (status) {
-            case 400 -> throw new CustomBadRequestException(
+            case 400 -> throw new ServerException(
                 ErrorMessage.Common.Code.INVALID_REQUEST,
                 ErrorMessage.Common.Message.INVALID_REQUEST(reason));
             case 401, 403 -> throw new CustomAuthException(
@@ -127,7 +126,7 @@ class GoogleCalendarClient implements CalendarClient {
             case 429 -> throw new CustomRetryableException(
                 ErrorMessage.Common.Code.RATE_LIMITED,
                 ErrorMessage.GoogleCalendar.Message.RATE_LIMITED);
-            default -> throw new CustomBadRequestException(
+            default -> throw new ServerException(
                 ErrorMessage.Common.Code.SOMETHING_WENT_WRONG,
                 ErrorMessage.Common.Message.SOMETHING_WENT_WRONG);
           }
@@ -136,10 +135,9 @@ class GoogleCalendarClient implements CalendarClient {
           throw new CustomRetryableException(ErrorMessage.Common.Code.NETWORK_TIMEOUT,
               ErrorMessage.Common.Message.NETWORK_TIMEOUT);
         } else {
-          throw new CustomBadRequestException(
+          throw new ServerException(
               ErrorMessage.Common.Code.SOMETHING_WENT_WRONG,
-              ErrorMessage.Common.Message.SOMETHING_WENT_WRONG,
-              e);
+              ErrorMessage.Common.Message.SOMETHING_WENT_WRONG);
         }
       }
     }
@@ -153,10 +151,10 @@ class GoogleCalendarClient implements CalendarClient {
       EventDateTime googleEndDate;
       if (dto.isAllDay()) {
         // Use date-only; Google interprets as all-day in calendar’googleStartDate TZ
-        LocalDate startDate = dto.startAt() != null
+        var startDate = dto.startAt() != null
             ? LocalDateTime.ofInstant(dto.startAt(), dto.zone()).toLocalDate()
             : LocalDate.now(dto.zone());
-        LocalDate endDate = dto.endAt() != null
+        var endDate = dto.endAt() != null
             ? LocalDateTime.ofInstant(dto.endAt(), dto.zone()).toLocalDate()
             : startDate.plusDays(1); // Google expects end to be exclusive
 

@@ -8,7 +8,7 @@ public interface CalendarClient {
 
   CalendarProvider type();
 
-  CalendarClient.CalendarClientConnection connect(CalendarConnection connection);
+  CalendarClient.CalendarClientConnection auth(CalendarConnection connection);
 
   interface CalendarClientConnection {
 
