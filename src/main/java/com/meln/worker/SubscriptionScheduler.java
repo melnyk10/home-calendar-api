@@ -55,18 +55,25 @@ public class SubscriptionScheduler {
     List<UserEvent> processedUserEvents = new ArrayList<>();
     for (Event event : events) {
       for (Target target : event.getTargets()) {
-        var userSubscription = userSubscriptionByTargetId.get(target.getId());
-        for (UserSubscription subscription : userSubscription) {
-          Long userId = subscription.getUser().getId();
-          var calendarClient = calendarService.auth(userId, event.getProvider().getId());
-          String newEventId = calendarClient.createEvent(EventPayload.from(event));
+        if (!userSubscriptionByTargetId.containsKey(target.getId())) {
+          continue;
+        }
 
-          var userEvent = buildUserEvent(event, userId, newEventId);
+        var usersSubscription = userSubscriptionByTargetId.get(target.getId());
+        for (var subscription : usersSubscription) {
+          var userEvent = createEvent(subscription, event);
           processedUserEvents.add(userEvent);
         }
       }
     }
     userEventService.saveAll(processedUserEvents);
+  }
+
+  private UserEvent createEvent(UserSubscription userSubscription, Event event) {
+    var userId = userSubscription.getUser().getId();
+    var calendarClient = calendarService.auth(userId, event.getProvider().getId());
+    var newEventId = calendarClient.createEvent(EventPayload.from(event));
+    return buildUserEvent(event, userId, newEventId);
   }
 
   private UserEvent buildUserEvent(Event event, Long userId, String calendarSourceEventId) {
