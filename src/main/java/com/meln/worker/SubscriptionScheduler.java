@@ -7,7 +7,6 @@ import com.meln.app.event.model.Event;
 import com.meln.app.event.model.EventPayload;
 import com.meln.app.event.model.Target;
 import com.meln.app.user.UserEventRepository;
-import com.meln.app.user.UserEventService;
 import com.meln.app.user.UserSubscriptionService;
 import com.meln.app.user.model.UserEvent;
 import com.meln.app.user.model.UserSubscription;

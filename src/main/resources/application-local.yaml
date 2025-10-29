@@ -29,7 +29,7 @@ quarkus:
     migrate-at-start: true
     table: flyway_schema_history
     schemas: public
-    locations: classpath:db/migration
+    locations: filesystem:../../../../migrations
     connect-retries: 10
   log:
     console:

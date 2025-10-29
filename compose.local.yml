@@ -23,6 +23,10 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d register" ]
+      interval: 2s
+      start_period: 3s
     networks:
       - home-calendar-network
 
@@ -34,6 +38,22 @@ services:
     ports:
       - "8085:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    networks:
+      - home-calendar-network
+
+  flyway:
+    container_name: flyway
+    image: flyway/flyway
+    volumes:
+      - ./flyway.toml:/flyway/conf/flyway.toml:ro
+      - ./migrations:/flyway/migrations:ro
+    command: -configFiles=/flyway/conf/flyway.toml migrate -environment=docker -locations=filesystem:/flyway/migrations
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - home-calendar-network
