@@ -31,15 +31,16 @@ public class SubscriptionScheduler {
   private final UserSubscriptionService userSubscriptionService;
   private final CalendarService calendarService;
 
-  //todo: find better way to update events. Something like webhook, Queue?
+  //todo: find better way to update events. Something like queue?
   @Scheduled(every = "20m")
   public void sync() {
-    createUserEvents();
-    //todo: updateUserEvents(calendarByUserId);
+    Map<Long, CalendarClientConnection> calendarClientByUserId = new HashMap<>();
+    createUserEvents(calendarClientByUserId);
+    updateUserEvents(calendarClientByUserId);
   }
 
-  private void createUserEvents() {
-    var events = eventService.findAllByNotFoundEvents();
+  private void createUserEvents(Map<Long, CalendarClientConnection> calendarClientByUserId) {
+    var events = eventService.listMissingUserEvents();
     if (events.isEmpty()) {
       log.info("No events found for creation");
       return;
@@ -52,14 +53,19 @@ public class SubscriptionScheduler {
 
     var userSubscriptionByTargetId = listUserSubscriptionsByTargetIds(events);
 
-    Map<Long, CalendarClientConnection> calendarClientByUserId = new HashMap<>();
-
     List<UserEvent> processedUserEvents = new ArrayList<>();
     for (var task : eventTasks) {
       //todo: what if user is subscribed to more than one target in event?
       var usersSubscription = userSubscriptionByTargetId.get(task.target().getId());
-      var userEvents = createUsersEvents(usersSubscription, task, calendarClientByUserId);
-      processedUserEvents.addAll(userEvents);
+      for (var subscription : usersSubscription) {
+        try {
+          var event = createEvent(task, subscription, calendarClientByUserId);
+          processedUserEvents.add(event);
+        } catch (Exception exception) {
+          log.warn("Can't create event for user: {}, event: {}",
+              subscription.getUser().getEmail(), task.event().getId(), exception);
+        }
+      }
     }
 
     userEventRepository.saveAll(processedUserEvents);
@@ -74,25 +80,6 @@ public class SubscriptionScheduler {
     return userSubscriptionService.listUserSubscriptionMap(eventTargetIds);
   }
 
-  private List<UserEvent> createUsersEvents(List<UserSubscription> usersSubscription,
-      EventTargetTask task, Map<Long, CalendarClientConnection> calendarClientByUserId) {
-
-    List<UserEvent> processedUserEvents = new ArrayList<>();
-    for (var subscription : usersSubscription) {
-      UserEvent userEvent;
-      try {
-        userEvent = createEvent(task, subscription, calendarClientByUserId);
-      } catch (Exception exception) {
-        log.error("Error creating event for user: {}, event: {}",
-            subscription.getUser().getEmail(), task.event().getId(), exception);
-        continue;
-      }
-      processedUserEvents.add(userEvent);
-    }
-
-    return processedUserEvents;
-  }
-
   private UserEvent createEvent(EventTargetTask task, UserSubscription subscription,
       Map<Long, CalendarClientConnection> calendarClientByUserId) {
     var userId = subscription.getUser().getId();
@@ -103,12 +90,47 @@ public class SubscriptionScheduler {
   }
 
   private UserEvent buildUserEvent(Event event, Long userId, String calendarSourceEventId) {
-    UserEvent userEvent = new UserEvent();
+    var userEvent = new UserEvent();
     userEvent.setEventId(event.getId());
     userEvent.setHash(event.getHash());
     userEvent.setCalendarSourceEventId(calendarSourceEventId);
     userEvent.setUserId(userId);
     return userEvent;
+  }
+
+  private void updateUserEvents(Map<Long, CalendarClientConnection> calendarClientByUserId) {
+    var events = eventService.listChangedUserEvents();
+    if (events.isEmpty()) {
+      log.info("No events found for updating");
+      return;
+    }
+
+    var eventTasks = events.stream()
+        .flatMap(event -> event.getTargets().stream()
+            .map(target -> new EventTargetTask(event, target)))
+        .toList();
+
+    var userSubscriptionByTargetId = listUserSubscriptionsByTargetIds(events);
+
+    for (var task : eventTasks) {
+      var usersSubscription = userSubscriptionByTargetId.get(task.target().getId());
+      for (var subscription : usersSubscription) {
+        updateEvent(task, subscription, calendarClientByUserId);
+      }
+    }
+  }
+
+  private void updateEvent(EventTargetTask task, UserSubscription subscription,
+      Map<Long, CalendarClientConnection> calendarClientByUserId) {
+    try {
+      var userId = subscription.getUser().getId();
+      var calendarClientConnection = calendarClientByUserId.computeIfAbsent(userId,
+          id -> calendarService.auth(id, task.event().getProvider().getId()));
+      calendarClientConnection.updateEvent(EventPayload.from(task.event()));
+    } catch (Exception exception) {
+      log.error("Error updating event for user: {}, event: {}",
+          subscription.getUser().getEmail(), task.event().getId(), exception);
+    }
   }
 
   public record EventTargetTask(Event event, Target target) {

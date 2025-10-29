@@ -21,7 +21,7 @@ class EventRepository implements PanacheRepository<Event> {
   private final EntityManager entityManager;
 
   @SuppressWarnings("unchecked")
-  public List<Event> findAllByNotFoundEvents() {
+  public List<Event> findAllMissingUserEvents() {
     var sql = """
         select e.* from event e
                  join event_target et on e.id = et.event_id
@@ -36,15 +36,13 @@ class EventRepository implements PanacheRepository<Event> {
   }
 
   @SuppressWarnings("unchecked")
-  public List<Event> findAllByUserSubscriptionsEvents() {
+  public List<Event> findAllChangedUserEvents() {
     var sql = """
-        select e.* from event e
+        select e.*
+        from event e
                  join event_target et on e.id = et.event_id
-                 join user_subscription us on us.target_id = et.target_id
-        where e.hash != us.hash
-        and exists (select 1
-                      from user_event ue
-                      where ue.event_id = e.id)
+                 join user_event ue on ue.event_id = e.id
+        where e.hash != ue.hash
         """;
     return getEntityManager()
         .createNativeQuery(sql, Event.class)

@@ -25,12 +25,12 @@ public class EventService {
   private final ProviderRepository providerRepository;
   private final TargetRepository targetRepository;
 
-  public List<Event> listAllChangedEvents() {
-    return eventRepository.findAllByUserSubscriptionsEvents();
+  public List<Event> listChangedUserEvents() {
+    return eventRepository.findAllChangedUserEvents();
   }
 
-  public List<Event> findAllByNotFoundEvents() {
-    return eventRepository.findAllByNotFoundEvents();
+  public List<Event> listMissingUserEvents() {
+    return eventRepository.findAllMissingUserEvents();
   }
 
   @Transactional
