@@ -11,9 +11,9 @@ public class CalendarService {
   private final CalendarConnectionRepository calendarConnectionRepository;
   private final CalendarRegistry calendarRegistry;
 
-  public CalendarClient.CalendarClientConnection auth(Long userId, Integer providerId) {
+  public CalendarClient.CalendarClientConnection auth(String email, Integer providerId) {
     var calendarConnection =
-        calendarConnectionRepository.findAllCalendarConnections(userId, providerId);
+        calendarConnectionRepository.findAllCalendarConnections(email, providerId);
     if (calendarConnection == null) {
       return null;
     }

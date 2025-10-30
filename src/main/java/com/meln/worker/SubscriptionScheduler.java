@@ -34,12 +34,12 @@ public class SubscriptionScheduler {
   //todo: find better way to update events. Something like queue?
   @Scheduled(every = "20m")
   public void sync() {
-    Map<Long, CalendarClientConnection> calendarClientByUserId = new HashMap<>();
+    Map<String, CalendarClientConnection> calendarClientByUserId = new HashMap<>();
     createUserEvents(calendarClientByUserId);
     updateUserEvents(calendarClientByUserId);
   }
 
-  private void createUserEvents(Map<Long, CalendarClientConnection> calendarClientByUserId) {
+  private void createUserEvents(Map<String, CalendarClientConnection> calendarClientByUserId) {
     var events = eventService.listMissingUserEvents();
     if (events.isEmpty()) {
       log.info("No events found for creation");
@@ -81,12 +81,12 @@ public class SubscriptionScheduler {
   }
 
   private UserEvent createEvent(EventTargetTask task, UserSubscription subscription,
-      Map<Long, CalendarClientConnection> calendarClientByUserId) {
-    var userId = subscription.getUser().getId();
-    var calendarClientConnection = calendarClientByUserId.computeIfAbsent(userId,
-        id -> calendarService.auth(id, task.event().getProvider().getId()));
+      Map<String, CalendarClientConnection> calendarClientByUserId) {
+    var user = subscription.getUser();
+    var calendarClientConnection = calendarClientByUserId.computeIfAbsent(user.getEmail(),
+        id -> calendarService.auth(user.getEmail(), task.event().getProvider().getId()));
     var newEventId = calendarClientConnection.createEvent(EventPayload.from(task.event()));
-    return buildUserEvent(task.event(), userId, newEventId);
+    return buildUserEvent(task.event(), user.getId(), newEventId);
   }
 
   private UserEvent buildUserEvent(Event event, Long userId, String calendarSourceEventId) {
@@ -98,7 +98,7 @@ public class SubscriptionScheduler {
     return userEvent;
   }
 
-  private void updateUserEvents(Map<Long, CalendarClientConnection> calendarClientByUserId) {
+  private void updateUserEvents(Map<String, CalendarClientConnection> calendarClientByUserId) {
     var events = eventService.listChangedUserEvents();
     if (events.isEmpty()) {
       log.info("No events found for updating");
@@ -121,11 +121,11 @@ public class SubscriptionScheduler {
   }
 
   private void updateEvent(EventTargetTask task, UserSubscription subscription,
-      Map<Long, CalendarClientConnection> calendarClientByUserId) {
+      Map<String, CalendarClientConnection> calendarClientByUserId) {
     try {
-      var userId = subscription.getUser().getId();
-      var calendarClientConnection = calendarClientByUserId.computeIfAbsent(userId,
-          id -> calendarService.auth(id, task.event().getProvider().getId()));
+      var user = subscription.getUser();
+      var calendarClientConnection = calendarClientByUserId.computeIfAbsent(user.getEmail(),
+          id -> calendarService.auth(user.getEmail(), task.event().getProvider().getId()));
       calendarClientConnection.updateEvent(EventPayload.from(task.event()));
       //todo: update hash in UserEvent
     } catch (Exception exception) {

@@ -99,7 +99,7 @@ create table if not exists calendar
 create table calendar_connection
 (
     id                 bigserial primary key,
-    user_id            bigint      not null references "user" (id) on delete cascade,
+    email              text        not null references "user" (email) on delete cascade,
     calendar_id        int         not null references calendar (id) on delete cascade,
     access_token       text,
     refresh_token      text,
@@ -108,7 +108,7 @@ create table calendar_connection
     source_calendar_id text,
     created_at         timestamptz not null default now(),
     updated_at         timestamptz not null default now(),
-    unique (user_id, calendar_id)
+    unique (email, calendar_id)
 );
 
 create table provider_calendar

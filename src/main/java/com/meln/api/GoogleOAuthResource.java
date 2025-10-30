@@ -54,10 +54,10 @@ public class GoogleOAuthResource {
       return redirectOrJsonError(400, "missing state");
     }
 
-    var userId = stateStore.findByState(state).orElse(null);
+    var email = stateStore.findByState(state).orElse(null);
     try {
       GoogleTokenResponse tokenResp = authService.requestToken(code);
-      tokenService.saveOrUpdate(userId, tokenResp);
+      tokenService.saveOrUpdate(email, tokenResp);
       return Response.seeOther(UriBuilder.fromUri(successRedirect).build()).build();
     } catch (Exception e) {
       return redirectOrJsonError(500, "oauth_error");
@@ -67,8 +67,8 @@ public class GoogleOAuthResource {
   @POST
   @Path(GoogleCalendar.DISCONNECT)
   public Response disconnect(@Context SecurityIdentity identity) {
-    var userId = identity.getPrincipal().getName();
-    var token = tokenService.findByUserEmail(userId);
+    var email = identity.getPrincipal().getName();
+    var token = tokenService.findByUserEmail(email);
     if (token != null) {
       tokenService.delete(token);
     }

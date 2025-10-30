@@ -19,18 +19,18 @@ public class CalendarConnectionRepository implements PanacheRepository<CalendarC
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
-  public CalendarConnection findAllCalendarConnections(Long userId, Integer providerId) {
+  public CalendarConnection findAllCalendarConnections(String email, Integer providerId) {
     String sql = """
         select cc.*
         from calendar_connection cc
                  join provider_calendar pc on pc.calendar_connection_id = cc.id
-        where cc.user_id = :userId
+        where cc.email = :email
           and pc.provider_id = :providerId
         """;
 
     return (CalendarConnection) getEntityManager()
         .createNativeQuery(sql, CalendarConnection.class)
-        .setParameter("userId", userId)
+        .setParameter("email", email)
         .setParameter("providerId", providerId)
         .getSingleResultOrNull();
   }

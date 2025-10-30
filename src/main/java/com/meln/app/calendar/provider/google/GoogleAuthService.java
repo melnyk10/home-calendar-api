@@ -107,11 +107,11 @@ public class GoogleAuthService {
     return repository.findByUserEmail(email);
   }
 
-  public void saveOrUpdate(String userEmail, GoogleTokenResponse tokens) {
+  public void saveOrUpdate(String email, GoogleTokenResponse tokens) {
 
     var expiresIn = tokens.getExpiresInSeconds() == null ? 3600L : tokens.getExpiresInSeconds();
     var googleToken = CalendarConnection.builder()
-//        .userEmail(userEmail)
+        .email(email)
         .accessToken(tokens.getAccessToken())
         .refreshToken(tokens.getRefreshToken())
         .expiresAt(Instant.now().plusSeconds(expiresIn - 60))
