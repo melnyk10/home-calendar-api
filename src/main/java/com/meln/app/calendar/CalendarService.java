@@ -14,6 +14,9 @@ public class CalendarService {
   public CalendarClient.CalendarClientConnection auth(Long userId, Integer providerId) {
     var calendarConnection =
         calendarConnectionRepository.findAllCalendarConnections(userId, providerId);
+    if (calendarConnection == null) {
+      return null;
+    }
     return calendarRegistry.auth(calendarConnection);
   }
 

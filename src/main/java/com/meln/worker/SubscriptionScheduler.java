@@ -62,8 +62,8 @@ public class SubscriptionScheduler {
           var event = createEvent(task, subscription, calendarClientByUserId);
           processedUserEvents.add(event);
         } catch (Exception exception) {
-          log.warn("Can't create event for user: {}, event: {}",
-              subscription.getUser().getEmail(), task.event().getId(), exception);
+          log.error("Can't create event for user: {}, event: {}",
+              subscription.getUser().getEmail(), task.event().getId());
         }
       }
     }

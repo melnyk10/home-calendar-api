@@ -32,6 +32,6 @@ public class CalendarConnectionRepository implements PanacheRepository<CalendarC
         .createNativeQuery(sql, CalendarConnection.class)
         .setParameter("userId", userId)
         .setParameter("providerId", providerId)
-        .getSingleResult();
+        .getSingleResultOrNull();
   }
 }
