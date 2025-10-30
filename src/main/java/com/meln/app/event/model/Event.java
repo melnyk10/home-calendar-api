@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
@@ -80,7 +81,8 @@ public class Event {
   )
   private Set<Target> targets = new HashSet<>();
 
-  @Column(name = "hash")
+  @Generated
+  @Column(name = "hash", nullable = false, length = 32, insertable = false, updatable = false)
   private String hash;
 
   @Column(name = "is_all_day", nullable = false)

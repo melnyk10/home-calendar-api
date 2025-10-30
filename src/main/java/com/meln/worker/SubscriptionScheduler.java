@@ -51,12 +51,12 @@ public class SubscriptionScheduler {
             .map(target -> new EventTargetTask(event, target)))
         .toList();
 
-    var userSubscriptionByTargetId = listUserSubscriptionsByTargetIds(events);
+    var subscriptionByTargetId = listUserSubscriptionsByTargetIds(events);
 
     List<UserEvent> processedUserEvents = new ArrayList<>();
     for (var task : eventTasks) {
       //todo: what if user is subscribed to more than one target in event?
-      var usersSubscription = userSubscriptionByTargetId.get(task.target().getId());
+      var usersSubscription = subscriptionByTargetId.getOrDefault(task.target().getId(), List.of());
       for (var subscription : usersSubscription) {
         try {
           var event = createEvent(task, subscription, calendarClientByUserId);
@@ -110,10 +110,10 @@ public class SubscriptionScheduler {
             .map(target -> new EventTargetTask(event, target)))
         .toList();
 
-    var userSubscriptionByTargetId = listUserSubscriptionsByTargetIds(events);
+    var subscriptionByTargetId = listUserSubscriptionsByTargetIds(events);
 
     for (var task : eventTasks) {
-      var usersSubscription = userSubscriptionByTargetId.get(task.target().getId());
+      var usersSubscription = subscriptionByTargetId.getOrDefault(task.target().getId(), List.of());
       for (var subscription : usersSubscription) {
         updateEvent(task, subscription, calendarClientByUserId);
       }
@@ -127,6 +127,7 @@ public class SubscriptionScheduler {
       var calendarClientConnection = calendarClientByUserId.computeIfAbsent(userId,
           id -> calendarService.auth(id, task.event().getProvider().getId()));
       calendarClientConnection.updateEvent(EventPayload.from(task.event()));
+      //todo: update hash in UserEvent
     } catch (Exception exception) {
       log.error("Error updating event for user: {}, event: {}",
           subscription.getUser().getEmail(), task.event().getId(), exception);

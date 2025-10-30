@@ -10,6 +10,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,6 +60,8 @@ public class EventService {
 
     if (eventPayload.payload() != null && !eventPayload.payload().isEmpty()) {
       event.setPayload(eventPayload.payload());
+    } else {
+      event.setPayload(new HashMap<>());
     }
 
     return event;
