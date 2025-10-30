@@ -1,0 +1,12 @@
+[flyway]
+cleanDisabled = false
+
+[environments.local]
+url = "jdbc:postgresql://localhost:5435/homecalendardb"
+user = "admin"
+password = "admin"
+
+[environments.docker]
+url = "jdbc:postgresql://db:5432/homecalendardb"
+user = "admin"
+password = "admin"

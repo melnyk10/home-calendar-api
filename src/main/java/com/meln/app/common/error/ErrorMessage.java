@@ -59,27 +59,17 @@ public interface ErrorMessage {
     }
   }
 
-  interface Hltv {
+  interface Provider {
 
     interface Code {
 
-      String HLTV_TEAMS_FETCH_FAILED = "HLTV_TEAMS_FETCH_FAILED";
-      String HLTV_TEAMS_SAVE_FAILED = "HLTV_TEAMS_SAVE_FAILED";
-      String HLTV_MATCHES_SAVE_FAILED = "HLTV_MATCHES_SAVE_FAILED";
-      String HLTV_MATCHES_FETCH_FAILED = "HLTV_MATCHES_FETCH_FAILED";
+      String UNKNOWN_PROVIDER = "UNKNOWN_PROVIDER";
     }
 
     interface Message {
 
-      String HLTV_TEAMS_FETCH_FAILED = "Unable to fetch HLTV teams from source";
-      String HLTV_MATCHES_FETCH_FAILED = "Unable to fetch HLTV matches from source";
-
-      static String HLTV_TEAMS_SAVE_FAILED(int temaSize) {
-        return String.format("Unable to save %d HLTV teams.", temaSize);
-      }
-
-      static String HLTV_MATCHES_SAVE_FAILED(int matchesSize) {
-        return String.format("Unable to save %d HLTV matches.", matchesSize);
+      static String UNKNOWN_PROVIDER(String name) {
+        return "Unknown provider: %s".formatted(name);
       }
     }
   }
@@ -122,13 +112,10 @@ public interface ErrorMessage {
     interface Message {
 
       String RATE_LIMITED = "Rate limited by Google Calendar. Please retry with backoff.";
+      String GOOGLE_UNAUTHORIZED = "Google account is not connected for user";
 
       static String UNAUTHORIZED_OR_FORBIDDEN(String reason) {
         return "Google authorization failed or forbidden: %s".formatted(reason);
-      }
-
-      static String GOOGLE_UNAUTHORIZED(String email) {
-        return "Google account is not connected for user ".formatted(email);
       }
 
     }

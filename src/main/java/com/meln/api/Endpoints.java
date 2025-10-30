@@ -12,11 +12,6 @@ public interface Endpoints {
     String ME = USERS + "/me";
   }
 
-  interface Subscription {
-
-    String SUBSCRIPTIONS = "/subscriptions";
-  }
-
   interface GoogleCalendar {
 
     String GOOGLE = "/google";

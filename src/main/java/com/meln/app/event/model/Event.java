@@ -1,108 +1,104 @@
 package com.meln.app.event.model;
 
-import io.quarkus.mongodb.panache.PanacheMongoEntity;
-import io.quarkus.mongodb.panache.common.MongoEntity;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 @Getter
 @Setter
 @Builder
-@ToString
-@EqualsAndHashCode(of = {"provider", "sourceId"})
-@NoArgsConstructor
 @AllArgsConstructor
-@MongoEntity(collection = "events")
-public class Event extends PanacheMongoEntity {
+@NoArgsConstructor
+@Entity
+@Table(
+    name = "event",
+    indexes = {
+        @Index(name = "idx_event_subject_time", columnList = "subject_id, occurred_at"),
+        @Index(name = "idx_event_type_time", columnList = "type, occurred_at"),
+        @Index(name = "idx_event_provider_time", columnList = "provider_id, occurred_at")
+    }
+)
+public class Event {
 
-  public static final String COL_PROVIDER = "provider";
-  public static final String COL_SOURCE_ID = "sourceId";
-  public static final String COL_CALENDAR_EVENT_SOURCE_ID = "calendarEventSourceId";
-  public static final String COL_TITLE = "title";
-  public static final String COL_URL = "url";
-  public static final String COL_DETAILS = "details";
-  public static final String COL_NOTES = "notes";
-  public static final String COL_ALL_DAY = "allDay";
-  public static final String COL_START_AT = "startAt";
-  public static final String COL_END_AT = "endAt";
-  public static final String COL_CREATED_AT = "createdAt";
-  public static final String COL_UPDATED_AT = "updatedAt";
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(columnDefinition = "uuid")
+  private Long id;
 
-  @NotBlank
-  @BsonProperty(COL_SOURCE_ID)
+  @Column(name = "source_id", nullable = false, unique = true)
   private String sourceId;
 
-  @NotBlank
-  @BsonProperty(COL_CALENDAR_EVENT_SOURCE_ID)
-  private String calendarEventSourceId;
-
-  @NotNull
-  @BsonProperty(COL_PROVIDER)
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @JoinColumn(name = "provider_id", nullable = false)
   private Provider provider;
 
-  @NotBlank
-  @BsonProperty(COL_TITLE)
-  private String title;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "type", nullable = false)
+  private TargetType type;
 
-  @BsonProperty(COL_URL)
-  private String url;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-  @BsonProperty(COL_DETAILS)
+  @Column(name = "details", nullable = false)
   private String details;
 
-  @BsonProperty(COL_NOTES)
-  private String notes;
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(columnDefinition = "jsonb", nullable = false)
+  private Map<String, Object> payload = new HashMap<>();
 
-  @BsonProperty(COL_ALL_DAY)
+  @ManyToMany
+  @JoinTable(
+      name = "event_target",
+      joinColumns = @JoinColumn(name = "event_id"),
+      inverseJoinColumns = @JoinColumn(name = "target_id")
+  )
+  private Set<Target> targets = new HashSet<>();
+
+  @Generated
+  @Column(name = "hash", nullable = false, length = 32, insertable = false, updatable = false)
+  private String hash;
+
+  @Column(name = "is_all_day", nullable = false)
   private boolean allDay;
 
-  @NotNull
-  @BsonProperty(COL_START_AT)
+  @Column(name = "start_at", nullable = false)
   private Instant startAt;
 
-  @BsonProperty(COL_END_AT)
+  @Column(name = "end_at", nullable = false)
   private Instant endAt;
 
-  @BsonProperty(COL_CREATED_AT)
+  @CreationTimestamp
+  @Column(name = "created_at", nullable = false)
   private Instant createdAt;
 
-  @BsonProperty(COL_UPDATED_AT)
+  @UpdateTimestamp
+  @Column(name = "updated_at", nullable = false)
   private Instant updatedAt;
-
-  @Override
-  public void persist() {
-    prePersist();
-    super.persist();
-  }
-
-  public void prePersist() {
-    Instant now = Instant.now();
-    if (createdAt == null) {
-      createdAt = now;
-    }
-    updatedAt = now;
-  }
-
-  @Override
-  public void update() {
-    preUpdate();
-    super.update();
-  }
-
-  public void preUpdate() {
-    updatedAt = Instant.now();
-  }
-
-  public String getId() {
-    return id.toString();
-  }
 }

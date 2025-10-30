@@ -1,26 +1,20 @@
 package com.meln.app.calendar;
 
-import com.meln.app.calendar.model.Calendar;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.util.Map;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
+import lombok.AllArgsConstructor;
 
 @ApplicationScoped
-@RequiredArgsConstructor(onConstructor_ = @Inject)
+@AllArgsConstructor(onConstructor_ = @Inject)
 public class CalendarService {
 
-  private final CalendarRepository repository;
+  private final CalendarConnectionRepository calendarConnectionRepository;
+  private final CalendarRegistry calendarRegistry;
 
-  public Map<ObjectId, CalendarConnectionProperties> getCalendarIntegrationPropsByUserId() {
-    var calendars = repository.listAll();
-    return calendars.stream()
-        .collect(Collectors.toMap(
-            Calendar::getUserId,
-            Calendar::getProperties)
-        );
+  public CalendarClient.CalendarClientConnection auth(Long userId, Integer providerId) {
+    var calendarConnection =
+        calendarConnectionRepository.findAllCalendarConnections(userId, providerId);
+    return calendarRegistry.auth(calendarConnection);
   }
 
 }

@@ -21,7 +21,7 @@ public class UserResource {
   @Path(Endpoints.User.ME)
   @Produces(MediaType.APPLICATION_JSON)
   public User me(@Context SecurityIdentity identity) {
-    String email = identity.getPrincipal().getName();
+    var email = identity.getPrincipal().getName();
     return userRepository.findByEmail(email);
   }
 

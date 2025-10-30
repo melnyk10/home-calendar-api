@@ -37,9 +37,9 @@ public class GoogleOAuthResource {
   @Path(GoogleCalendar.CONNECT)
   @Produces(MediaType.APPLICATION_JSON)
   public Response connect(@Context SecurityIdentity identity) {
-    String userId = identity.getPrincipal().getName();
-    String state = stateStore.issue(userId, Duration.ofMinutes(10));
-    String consentUrl = authService.buildAuthUrl(state);
+    var userId = identity.getPrincipal().getName();
+    var state = stateStore.issue(userId, Duration.ofMinutes(10));
+    var consentUrl = authService.buildAuthUrl(state);
     return Response.seeOther(UriBuilder.fromUri(consentUrl).build()).build();
   }
 
@@ -54,7 +54,7 @@ public class GoogleOAuthResource {
       return redirectOrJsonError(400, "missing state");
     }
 
-    String userId = stateStore.findByState(state).orElse(null);
+    var userId = stateStore.findByState(state).orElse(null);
     try {
       GoogleTokenResponse tokenResp = authService.requestToken(code);
       tokenService.saveOrUpdate(userId, tokenResp);
@@ -67,17 +67,17 @@ public class GoogleOAuthResource {
   @POST
   @Path(GoogleCalendar.DISCONNECT)
   public Response disconnect(@Context SecurityIdentity identity) {
-    String userId = identity.getPrincipal().getName();
+    var userId = identity.getPrincipal().getName();
     var token = tokenService.findByUserEmail(userId);
     if (token != null) {
-      token.delete();
+      tokenService.delete(token);
     }
     return Response.noContent().build();
   }
 
   private Response redirectOrJsonError(int status, String message) {
     if (failureRedirect != null && !failureRedirect.isBlank()) {
-      String url = UriBuilder.fromUri(failureRedirect)
+      var url = UriBuilder.fromUri(failureRedirect)
           .queryParam("reason", message)
           .build()
           .toString();
