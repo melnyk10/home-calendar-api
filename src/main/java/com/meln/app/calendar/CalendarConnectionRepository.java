@@ -11,14 +11,6 @@ public class CalendarConnectionRepository implements PanacheRepository<CalendarC
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
-  public void save(CalendarConnection googleToken) {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
-  public void delete(CalendarConnection connection) {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
   public CalendarConnection findAllCalendarConnections(String email, Integer providerId) {
     String sql = """
         select cc.*

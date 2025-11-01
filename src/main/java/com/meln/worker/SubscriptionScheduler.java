@@ -62,13 +62,13 @@ public class SubscriptionScheduler {
           var event = createEvent(task, subscription, calendarClientByUserId);
           processedUserEvents.add(event);
         } catch (Exception exception) {
-          log.error("Can't create event for user: {}, event: {}",
-              subscription.getUser().getEmail(), task.event().getId());
+          log.error("Can't create event for user: {}, event: {}. Error message: {}",
+              subscription.getUser().getEmail(), task.event().getId(), exception.getMessage());
         }
       }
     }
 
-    userEventRepository.saveAll(processedUserEvents);
+    userEventRepository.persist(processedUserEvents);
   }
 
   private Map<Long, List<UserSubscription>> listUserSubscriptionsByTargetIds(List<Event> events) {

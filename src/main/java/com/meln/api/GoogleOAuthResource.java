@@ -17,8 +17,10 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+@Slf4j
 @Path(Endpoints.API_V1)
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class GoogleOAuthResource {
@@ -37,8 +39,8 @@ public class GoogleOAuthResource {
   @Path(GoogleCalendar.CONNECT)
   @Produces(MediaType.APPLICATION_JSON)
   public Response connect(@Context SecurityIdentity identity) {
-    var userId = identity.getPrincipal().getName();
-    var state = stateStore.issue(userId, Duration.ofMinutes(10));
+    var email = identity.getPrincipal().getName();
+    var state = stateStore.issue(email, Duration.ofMinutes(10));
     var consentUrl = authService.buildAuthUrl(state);
     return Response.seeOther(UriBuilder.fromUri(consentUrl).build()).build();
   }
@@ -60,6 +62,7 @@ public class GoogleOAuthResource {
       tokenService.saveOrUpdate(email, tokenResp);
       return Response.seeOther(UriBuilder.fromUri(successRedirect).build()).build();
     } catch (Exception e) {
+      log.error("Can't process google oauth callback. Error: {}", e.getMessage());
       return redirectOrJsonError(500, "oauth_error");
     }
   }

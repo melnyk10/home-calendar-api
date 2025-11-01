@@ -11,12 +11,14 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.UserCredentials;
 import com.meln.app.calendar.CalendarConnectionRepository;
+import com.meln.app.calendar.CalendarService;
 import com.meln.app.calendar.model.CalendarConnection;
-import com.meln.app.common.error.CustomException.CustomAuthException;
+import com.meln.app.calendar.model.CalendarProvider;
 import com.meln.app.common.error.ErrorMessage;
 import com.meln.app.common.error.ServerException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.List;
@@ -34,6 +36,7 @@ public class GoogleAuthService {
   );
 
   private final CalendarConnectionRepository repository;
+  private final CalendarService calendarService;
 
   @ConfigProperty(name = "app.google.client-id")
   String clientId;
@@ -107,10 +110,13 @@ public class GoogleAuthService {
     return repository.findByUserEmail(email);
   }
 
+  @Transactional
   public void saveOrUpdate(String email, GoogleTokenResponse tokens) {
 
     var expiresIn = tokens.getExpiresInSeconds() == null ? 3600L : tokens.getExpiresInSeconds();
+    var calendar = calendarService.getByEmailAndProvider(email, CalendarProvider.GOOGLE);
     var googleToken = CalendarConnection.builder()
+        .calendarId(calendar.getId())
         .email(email)
         .accessToken(tokens.getAccessToken())
         .refreshToken(tokens.getRefreshToken())
@@ -118,7 +124,7 @@ public class GoogleAuthService {
         .scopes(List.of(CalendarScopes.CALENDAR_EVENTS))
         .build();
 
-    repository.save(googleToken);
+    repository.persist(googleToken);
   }
 
   public void delete(CalendarConnection connection) {
