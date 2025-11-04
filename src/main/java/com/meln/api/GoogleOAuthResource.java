@@ -1,7 +1,7 @@
 package com.meln.api;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
-import com.meln.api.Endpoints.GoogleCalendar;
+import com.meln.api.Endpoints.Google;
 import com.meln.app.calendar.provider.google.GoogleAuthService;
 import com.meln.app.calendar.provider.google.InMemoryStateStore;
 import io.quarkus.security.identity.SecurityIdentity;
@@ -36,7 +36,7 @@ public class GoogleOAuthResource {
   String failureRedirect;
 
   @GET
-  @Path(GoogleCalendar.CONNECT)
+  @Path(Google.CONNECT)
   @Produces(MediaType.APPLICATION_JSON)
   public Response connect(@Context SecurityIdentity identity) {
     var email = identity.getPrincipal().getName();
@@ -46,7 +46,7 @@ public class GoogleOAuthResource {
   }
 
   @GET
-  @Path(Endpoints.GoogleCalendar.CALLBACK)
+  @Path(Google.CALLBACK)
   @Produces(MediaType.APPLICATION_JSON)
   public Response callback(@QueryParam("code") String code, @QueryParam("state") String state) {
     if (code == null || code.isBlank()) {
@@ -68,13 +68,11 @@ public class GoogleOAuthResource {
   }
 
   @POST
-  @Path(GoogleCalendar.DISCONNECT)
+  @Path(Google.DISCONNECT)
   public Response disconnect(@Context SecurityIdentity identity) {
     var email = identity.getPrincipal().getName();
     var token = tokenService.findByUserEmail(email);
-    if (token != null) {
-      tokenService.delete(token);
-    }
+    token.ifPresent(tokenService::delete);
     return Response.noContent().build();
   }
 

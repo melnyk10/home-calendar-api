@@ -2,6 +2,8 @@ package com.meln.app.calendar.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,8 +33,8 @@ public class CalendarConnection {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "calendar_id", nullable = false)
-  private Integer calendarId;
+  @Enumerated(EnumType.STRING)
+  private CalendarProvider provider;
 
   @Column(name = "email", nullable = false, unique = true)
   private String email;
@@ -49,9 +51,6 @@ public class CalendarConnection {
   @JdbcTypeCode(SqlTypes.ARRAY)
   @Column(name = "scopes", columnDefinition = "text[]")
   private List<String> scopes;
-
-  @Column(name = "source_calendar_id")
-  private String sourceCalendarId;
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)

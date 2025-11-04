@@ -10,15 +10,39 @@ GET {{baseUrl}}/api/v1/users/me
 Authorization: Bearer {{bearerToken}}
 Content-Type: application/json
 
-### Sync Hltv teams
-PUT {{baseUrl}}/api/v1/hltv/sync
+### List Providers
+GET {{baseUrl}}/api/v1/providers
 Authorization: Bearer {{bearerToken}}
 Content-Type: */*
-
-### Get all Subscirptiona
-GET {{baseUrl}}/api/v1/subscriptions
-Authorization: Bearer {{bearerToken}}
 
 ### Google Connect
 GET {{baseUrl}}/api/v1/google/connect
 Authorization: Bearer {{bearerToken}}
+
+### Google Calendar sync
+GET {{baseUrl}}/api/v1/calendars/sync
+Authorization: Bearer {{bearerToken}}
+Content-Type: */*
+
+### Google Calendar sync
+GET {{baseUrl}}/api/v1/calendars
+Authorization: Bearer {{bearerToken}}
+Content-Type: */*
+
+### Link Calendars with Providers
+POST {{baseUrl}}/api/v1/calendar-provider
+Authorization: Bearer {{bearerToken}}
+Content-Type: application/json
+
+{
+  "calendarProviders": [
+    {
+      "calendarId": 4,
+      "providerId": 2
+    },
+    {
+      "calendarId": 6,
+      "providerId": 1
+    }
+  ]
+}

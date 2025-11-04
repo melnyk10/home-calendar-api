@@ -1,5 +1,6 @@
 package com.meln.app.calendar;
 
+import com.meln.app.calendar.CalendarClient.CalendarEventClient;
 import com.meln.app.calendar.model.CalendarConnection;
 import com.meln.app.calendar.model.CalendarProvider;
 import com.meln.app.common.error.ErrorMessage;
@@ -20,18 +21,17 @@ public class CalendarRegistry {
     calendarClients.forEach(c -> calendarClientByProvider.put(c.type(), c));
   }
 
-  public CalendarClient.CalendarClientConnection auth(CalendarConnection connection) {
+  public CalendarEventClient auth(CalendarConnection connection) {
     if (connection == null) {
       throw new ServerException(
           ErrorMessage.Calendar.Code.INVALID_CALENDAR_PROVIDER_PROPERTIES,
           ErrorMessage.Calendar.Message.CALENDAR_PROVIDER_PROPERTIES_NOT_PROVIDED);
     }
 
-    CalendarProvider google = CalendarProvider.GOOGLE;
-    var calendarClient = calendarClientByProvider.get(google);
+    var calendarClient = calendarClientByProvider.get(CalendarProvider.GOOGLE);
     if (calendarClient == null) {
       throw new ServerException(ErrorMessage.Calendar.Code.INVALID_CALENDAR_PROVIDER,
-          ErrorMessage.Calendar.Message.NO_PROVIDER_BY_PROPS(google.name()));
+          ErrorMessage.Calendar.Message.NO_PROVIDER_BY_PROPS(CalendarProvider.GOOGLE.name()));
     }
     return calendarClient.auth(connection);
   }

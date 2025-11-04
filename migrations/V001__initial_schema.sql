@@ -89,34 +89,33 @@ create table if not exists calendar
     source_calendar_id text,
     name               text        not null,
     provider           varchar(16) not null, -- e.g. 'google','outlook','ics'
-    account_email      text,
-    user_id            bigint      not null references "user" (id) on delete cascade,
+    email              text,
+--     calendar_connection_id int not null references calendar_connection (id),
     created_at         timestamptz not null default now(),
     updated_at         timestamptz not null default now(),
-    unique (user_id, name)
+    unique (email, name)
 );
 
 create table calendar_connection
 (
-    id                 bigserial primary key,
-    email              text        not null references "user" (email) on delete cascade,
-    calendar_id        int         not null references calendar (id) on delete cascade,
-    access_token       text,
-    refresh_token      text,
-    expires_at         timestamptz,
-    scopes             text[],
-    source_calendar_id text,
-    created_at         timestamptz not null default now(),
-    updated_at         timestamptz not null default now(),
-    unique (email, calendar_id)
+    id            bigserial primary key,
+    provider      varchar(16) not null, -- e.g. 'google','outlook','ics'
+    email         text        not null references "user" (email) on delete cascade,
+    access_token  text,
+    refresh_token text,
+    expires_at    timestamptz,
+    scopes        text[],
+    created_at    timestamptz not null default now(),
+    updated_at    timestamptz not null default now(),
+    unique (email, provider)
 );
 
-create table provider_calendar
+create table calendar_provider
 (
-    id                     bigserial primary key,
-    calendar_connection_id bigint not null references calendar_connection (id),
-    provider_id            bigint not null references provider (id) on delete cascade,
-    unique (calendar_connection_id, provider_id)
+    id          bigserial primary key,
+    calendar_id bigint not null references calendar (id) on delete cascade,
+    provider_id bigint not null references provider (id) on delete cascade,
+    constraint uq_calendar_provider unique (calendar_id, provider_id)
 );
 
 create table user_subscription

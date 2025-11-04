@@ -13,7 +13,7 @@ public class UserRepository implements PanacheRepository<User> {
   }
 
   @Transactional
-  public boolean existsByEmail(String email) {
+  boolean existsByEmail(String email) {
     return find(User.COL_EMAIL, email).firstResultOptional().isPresent();
   }
 }

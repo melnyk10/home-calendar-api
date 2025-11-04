@@ -83,6 +83,7 @@ public interface ErrorMessage {
       String CALENDAR_EVENT_SOURCE_ID_NOT_PROVIDED = "CALENDAR_EVENT_SOURCE_ID_NOT_PROVIDED";
       String CALENDAR_ID_NOT_PROVIDED = "CALENDAR_ID_NOT_PROVIDED";
       String EVENT_NOT_FOUND = "EVENT_NOT_FOUND";
+      String CANNOT_SAVE_SYNCED_CALENDARS = "CANNOT_SAVE_SYNCED_CALENDARS";
     }
 
     interface Message {
@@ -91,6 +92,7 @@ public interface ErrorMessage {
       String CALENDAR_EVENT_SOURCE_ID_NOT_PROVIDED = "Calendar event source id not provided";
       String CALENDAR_ID_NOT_PROVIDED = "Calendar ID must not be blank";
       String START_AT_AND_END_AT_REQUIRED = "startAt and endAt are required for timed events";
+      String CANNOT_SAVE_SYNCED_CALENDARS = "Can't save synced calendars.";
 
       static String NO_PROVIDER_BY_PROPS(String name) {
         return "No provider for: %s".formatted(name);
@@ -99,6 +101,17 @@ public interface ErrorMessage {
       static String EVENT_NOT_FOUND(String sourceId) {
         return "Event not found for id=%s (may be deleted or wrong calendar)".formatted(sourceId);
       }
+    }
+  }
+
+  interface CalendarProvider {
+    interface Code {
+      String CALENDAR_PROVIDER_DUPLICATION = "CALENDAR_PROVIDER_DUPLICATION";
+      String CANNOT_LINK_CALENDAR_PROVIDER = "CANNOT_LINK_CALENDAR_PROVIDER";
+    }
+    interface Message {
+      String CALENDAR_PROVIDER_DUPLICATION = "Such calendar provider relations already exist";
+      String CANNOT_LINK_CALENDAR_PROVIDER = "Can't link calendars with providers";
     }
   }
 

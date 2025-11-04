@@ -13,20 +13,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "provider_calendar")
+@Table(name = "calendar_provider")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProviderCalendar {
+public class CalendarProvider {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "calendar_connection_id", nullable = false)
-  private Integer calendarConnectionId;
+  @Column(name = "calendar_id", nullable = false)
+  private Integer calendarId;
 
   @Column(name = "provider_id", nullable = false)
   private Integer providerId;
