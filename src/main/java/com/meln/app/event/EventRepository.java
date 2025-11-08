@@ -16,7 +16,7 @@ import lombok.AllArgsConstructor;
 class EventRepository implements PanacheRepository<Event> {
 
   @SuppressWarnings("unchecked")
-  public List<Event> findAllMissingUserEvents() {
+  List<Event> findAllMissingUserEvents() {
     var sql = """
         select e.* from event e
                  join event_target et on e.id = et.event_id
@@ -31,7 +31,7 @@ class EventRepository implements PanacheRepository<Event> {
   }
 
   @SuppressWarnings("unchecked")
-  public List<Event> findAllChangedUserEvents() {
+  List<Event> findAllChangedUserEvents() {
     var sql = """
         select e.*
         from event e
@@ -45,7 +45,7 @@ class EventRepository implements PanacheRepository<Event> {
   }
 
   @Transactional
-  public void upsertAll(List<Event> events) {
+  void upsertAll(List<Event> events) {
     var sourceIds = events.stream().map(Event::getSourceId).collect(Collectors.toSet());
     var eventBySourceId = find("sourceId in :sourceIds",
         Parameters.with("sourceIds", sourceIds)).list().stream()

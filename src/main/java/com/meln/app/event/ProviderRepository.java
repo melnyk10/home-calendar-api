@@ -9,7 +9,7 @@ import java.util.Optional;
 @ApplicationScoped
 public class ProviderRepository implements PanacheRepository<Provider> {
 
-  public Optional<Provider> findByType(ProviderType type) {
+  Optional<Provider> findByType(ProviderType type) {
     return find("type", type).singleResultOptional();
   }
 }

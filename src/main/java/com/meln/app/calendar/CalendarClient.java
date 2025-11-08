@@ -3,17 +3,21 @@ package com.meln.app.calendar;
 import com.meln.app.calendar.model.CalendarConnection;
 import com.meln.app.calendar.model.CalendarProvider;
 import com.meln.app.event.model.EventPayload;
+import java.util.List;
 
 public interface CalendarClient {
 
   CalendarProvider type();
 
-  CalendarClient.CalendarClientConnection auth(CalendarConnection connection);
+  CalendarEventClient auth(CalendarConnection connection);
 
-  interface CalendarClientConnection {
+  interface CalendarEventClient {
 
-    String createEvent(EventPayload event);
+    //todo: move to another interface ?
+    List<CalendarPayload> listCalendars();
 
-    void updateEvent(EventPayload event);
+    String createEvent(String calendarId, EventPayload event);
+
+    void updateEvent(String calendarId, EventPayload event);
   }
 }

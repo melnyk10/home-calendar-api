@@ -32,11 +32,11 @@ class KnownUserAugmentor implements SecurityIdentityAugmentor {
       return Uni.createFrom().failure(new AuthenticationFailedException("Missing email claim"));
     }
 
-    boolean exists = userRepository.existsByEmail(email);
-    if (!exists) {
-      return Uni.createFrom().failure(new AuthenticationFailedException("Unknown user"));
-    }
-    return Uni.createFrom().item(identity);
+    return context.runBlocking(() -> {
+      if (!userRepository.existsByEmail(email)) {
+        throw new AuthenticationFailedException("Unknown user");
+      }
+      return identity;
+    });
   }
-
 }

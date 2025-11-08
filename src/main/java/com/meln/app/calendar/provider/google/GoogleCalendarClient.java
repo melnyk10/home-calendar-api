@@ -3,10 +3,12 @@ package com.meln.app.calendar.provider.google;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.CalendarList;
+import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.Event.ExtendedProperties;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.meln.app.calendar.CalendarClient;
+import com.meln.app.calendar.CalendarPayload;
 import com.meln.app.calendar.model.CalendarConnection;
 import com.meln.app.calendar.model.CalendarProvider;
 import com.meln.app.common.error.CustomException.CustomAuthException;
@@ -22,9 +24,9 @@ import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
@@ -43,16 +45,66 @@ class GoogleCalendarClient implements CalendarClient {
   }
 
   @Override
-  public CalendarClientConnection auth(CalendarConnection connection) {
+  public CalendarEventClient auth(CalendarConnection connection) {
     var calendarClient = googleAuthService.calendarClient(connection);
-    return new GoogleConnection(calendarClient, connection.getSourceCalendarId());
+    return new Google(calendarClient);
   }
 
-  private record GoogleConnection(Calendar calendar, String calendarId) implements
-      CalendarClientConnection {
+  private record Google(Calendar calendar) implements CalendarEventClient {
 
     @Override
-    public String createEvent(EventPayload event) {
+    public List<CalendarPayload> listCalendars() {
+      List<CalendarPayload> result = new ArrayList<>();
+
+      String pageToken = null;
+      do {
+        CalendarList calendarsResponse;
+        try {
+          calendarsResponse = calendar.calendarList()
+              .list()
+              .setPageToken(pageToken)
+              .execute();
+        } catch (IOException e) {
+          log.error("Error listing calendars", e);
+          throw new ServerException("CANNOT_LIST_CALENDARS", "Can't list google calendars");
+        }
+
+        var mainEmail = findMainAccount(calendarsResponse.getItems());
+        if (mainEmail.isEmpty()) {
+          return List.of();
+        }
+
+        var calendars = mapCalendars(mainEmail.get(), calendarsResponse.getItems());
+        result.addAll(calendars);
+        pageToken = calendarsResponse.getNextPageToken();
+      } while (pageToken != null);
+
+      return result;
+    }
+
+    private Optional<String> findMainAccount(Collection<CalendarListEntry> calendars) {
+      return calendars.stream()
+          .filter(CalendarListEntry::isPrimary)
+          .map(CalendarListEntry::getId)
+          .findFirst();
+    }
+
+    private List<CalendarPayload> mapCalendars(String email,
+        Collection<CalendarListEntry> calendars) {
+      return calendars.stream()
+          .filter(it -> !it.isPrimary())
+          .filter(CalendarListEntry::isSelected)
+          .map(it -> CalendarPayload.builder()
+              .id(it.getId())
+              .name(it.getSummary())
+              .email(email)
+              .provider(CalendarProvider.GOOGLE)
+              .build())
+          .toList();
+    }
+
+    @Override
+    public String createEvent(String calendarId, EventPayload event) {
       Event response = withGoogleExceptionHandling(() -> {
         var newEvent = buildEvent(event, new Event());
 
@@ -63,13 +115,13 @@ class GoogleCalendarClient implements CalendarClient {
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
-      }, event);
+      }, calendarId, event);
 
       return response.getId();
     }
 
     @Override
-    public void updateEvent(EventPayload event) {
+    public void updateEvent(String calendarId, EventPayload event) {
       withGoogleExceptionHandling(() -> {
         var updateEvent = buildEvent(event, new Event());
         updateEvent.setId(event.calendarEventSourceId());
@@ -83,10 +135,11 @@ class GoogleCalendarClient implements CalendarClient {
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
-      }, event);
+      }, calendarId, event);
     }
 
-    private <T> T withGoogleExceptionHandling(Supplier<T> call, EventPayload event) {
+    private <T> T withGoogleExceptionHandling(Supplier<T> call, String calendarId,
+        EventPayload event) {
       if (event == null) {
         throw new ServerException(
             ErrorMessage.Common.Code.REQUEST_BODY_REQUIRED,
@@ -182,18 +235,6 @@ class GoogleCalendarClient implements CalendarClient {
       return event;
     }
 
-    private void updateExtraProps(Event event, Map<String, String> extraProps) {
-      Map<String, String> extendedProperties = Optional.ofNullable(event)
-          .map(Event::getExtendedProperties)
-          .map(ExtendedProperties::getPrivate).orElse(new HashMap<>());
-
-      extendedProperties.putAll(extraProps);
-
-      var ext = new ExtendedProperties();
-      ext.setPrivate(extendedProperties);
-
-      Objects.requireNonNull(event).setExtendedProperties(ext);
-    }
   }
 
 }

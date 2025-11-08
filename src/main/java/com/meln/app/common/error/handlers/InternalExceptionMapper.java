@@ -14,10 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 public class InternalExceptionMapper implements ExceptionMapper<Exception> {
 
   @Override
-  public Response toResponse(Exception e) {
-    log.error("Something went wrong", e);
-    Error error = Error.from(Common.Code.SOMETHING_WENT_WRONG,
-        Common.Message.SOMETHING_WENT_WRONG);
+  public Response toResponse(Exception exception) {
+    log.error("Something went wrong", exception);
+    Error error = Error.from(Common.Code.SOMETHING_WENT_WRONG, Common.Message.SOMETHING_WENT_WRONG);
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
         .type(MediaType.APPLICATION_JSON_TYPE)
         .entity(new ErrorResponse(error))

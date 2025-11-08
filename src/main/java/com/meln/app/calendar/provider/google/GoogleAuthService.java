@@ -12,14 +12,16 @@ import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.UserCredentials;
 import com.meln.app.calendar.CalendarConnectionRepository;
 import com.meln.app.calendar.model.CalendarConnection;
-import com.meln.app.common.error.CustomException.CustomAuthException;
+import com.meln.app.calendar.model.CalendarProvider;
 import com.meln.app.common.error.ErrorMessage;
 import com.meln.app.common.error.ServerException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -30,7 +32,8 @@ public class GoogleAuthService {
   private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
   public static final NetHttpTransport HTTP = new NetHttpTransport();
   private static final List<String> SCOPES = List.of(
-      "https://www.googleapis.com/auth/calendar.events"
+      CalendarScopes.CALENDAR_READONLY,
+      CalendarScopes.CALENDAR_EVENTS
   );
 
   private final CalendarConnectionRepository repository;
@@ -103,22 +106,24 @@ public class GoogleAuthService {
     return new HttpCredentialsAdapter(creds);
   }
 
-  public CalendarConnection findByUserEmail(String email) {
+  public Optional<CalendarConnection> findByUserEmail(String email) {
     return repository.findByUserEmail(email);
   }
 
+  @Transactional
   public void saveOrUpdate(String email, GoogleTokenResponse tokens) {
 
     var expiresIn = tokens.getExpiresInSeconds() == null ? 3600L : tokens.getExpiresInSeconds();
     var googleToken = CalendarConnection.builder()
+        .provider(CalendarProvider.GOOGLE)
         .email(email)
         .accessToken(tokens.getAccessToken())
         .refreshToken(tokens.getRefreshToken())
         .expiresAt(Instant.now().plusSeconds(expiresIn - 60))
-        .scopes(List.of(CalendarScopes.CALENDAR_EVENTS))
+        .scopes(SCOPES)
         .build();
 
-    repository.save(googleToken);
+    repository.persist(googleToken);
   }
 
   public void delete(CalendarConnection connection) {

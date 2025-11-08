@@ -12,7 +12,23 @@ public interface Endpoints {
     String ME = USERS + "/me";
   }
 
-  interface GoogleCalendar {
+  interface Provider {
+
+    String PROVIDERS = "/providers";
+  }
+
+  interface Calendar {
+
+    String CALENDARS = "/calendars";
+    String SYNC = CALENDARS + "/sync";
+  }
+
+  interface CalendarProvider {
+
+    String CALENDAR_PROVIDER = "/calendar-provider";
+  }
+
+  interface Google {
 
     String GOOGLE = "/google";
     String CONNECT = GOOGLE + "/connect";

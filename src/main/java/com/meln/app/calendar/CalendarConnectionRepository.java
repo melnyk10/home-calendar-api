@@ -3,27 +3,21 @@ package com.meln.app.calendar;
 import com.meln.app.calendar.model.CalendarConnection;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import java.util.Optional;
 
 @ApplicationScoped
 public class CalendarConnectionRepository implements PanacheRepository<CalendarConnection> {
 
-  public CalendarConnection findByUserEmail(String email) {
-    throw new UnsupportedOperationException("Not supported yet.");
+  public Optional<CalendarConnection> findByUserEmail(String email) {
+    return find("email", email).firstResultOptional();
   }
 
-  public void save(CalendarConnection googleToken) {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
-  public void delete(CalendarConnection connection) {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
-  public CalendarConnection findAllCalendarConnections(String email, Integer providerId) {
+  CalendarConnection findAllCalendarConnections(String email, Integer providerId) {
     String sql = """
         select cc.*
         from calendar_connection cc
-                 join provider_calendar pc on pc.calendar_connection_id = cc.id
+                 join calendar c on c.email = cc.email
+                 join provider_calendar pc on pc.calendar_id = cc.id
         where cc.email = :email
           and pc.provider_id = :providerId
         """;
