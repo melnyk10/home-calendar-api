@@ -14,7 +14,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import java.util.Collection;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,7 +37,7 @@ public class CalendarResource {
   @DELETE
   @Path(Calendar.CALENDARS)
   public Response delete(@Context SecurityIdentity identity,
-      @QueryParam("ids") Collection<Integer> calendarIds) {
+      @QueryParam("ids") List<Integer> calendarIds) {
     var email = identity.getPrincipal().getName();
     calendarService.delete(email, calendarIds);
     return Response.status(Status.OK).build();
