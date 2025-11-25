@@ -75,12 +75,9 @@ class HltvEventProvider implements Provider {
     if (hltvMatch == null) {
       return null;
     }
-    if (hltvMatch.getTeam1() == null) {
-      return null;
-    }
 
     var eventName =
-        hltvMatch.getTeam1() + " vs " + parseTeamName(hltvMatch.getTeam2());
+        parseTeamName(hltvMatch.getTeam1()) + " vs " + parseTeamName(hltvMatch.getTeam2());
 
     var eventDuration = calculateEventDuration(hltvMatch);
     return EventPayload.builder()
@@ -145,6 +142,7 @@ class HltvEventProvider implements Provider {
   }
 
   private String parseDetails(HltvMatch hltvMatch) {
+    var firstTeamName = parseTeamName(hltvMatch.getTeam1());
     var secondTeamName = parseTeamName(hltvMatch.getTeam2());
     return String.format("""
             Match: %s vs %s
@@ -153,7 +151,7 @@ class HltvEventProvider implements Provider {
             Match Page: %s
             Event Page: %s
             """,
-        hltvMatch.getTeam1(),
+        firstTeamName,
         secondTeamName,
         hltvMatch.getEventName(),
         hltvMatch.getBestOf(),
