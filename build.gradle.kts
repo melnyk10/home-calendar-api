@@ -38,6 +38,8 @@ dependencies {
     implementation("io.quarkus:quarkus-scheduler")
     implementation("io.quarkus:quarkus-hibernate-validator")
 
+    implementation("io.quarkus:quarkus-grpc")
+    
     // --- Database / ORM ---
     implementation("io.quarkus:quarkus-hibernate-orm-panache")
     implementation("io.quarkus:quarkus-jdbc-postgresql")

@@ -8,8 +8,9 @@ import com.meln.app.event.model.EventPayload.TargetPayload;
 import com.meln.app.event.model.ProviderType;
 import com.meln.app.event.model.Target;
 import com.meln.app.event.model.TargetType;
-import com.meln.app.event.provider.hltv.dto.HltvMatchResponse;
-import com.meln.app.event.provider.hltv.dto.HltvMatchResponse.Team;
+import home_calendar.hltv.HltvMatch;
+import home_calendar.hltv.HltvTeamBrief;
+import home_calendar.hltv.SyncMatchesResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.time.Instant;
@@ -28,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor(onConstructor_ = @Inject)
 class HltvEventProvider implements Provider {
 
-  private final HltvMatchClient hltvMatchClient;
+  private final HltvGrpcClient hltvGrpcClient;
   private final TargetRepository targetRepository;
 
   @Override
@@ -40,19 +41,17 @@ class HltvEventProvider implements Provider {
   public List<EventPayload> fetchAll() {
     List<EventPayload> events = new ArrayList<>();
 
-    var hltvTeamIds = targetRepository.listAllByProvider(providerType()).stream()
+    var hltvTeams = targetRepository.listAllByProvider(providerType()).stream()
         .map(Target::getData)
-        .map(it -> it.get("id"))
         .filter(Objects::nonNull)
-        .map(String::valueOf)
         .toList();
 
-    Instant now = Instant.now();
-    for (var teamId : hltvTeamIds) {
-      List<HltvMatchResponse> matchResponses = fetchMatchesByTeamId(teamId);
+    for (var teamId : hltvTeams) {
+      var id = String.valueOf(teamId.get("id"));
+      var slug = String.valueOf(teamId.get("slug"));
+      List<HltvMatch> matchResponses = fetchMatchesByTeamId(id, slug);
       var teamMatches = matchResponses.stream()
           .filter(Objects::nonNull)
-          .filter(it -> it.getDateTime().isAfter(now))
           .map(this::from)
           .toList();
       events.addAll(teamMatches);
@@ -61,9 +60,10 @@ class HltvEventProvider implements Provider {
     return events;
   }
 
-  private List<HltvMatchResponse> fetchMatchesByTeamId(String teamId) {
+  private List<HltvMatch> fetchMatchesByTeamId(String teamId, String slug) {
     try {
-      return hltvMatchClient.syncMatches(teamId);
+      SyncMatchesResponse response = hltvGrpcClient.syncMatches(teamId, slug);
+      return response.getMatchesList();
     } catch (Exception exception) {
       log.error("Can't fetch matches by team id: {}. Error message: {}",
           teamId, exception.getMessage(), exception);
@@ -71,16 +71,13 @@ class HltvEventProvider implements Provider {
     }
   }
 
-  private EventPayload from(HltvMatchResponse hltvMatch) {
+  private EventPayload from(HltvMatch hltvMatch) {
     if (hltvMatch == null) {
-      return null;
-    }
-    if (hltvMatch.getTeam1() == null) {
       return null;
     }
 
     var eventName =
-        hltvMatch.getTeam1().getName() + " vs " + parseTeamName(hltvMatch.getTeam2());
+        parseTeamName(hltvMatch.getTeam1()) + " vs " + parseTeamName(hltvMatch.getTeam2());
 
     var eventDuration = calculateEventDuration(hltvMatch);
     return EventPayload.builder()
@@ -99,25 +96,25 @@ class HltvEventProvider implements Provider {
   }
 
   //todo: maybe implement interface that will have buildSourceId ?
-  private String buildSourceId(HltvMatchResponse eventPayload) {
+  private String buildSourceId(HltvMatch eventPayload) {
     return providerType().name().toLowerCase().concat(":") +
         TargetType.MATCH.name().toLowerCase().concat(":") +
         eventPayload.getMatchId();
   }
 
-  private String parseTeamName(HltvMatchResponse.Team team) {
+  private String parseTeamName(HltvTeamBrief team) {
     return Optional.ofNullable(team)
-        .map(HltvMatchResponse.Team::getName)
+        .map(HltvTeamBrief::getName)
         .orElse("TBD");
   }
 
-  private List<TargetPayload> parseTargets(HltvMatchResponse hltvMatch) {
+  private List<TargetPayload> parseTargets(HltvMatch hltvMatch) {
     if (hltvMatch == null) {
       return List.of();
     }
 
     List<TargetPayload> targets = new ArrayList<>();
-    Team team1 = hltvMatch.getTeam1();
+    HltvTeamBrief team1 = hltvMatch.getTeam1();
     if (team1 != null) {
       targets.add(TargetPayload.builder()
           .sourceId(buildTargetId(team1))
@@ -126,7 +123,7 @@ class HltvEventProvider implements Provider {
           .data(Map.of("id", team1.getId(), "slug", team1.getSlug()))
           .build());
     }
-    Team team2 = hltvMatch.getTeam2();
+    HltvTeamBrief team2 = hltvMatch.getTeam2();
     if (team2 != null) {
       targets.add(TargetPayload.builder()
           .sourceId(buildTargetId(team2))
@@ -140,11 +137,12 @@ class HltvEventProvider implements Provider {
   }
 
   //todo: maybe implement interface that will have buildTargetId ?
-  private String buildTargetId(HltvMatchResponse.Team hltvMatch) {
+  private String buildTargetId(HltvTeamBrief hltvMatch) {
     return "hltv".concat(":").concat("team").concat(":").concat(hltvMatch.getId());
   }
 
-  private String parseDetails(HltvMatchResponse hltvMatch) {
+  private String parseDetails(HltvMatch hltvMatch) {
+    var firstTeamName = parseTeamName(hltvMatch.getTeam1());
     var secondTeamName = parseTeamName(hltvMatch.getTeam2());
     return String.format("""
             Match: %s vs %s
@@ -153,7 +151,7 @@ class HltvEventProvider implements Provider {
             Match Page: %s
             Event Page: %s
             """,
-        hltvMatch.getTeam1().getName(),
+        firstTeamName,
         secondTeamName,
         hltvMatch.getEventName(),
         hltvMatch.getBestOf(),
@@ -162,7 +160,7 @@ class HltvEventProvider implements Provider {
     );
   }
 
-  private DateRange calculateEventDuration(HltvMatchResponse hltvMatch) {
+  private DateRange calculateEventDuration(HltvMatch hltvMatch) {
     //todo: calculate startAt and endAt based on hltvMatch.startAt and bestOf
     // respect zone
     return new DateRange(Instant.now(), Instant.now());

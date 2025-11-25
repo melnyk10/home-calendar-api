@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package home_calendar.hltv;
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.meln.grpc.hltv";
+option java_outer_classname = "HltvProto";
+
+message HltvTeam {
+  int32 rank = 1;
+  string name = 2;
+  string logo_url = 3;
+  int32 team_id = 4;
+  string team_id_name = 5;
+}
+
+message HltvStream {
+  string name = 1;
+  string url = 2;
+  string language = 3;
+}
+
+message HltvTeamBrief {
+  string id = 1;
+  string name = 2;
+  string slug = 3;
+}
+
+message HltvMatch {
+  string event_name = 1;
+  string event_url = 2;
+  int64 match_id = 3;
+  string match_url = 4;
+  string datetime = 5;
+  HltvTeamBrief team1 = 6;
+  HltvTeamBrief team2 = 7;
+  int32 score1 = 8;
+  int32 score2 = 9;
+  int32 best_of = 10;
+  repeated HltvStream streams = 11;
+}
+
+message SyncMatchesRequest {
+  string team_id = 1;
+  string slug = 2;
+}
+
+message SyncTeamsResponse {
+  repeated HltvTeam teams = 1;
+}
+
+message SyncMatchesResponse {
+  repeated HltvMatch matches = 1;
+}
+
+service HltvService {
+  rpc SyncTeams(google.protobuf.Empty) returns (SyncTeamsResponse);
+  rpc SyncMatches(SyncMatchesRequest) returns (SyncMatchesResponse);
+}

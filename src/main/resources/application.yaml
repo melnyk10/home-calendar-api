@@ -30,6 +30,12 @@ quarkus:
         authenticated:
           paths: /*
           policy: authenticated
+  grpc:
+    clients:
+      hltv:
+        host: localhost
+        port: 50051
+        plain-text: true
   scheduler:
     enabled: true
   cache:
