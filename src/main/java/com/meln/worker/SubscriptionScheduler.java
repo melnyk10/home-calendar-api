@@ -68,7 +68,9 @@ public class SubscriptionScheduler {
       }
     }
 
-    userEventRepository.persist(processedUserEvents);
+    if (!processedUserEvents.isEmpty()) {
+      userEventRepository.persist(processedUserEvents);
+    }
   }
 
   private Map<Long, List<UserSubscription>> listUserSubscriptionsByTargetIds(List<Event> events) {

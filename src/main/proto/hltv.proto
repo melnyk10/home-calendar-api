@@ -5,7 +5,7 @@ package home_calendar.hltv;
 import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
-option java_package = "com.meln.grpc.hltv";
+option java_package = "home_calendar.hltv";
 option java_outer_classname = "HltvProto";
 
 message HltvTeam {
@@ -17,13 +17,14 @@ message HltvTeam {
 }
 
 message HltvStream {
-  string name = 1;
-  string url = 2;
-  string language = 3;
+  string name = 2;
+  string url = 3;
+  string language = 4;
+  int32 viewers = 5;
 }
 
 message HltvTeamBrief {
-  string id = 1;
+  int32 id = 1;
   string name = 2;
   string slug = 3;
 }

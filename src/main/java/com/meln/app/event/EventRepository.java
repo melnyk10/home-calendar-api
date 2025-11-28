@@ -21,7 +21,8 @@ class EventRepository implements PanacheRepository<Event> {
         select e.* from event e
                  join event_target et on e.id = et.event_id
                  join user_subscription us on us.target_id = et.target_id
-        where not exists (select 1
+        where us.is_active = true
+          and not exists (select 1
                           from user_event ue
                           where ue.event_id = e.id)
         """;

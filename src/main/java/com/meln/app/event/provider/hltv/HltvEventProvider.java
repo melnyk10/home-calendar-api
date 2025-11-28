@@ -46,10 +46,12 @@ class HltvEventProvider implements Provider {
         .filter(Objects::nonNull)
         .toList();
 
-    for (var teamId : hltvTeams) {
-      var id = String.valueOf(teamId.get("id"));
-      var slug = String.valueOf(teamId.get("slug"));
+    for (var teamSourceData : hltvTeams) {
+      var id = String.valueOf(teamSourceData.get("id"));
+      var slug = String.valueOf(teamSourceData.get("slug"));
+
       List<HltvMatch> matchResponses = fetchMatchesByTeamId(id, slug);
+
       var teamMatches = matchResponses.stream()
           .filter(Objects::nonNull)
           .map(this::from)
@@ -138,7 +140,7 @@ class HltvEventProvider implements Provider {
 
   //todo: maybe implement interface that will have buildTargetId ?
   private String buildTargetId(HltvTeamBrief hltvMatch) {
-    return "hltv".concat(":").concat("team").concat(":").concat(hltvMatch.getId());
+    return "hltv".concat(":").concat("team").concat(":").concat(String.valueOf(hltvMatch.getId()));
   }
 
   private String parseDetails(HltvMatch hltvMatch) {
