@@ -17,9 +17,9 @@ public class CalendarConnectionRepository implements PanacheRepository<CalendarC
         select cc.*
         from calendar_connection cc
                  join calendar c on c.email = cc.email
-                 join provider_calendar pc on pc.calendar_id = cc.id
+                 join calendar_provider cp on cp.calendar_id = cc.id
         where cc.email = :email
-          and pc.provider_id = :providerId
+          and cp.provider_id = :providerId
         """;
 
     return (CalendarConnection) getEntityManager()

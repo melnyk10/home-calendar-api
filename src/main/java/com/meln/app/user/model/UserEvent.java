@@ -16,7 +16,7 @@ import lombok.Setter;
 @Entity
 @Table(
     name = "user_event",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "event_id"})
+    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "event_id"})
 )
 @Getter
 @Setter
@@ -35,7 +35,7 @@ public class UserEvent {
   @Column(name = "event_id")
   private Long eventId;
 
-  @Column(name = "calendar_source_event_id", nullable = false, unique = true)
+  @Column(name = "calendar_source_event_id", unique = true)
   private String calendarSourceEventId;
 
   @Column(name = "hash", nullable = false)

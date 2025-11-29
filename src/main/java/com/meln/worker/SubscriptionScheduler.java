@@ -13,6 +13,7 @@ import com.meln.app.user.model.UserSubscription;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ public class SubscriptionScheduler {
 
   //todo: find better way to update events. Something like queue?
   @Scheduled(every = "20m")
+  @Transactional
   public void sync() {
     Map<String, CalendarEventClient> calendarClientByUserId = new HashMap<>();
     createUserEvents(calendarClientByUserId);
@@ -85,10 +87,17 @@ public class SubscriptionScheduler {
   private UserEvent createEvent(EventTargetTask task, UserSubscription subscription,
       Map<String, CalendarEventClient> calendarClientByUserId) {
     var user = subscription.getUser();
+    var event = task.event();
+
     var calendarClientConnection = calendarClientByUserId.computeIfAbsent(user.getEmail(),
-        id -> calendarService.auth(user.getEmail(), task.event().getProvider().getId()));
-    var newEventId = calendarClientConnection.createEvent(null, EventPayload.from(task.event()));
-    return buildUserEvent(task.event(), user.getId(), newEventId);
+        id -> calendarService.auth(user.getEmail(), event.getProvider().getId()));
+
+    String newEventId = null;
+    if (calendarClientConnection != null) {
+      newEventId = calendarClientConnection.createEvent(null, EventPayload.from(event));
+    }
+
+    return buildUserEvent(event, user.getId(), newEventId);
   }
 
   private UserEvent buildUserEvent(Event event, Long userId, String calendarSourceEventId) {
