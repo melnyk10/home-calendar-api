@@ -6,6 +6,7 @@ import com.meln.app.event.EventService;
 import com.meln.app.event.model.Event;
 import com.meln.app.event.model.EventPayload;
 import com.meln.app.event.model.Target;
+import com.meln.app.notification.NotificationService;
 import com.meln.app.user.UserEventRepository;
 import com.meln.app.user.UserSubscriptionService;
 import com.meln.app.user.model.UserEvent;
@@ -31,6 +32,7 @@ public class SubscriptionScheduler {
   private final UserEventRepository userEventRepository;
   private final UserSubscriptionService userSubscriptionService;
   private final CalendarService calendarService;
+  private final NotificationService notificationService;
 
   //todo: find better way to update events. Something like queue?
   @Scheduled(every = "20m")
@@ -63,6 +65,9 @@ public class SubscriptionScheduler {
         try {
           var event = createEvent(task, subscription, calendarClientByUserId);
           processedUserEvents.add(event);
+
+          String details = task.event().getDetails();
+          notificationService.sendMessage(details);
         } catch (Exception exception) {
           log.error("Can't create event for user: {}, event: {}. Error message: {}",
               subscription.getUser().getEmail(), task.event().getId(), exception.getMessage());
@@ -138,6 +143,7 @@ public class SubscriptionScheduler {
       var calendarClientConnection = calendarClientByUserId.computeIfAbsent(user.getEmail(),
           id -> calendarService.auth(user.getEmail(), task.event().getProvider().getId()));
       calendarClientConnection.updateEvent(null, EventPayload.from(task.event()));
+      notificationService.sendMessage(task.event().getDetails());
       //todo: update hash in UserEvent
     } catch (Exception exception) {
       log.error("Error updating event for user: {}, event: {}",

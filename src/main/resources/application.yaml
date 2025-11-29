@@ -36,6 +36,10 @@ quarkus:
         host: localhost
         port: 50051
         plain-text: true
+  rest-client:
+    discord-webhook:
+      url: ${DISCORD_WEBHOOK_URL}
+      scope: javax.inject.Singleton
   scheduler:
     enabled: true
   cache:

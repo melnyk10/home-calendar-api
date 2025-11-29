@@ -39,6 +39,7 @@ dependencies {
     implementation("io.quarkus:quarkus-hibernate-validator")
 
     implementation("io.quarkus:quarkus-grpc")
+    implementation("io.quarkus:quarkus-rest-client-jackson")
     
     // --- Database / ORM ---
     implementation("io.quarkus:quarkus-hibernate-orm-panache")
